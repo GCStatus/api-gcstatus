@@ -1,0 +1,78 @@
+name: Deploy to production environment
+on:
+  workflow_call:
+    inputs:
+      container-tag:
+        required: true
+        type: string
+
+  workflow_dispatch:
+    inputs:
+      container-tag:
+        description: "Container Tag"
+        required: true
+        type: string
+
+env:
+  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+  DOCKER_HUB_PAT: ${{ secrets.DOCKER_HUB_PAT }}
+  DOCKER_CONTAINER: gcstatus-api
+  DOCKER_PORT: ${{ secrets.DOCKER_PORT }}
+  EC2_HOST: ${{ secrets.EC2_HOST }}
+  EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+  EC2_USERNAME: ec2-user
+  EC2_PORT: 22
+  DOCKER_TAG: ${{ inputs.container-tag }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.EC2_HOST }}
+          username: ${{ env.EC2_USERNAME }}
+          key: ${{ env.EC2_SSH_KEY }}
+          port: ${{ env.EC2_PORT }}
+          envs: DOCKER_CONTAINER, DOCKER_PORT, DOCKER_HUB_USERNAME, DOCKER_HUB_PAT, DOCKER_TAG
+          script: |
+            IMAGE_ID=$(docker inspect -f '{{.Image}}' $(docker ps -q --filter "name=$DOCKER_CONTAINER"))
+            echo $DOCKER_HUB_PAT | docker login -u $DOCKER_HUB_USERNAME --password-stdin
+
+            docker pull $DOCKER_HUB_USERNAME/$DOCKER_CONTAINER:$DOCKER_TAG
+
+            docker stop $DOCKER_CONTAINER || true
+            docker rm $DOCKER_CONTAINER || true
+
+            if [ $(docker ps --filter "publish=$DOCKER_PORT" --format '{{.ID}}') ]; then
+              echo "Port $DOCKER_PORT is already in use. Stopping the container using this port..."
+              docker stop $(docker ps --filter "publish=$DOCKER_PORT" --format '{{.ID}}')
+            fi
+
+            docker run -d --name $DOCKER_CONTAINER -p $DOCKER_PORT:$DOCKER_PORT \
+              $DOCKER_HUB_USERNAME/$DOCKER_CONTAINER:$DOCKER_TAG
+
+            docker exec $DOCKER_CONTAINER sh -c 'cat <<EOF > /app/.env
+              ENV=production
+              JWT_TTL=15
+              JWT_SECRET=${{ secrets.JWT_SECRET }}
+              ACCESS_TOKEN_KEY=${{ secrets.ACCESS_TOKEN_KEY }}
+              DB_HOST=${{ secrets.DB_HOST }}
+              DB_PORT=${{ secrets.DB_PORT }}
+              DB_USEr=${{ secrets.DB_USER }}
+              DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+              DB_NAME=${{ secrets.DB_NAME }}
+              IS_AUTH_KEY=${{ secrets.IS_AUTH_KEY }}
+              HTTP_SECURE=${{ secrets.HTTP_SECURE }}
+              HTTP_ONLY=${{ secrets.HTTP_ONLY }}
+              HTTP_DOMAIN=${{ secrets.HTTP_DOMAIN }}
+              REDIS_HOST=${{ secrets.REDIS_HOST }}
+              PORT=${{ secrets.DOCKER_PORT }}
+              AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}
+              AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
+              AWS_MAIL_FROM=${{ secrets.AWS_MAIL_FROM }}
+              AWS_MAIL_REGION=${{ secrets.AWS_MAIL_REGION }}
+            EOF'
+
+            docker rmi $IMAGE_ID || true
