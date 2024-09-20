@@ -41,6 +41,8 @@ cd gcstatus
 docker buildx build --platform linux/amd64 -p 8080:8080 -t gcstatus-api .
 ```
 
+**Run the container up command:**
+
 ```bash
 docker run -d --name gcstatus-api -p 8080:8080 gcstatus-api
 ```
