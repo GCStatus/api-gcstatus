@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
@@ -8,6 +9,14 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
+
+func MockSendEmail(recipient, body, subject string) error {
+	if recipient == "fail@example.com" {
+		return errors.New("failed to send email")
+	}
+
+	return nil
+}
 
 func Setup(t *testing.T) (*gorm.DB, sqlmock.Sqlmock) {
 	godotenv.Load(".env.testing")

@@ -12,6 +12,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ses/types"
 )
 
+type SendEmailFunc func(recipient, body, subject string) error
+
 func Send(recipient string, body string, subject string) error {
 	env := envConfig.LoadConfig()
 
@@ -46,7 +48,6 @@ func Send(recipient string, body string, subject string) error {
 		Source: aws.String(env.AwsMailFrom),
 	}
 
-	// Send the email
 	_, err = svc.SendEmail(context.TODO(), input)
 	if err != nil {
 		return fmt.Errorf("failed to send email, %v", err)

@@ -31,21 +31,17 @@ const emailTemplate = `
   </main>
 `
 
-// Data structure for template placeholders
 type EmailData struct {
 	ResetURL string
 }
 
-func SendPasswordResetEmail(userEmail, resetToken string) error {
-	// Generate the password reset URL
+func SendPasswordResetEmail(userEmail, resetToken string, sendFunc SendEmailFunc) error {
 	resetURL := fmt.Sprintf("https://gcstatus.cloud/password/reset/%s/?email=%s", resetToken, userEmail)
 
-	// Prepare email template data
 	data := EmailData{
 		ResetURL: resetURL,
 	}
 
-	// Parse the email template
 	tmpl, err := template.New("email").Parse(emailTemplate)
 	if err != nil {
 		return fmt.Errorf("failed to parse email template: %v", err)
@@ -58,8 +54,7 @@ func SendPasswordResetEmail(userEmail, resetToken string) error {
 		return fmt.Errorf("failed to execute template: %v", err)
 	}
 
-	// Send the email
-	err = Send(userEmail, body.String(), "Password Reset Request")
+	err = sendFunc(userEmail, body.String(), "Password Reset Request")
 	if err != nil {
 		return fmt.Errorf("failed to send email: %v", err)
 	}

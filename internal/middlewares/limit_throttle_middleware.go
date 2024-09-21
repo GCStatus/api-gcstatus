@@ -10,9 +10,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const (
-	rateLimit  = 200             // Max requests allowed
-	timeWindow = 1 * time.Minute // Time window for rate limiting
+var (
+	RateLimit  = 200             // Max requests allowed
+	TimeWindow = 1 * time.Minute // Time window for rate limiting
 )
 
 func LimitThrottleMiddleware() gin.HandlerFunc {
@@ -33,11 +33,11 @@ func LimitThrottleMiddleware() gin.HandlerFunc {
 
 		// Set expiration for the key if it's the first request
 		if count == 1 {
-			cache.ExpireThrottleCache(ctx, key, timeWindow)
+			cache.ExpireThrottleCache(ctx, key, TimeWindow)
 		}
 
 		// Check if the user exceeded the rate limit
-		if count > int64(rateLimit) {
+		if count > int64(RateLimit) {
 			c.JSON(http.StatusTooManyRequests, gin.H{"error": "Too many requests. Please try again later."})
 			c.Abort()
 			return

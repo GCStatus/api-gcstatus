@@ -4,7 +4,6 @@ import (
 	"gcstatus/internal/domain"
 )
 
-// ProfileResource defines the structure of the profile response
 type ProfileResource struct {
 	ID        uint   `json:"id"`
 	Share     bool   `json:"share"`
@@ -20,7 +19,6 @@ type ProfileResource struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
-// TransformProfile is a function to transform a single profile
 func TransformProfile(profile domain.Profile) *ProfileResource {
 	return &ProfileResource{
 		ID:        profile.ID,

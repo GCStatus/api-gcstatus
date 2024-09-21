@@ -11,7 +11,7 @@ import (
 const confirmationEmailTemplate = `
   <main style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0;">
     <div style="max-width: 600px; background-color: #ffffff; padding: 20px; border-radius: 5px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-      <h2>Hello {{.Name}},</h2>
+      <h2>Hello, {{.Name}}!</h2>
       <p>We wanted to let you know that your password has been successfully reset.</p>
       <p>If you didn't request this change or if you believe this was done in error, please contact our support team immediately.</p>
       <p>For security reasons, we recommend you check your recent activities and ensure everything is as expected.</p>
@@ -26,21 +26,17 @@ const confirmationEmailTemplate = `
   </main>
 `
 
-// Data structure for template placeholders
 type ConfirmationEmailData struct {
 	Name string
 }
 
-// SendPasswordResetConfirmationEmail sends a confirmation email for a password reset
-func SendPasswordResetConfirmationEmail(userEmail, name string) error {
-	// Prepare email template data
+func SendPasswordResetConfirmationEmail(userEmail, name string, sendFunc SendEmailFunc) error {
 	firstName, _ := utils.GetFirstAndLastName(name)
 
 	data := ConfirmationEmailData{
 		Name: firstName,
 	}
 
-	// Parse the email template
 	tmpl, err := template.New("confirmationEmail").Parse(confirmationEmailTemplate)
 	if err != nil {
 		return fmt.Errorf("failed to parse email template: %v", err)
@@ -53,8 +49,7 @@ func SendPasswordResetConfirmationEmail(userEmail, name string) error {
 		return fmt.Errorf("failed to execute template: %v", err)
 	}
 
-	// Send the email
-	err = Send(userEmail, body.String(), "Password Reset Confirmation")
+	err = sendFunc(userEmail, body.String(), "Password Reset Confirmation")
 	if err != nil {
 		return fmt.Errorf("failed to send email: %v", err)
 	}

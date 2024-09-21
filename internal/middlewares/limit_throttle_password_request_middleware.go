@@ -23,6 +23,12 @@ func LimitResetRequestMiddleware() gin.HandlerFunc {
 			Email string `json:"email" binding:"required,email"`
 		}
 
+		if err := c.ShouldBindJSON(&input); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email format"})
+			c.Abort()
+			return
+		}
+
 		emailKey := "password-reset:" + input.Email
 
 		_, err := cache.GetPasswordThrottleCache(ctx, emailKey)
