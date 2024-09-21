@@ -246,7 +246,7 @@ func (h *AuthHandler) Me(c *gin.Context) {
 	}
 
 	// Try to get the user from the cache
-	user, found := cache.GetUserFromCache(userID)
+	user, found := cache.GlobalCache.GetUserFromCache(userID)
 	if !found {
 		// If user is not in the cache, retrieve from the service
 		user, err = h.userService.GetUserByID(userID)
@@ -255,7 +255,7 @@ func (h *AuthHandler) Me(c *gin.Context) {
 			return
 		}
 		// Store the user in the cache
-		cache.SetUserInCache(userID, user)
+		cache.GlobalCache.SetUserInCache(user)
 	}
 
 	transformedUser := resources.TransformUser(*user)

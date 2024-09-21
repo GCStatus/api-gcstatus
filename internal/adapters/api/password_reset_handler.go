@@ -1,7 +1,6 @@
 package api
 
 import (
-	"context"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/usecases"
 	"gcstatus/pkg/cache"
@@ -68,8 +67,6 @@ func (h *PasswordResetHandler) RequestPasswordReset(c *gin.Context) {
 }
 
 func (h *PasswordResetHandler) ResetUserPassword(c *gin.Context) {
-	ctx := context.Background()
-
 	var request struct {
 		Email                string `json:"email" binding:"required"`
 		Password             string `json:"password" binding:"required"`
@@ -131,7 +128,7 @@ func (h *PasswordResetHandler) ResetUserPassword(c *gin.Context) {
 		return
 	}
 
-	cache.RemovePasswordThrottleCache(ctx, user.Email)
+	cache.GlobalCache.RemovePasswordThrottleCache(user.Email)
 
 	c.JSON(http.StatusOK, gin.H{"message": "You password was successfully reseted!"})
 }
