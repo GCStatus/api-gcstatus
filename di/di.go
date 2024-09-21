@@ -3,6 +3,7 @@ package di
 import (
 	"gcstatus/config"
 	"gcstatus/internal/usecases"
+	"gcstatus/pkg/cache"
 	"log"
 
 	"gorm.io/driver/mysql"
@@ -28,6 +29,10 @@ func InitDependencies() (
 
 	// Auto-migrate the database
 	MigrateModels(dbConn)
+
+	if cfg.ENV != "testing" {
+		cache.GlobalCache = cache.NewRedisCache()
+	}
 
 	// Setup dependencies
 	userService, authService, passwordResetService := Setup(dbConn)

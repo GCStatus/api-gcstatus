@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"context"
 	"gcstatus/pkg/cache"
 	"log"
 	"net/http"
@@ -16,14 +15,12 @@ var (
 )
 
 func LimitThrottleMiddleware() gin.HandlerFunc {
-	var ctx = context.Background()
-
 	return func(c *gin.Context) {
 		ip := c.ClientIP()
 		key := "rate-limit:" + ip
 
 		// Increment the request count and set expiration if not set
-		count, err := cache.AddThrottleCache(ctx, key)
+		count, err := cache.GlobalCache.AddThrottleCache(key)
 		if err != nil {
 			log.Fatal(err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
@@ -33,7 +30,7 @@ func LimitThrottleMiddleware() gin.HandlerFunc {
 
 		// Set expiration for the key if it's the first request
 		if count == 1 {
-			cache.ExpireThrottleCache(ctx, key, TimeWindow)
+			cache.GlobalCache.ExpireThrottleCache(key, TimeWindow)
 		}
 
 		// Check if the user exceeded the rate limit

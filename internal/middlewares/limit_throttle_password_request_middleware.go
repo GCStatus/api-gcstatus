@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"context"
 	"gcstatus/pkg/cache"
 	"net/http"
 	"time"
@@ -16,8 +15,6 @@ const (
 
 // LimitResetRequestMiddleware is middleware that allows one request per minute
 func LimitResetRequestMiddleware() gin.HandlerFunc {
-	var ctx = context.Background()
-
 	return func(c *gin.Context) {
 		var input struct {
 			Email string `json:"email" binding:"required,email"`
@@ -31,9 +28,9 @@ func LimitResetRequestMiddleware() gin.HandlerFunc {
 
 		emailKey := "password-reset:" + input.Email
 
-		_, err := cache.GetPasswordThrottleCache(ctx, emailKey)
+		_, err := cache.GlobalCache.GetPasswordThrottleCache(emailKey)
 		if err == redis.Nil {
-			cache.SetPasswordThrottleCache(ctx, emailKey, oneMinute)
+			cache.GlobalCache.SetPasswordThrottleCache(emailKey, oneMinute)
 
 			c.Next()
 		} else if err != nil {

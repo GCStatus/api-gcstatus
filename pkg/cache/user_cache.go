@@ -9,9 +9,9 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-func GetUserFromCache(userID uint) (*domain.User, bool) {
+func (r *RedisCache) GetUserFromCache(userID uint) (*domain.User, bool) {
 	key := fmt.Sprintf("user:%d", userID)
-	result, err := rdb.Get(ctx, key).Result()
+	result, err := r.client.Get(ctx, key).Result()
 	if err != nil {
 		if err == redis.Nil {
 			return nil, false
@@ -28,21 +28,21 @@ func GetUserFromCache(userID uint) (*domain.User, bool) {
 	return &user, true
 }
 
-func SetUserInCache(userID uint, user *domain.User) {
-	key := fmt.Sprintf("user:%d", userID)
+func (r *RedisCache) SetUserInCache(user *domain.User) {
+	key := fmt.Sprintf("user:%d", user.ID)
 	data, err := json.Marshal(user)
 	if err != nil {
 		log.Println("Marshal error:", err)
 		return
 	}
-	if err := rdb.Set(ctx, key, data, 0).Err(); err != nil {
+	if err := r.client.Set(ctx, key, data, 0).Err(); err != nil {
 		log.Println("Redis error:", err)
 	}
 }
 
-func RemoveUserFromCache(userID uint) {
+func (r *RedisCache) RemoveUserFromCache(userID uint) {
 	key := fmt.Sprintf("user:%d", userID)
-	if err := rdb.Del(ctx, key).Err(); err != nil {
+	if err := r.client.Del(ctx, key).Err(); err != nil {
 		log.Println("Redis error:", err)
 	}
 }

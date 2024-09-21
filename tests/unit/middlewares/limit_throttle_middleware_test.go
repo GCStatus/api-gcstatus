@@ -1,8 +1,9 @@
 package tests
 
 import (
-	"context"
+	"gcstatus/internal/domain"
 	"gcstatus/internal/middlewares"
+	"gcstatus/pkg/cache"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -12,18 +13,44 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var MockThrottleCache = struct {
-	AddThrottleCache    func(ctx context.Context, key string) error
-	ExpireThrottleCache func(ctx context.Context, key string, timeWindow time.Duration) error
-}{}
-
-func AddThrottleCache(ctx context.Context, key string) error {
-	return MockThrottleCache.AddThrottleCache(ctx, key)
+type MockCache struct {
+	AddFunc                    func(key string) (int64, error)
+	ExpireFunc                 func(key string, timeWindow time.Duration) error
+	GetPasswordThrottleFunc    func(key string) (string, error)
+	SetPasswordThrottleFunc    func(key string, duration time.Duration) error
+	RemovePasswordThrottleFunc func(email string) error
+	GetUserFromCacheFunc       func(userID uint) (*domain.User, bool)
+	SetUserInCacheFunc         func(user *domain.User)
+	RemoveUserFromCacheFunc    func(userID uint)
 }
 
-func ExpireThrottleCache(ctx context.Context, key string, timeWindow time.Duration) error {
-	return MockThrottleCache.ExpireThrottleCache(ctx, key, timeWindow)
+func (m *MockCache) AddThrottleCache(key string) (int64, error) {
+	return m.AddFunc(key)
 }
+
+func (m *MockCache) ExpireThrottleCache(key string, timeWindow time.Duration) {
+	m.ExpireFunc(key, timeWindow)
+}
+
+func (m *MockCache) GetPasswordThrottleCache(key string) (string, error) {
+	return "", nil
+}
+
+func (m *MockCache) SetPasswordThrottleCache(key string, duration time.Duration) error {
+	return nil
+}
+
+func (m *MockCache) RemovePasswordThrottleCache(email string) error {
+	return nil
+}
+
+func (m *MockCache) GetUserFromCache(userID uint) (*domain.User, bool) {
+	return nil, false
+}
+
+func (m *MockCache) SetUserInCache(user *domain.User) {}
+
+func (m *MockCache) RemoveUserFromCache(userID uint) {}
 
 func TestLimitThrottleMiddleware(t *testing.T) {
 	gin.SetMode(gin.TestMode)
@@ -35,27 +62,26 @@ func TestLimitThrottleMiddleware(t *testing.T) {
 		expectedStatusCode   int
 		expectedCacheExpires bool
 		tempRateLimit        int
+		requestCount         int64
 	}{
 		"First request, should pass": {
 			cacheError:           nil,
 			expectedStatusCode:   http.StatusOK,
 			expectedCacheExpires: true,
 			tempRateLimit:        200,
+			requestCount:         1,
 		},
 		"Within rate limit, should pass": {
 			cacheError:         nil,
 			expectedStatusCode: http.StatusOK,
 			tempRateLimit:      200,
+			requestCount:       50,
 		},
 		"Exceeded rate limit, should block": {
 			cacheError:         nil,
 			expectedStatusCode: http.StatusTooManyRequests,
 			tempRateLimit:      1,
-		},
-		"Exceeded rate limit with lower threshold, should block": {
-			cacheError:         nil,
-			expectedStatusCode: http.StatusTooManyRequests,
-			tempRateLimit:      1,
+			requestCount:       201,
 		},
 	}
 
@@ -63,17 +89,19 @@ func TestLimitThrottleMiddleware(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			middlewares.RateLimit = tt.tempRateLimit
 
-			MockThrottleCache.AddThrottleCache = func(ctx context.Context, key string) error {
-				return tt.cacheError
+			mockCache := &MockCache{
+				AddFunc: func(key string) (int64, error) {
+					return tt.requestCount, tt.cacheError
+				},
+				ExpireFunc: func(key string, timeWindow time.Duration) error {
+					if tt.expectedCacheExpires {
+						assert.Equal(t, middlewares.TimeWindow, timeWindow)
+					}
+					return nil
+				},
 			}
 
-			MockThrottleCache.ExpireThrottleCache = func(ctx context.Context, key string, timeWindow time.Duration) error {
-				if tt.expectedCacheExpires {
-					assert.Equal(t, middlewares.TimeWindow, timeWindow)
-				}
-
-				return nil
-			}
+			cache.GlobalCache = mockCache
 
 			r := gin.New()
 			r.Use(middlewares.LimitThrottleMiddleware())
