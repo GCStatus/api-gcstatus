@@ -13,17 +13,6 @@ import (
 func TestCreateUser(t *testing.T) {
 	db, mock := tests.Setup(t)
 
-	defer func() {
-		dbConn, err := db.DB()
-		if err != nil {
-			t.Errorf("failed to get DB connection: %v", err)
-			return
-		}
-		if err := dbConn.Close(); err != nil {
-			t.Errorf("failed to close DB connection: %v", err)
-		}
-	}()
-
 	user := domain.User{
 		Name:      "John Doe",
 		Email:     "johndoe@example.com",
@@ -58,17 +47,6 @@ func TestCreateUser(t *testing.T) {
 func TestGetUserByID(t *testing.T) {
 	db, mock := tests.Setup(t)
 
-	defer func() {
-		dbConn, err := db.DB()
-		if err != nil {
-			t.Errorf("failed to get DB connection: %v", err)
-			return
-		}
-		if err := dbConn.Close(); err != nil {
-			t.Errorf("failed to close DB connection: %v", err)
-		}
-	}()
-
 	userID := uint(1)
 	mockUser := domain.User{
 		ID:        userID,
@@ -99,17 +77,6 @@ func TestGetUserByID(t *testing.T) {
 
 func TestSoftDeleteUser(t *testing.T) {
 	db, mock := tests.Setup(t)
-
-	defer func() {
-		dbConn, err := db.DB()
-		if err != nil {
-			t.Errorf("failed to get DB connection: %v", err)
-			return
-		}
-		if err := dbConn.Close(); err != nil {
-			t.Errorf("failed to close DB connection: %v", err)
-		}
-	}()
 
 	userID := uint(1)
 	mock.ExpectBegin()
