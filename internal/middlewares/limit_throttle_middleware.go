@@ -23,7 +23,7 @@ func LimitThrottleMiddleware() gin.HandlerFunc {
 		count, err := cache.GlobalCache.AddThrottleCache(key)
 		if err != nil {
 			log.Fatal(err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
 			c.Abort()
 			return
 		}
@@ -35,7 +35,7 @@ func LimitThrottleMiddleware() gin.HandlerFunc {
 
 		// Check if the user exceeded the rate limit
 		if count > int64(RateLimit) {
-			c.JSON(http.StatusTooManyRequests, gin.H{"error": "Too many requests. Please try again later."})
+			c.JSON(http.StatusTooManyRequests, gin.H{"message": "Too many requests. Please try again later."})
 			c.Abort()
 			return
 		}

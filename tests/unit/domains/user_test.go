@@ -14,8 +14,14 @@ func TestCreateUser(t *testing.T) {
 	db, mock := tests.Setup(t)
 
 	defer func() {
-		dbConn, _ := db.DB()
-		dbConn.Close()
+		dbConn, err := db.DB()
+		if err != nil {
+			t.Errorf("failed to get DB connection: %v", err)
+			return
+		}
+		if err := dbConn.Close(); err != nil {
+			t.Errorf("failed to close DB connection: %v", err)
+		}
 	}()
 
 	user := domain.User{
@@ -53,8 +59,14 @@ func TestGetUserByID(t *testing.T) {
 	db, mock := tests.Setup(t)
 
 	defer func() {
-		dbConn, _ := db.DB()
-		dbConn.Close()
+		dbConn, err := db.DB()
+		if err != nil {
+			t.Errorf("failed to get DB connection: %v", err)
+			return
+		}
+		if err := dbConn.Close(); err != nil {
+			t.Errorf("failed to close DB connection: %v", err)
+		}
 	}()
 
 	userID := uint(1)
@@ -89,8 +101,14 @@ func TestSoftDeleteUser(t *testing.T) {
 	db, mock := tests.Setup(t)
 
 	defer func() {
-		dbConn, _ := db.DB()
-		dbConn.Close()
+		dbConn, err := db.DB()
+		if err != nil {
+			t.Errorf("failed to get DB connection: %v", err)
+			return
+		}
+		if err := dbConn.Close(); err != nil {
+			t.Errorf("failed to close DB connection: %v", err)
+		}
 	}()
 
 	userID := uint(1)

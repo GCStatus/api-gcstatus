@@ -1,0 +1,10 @@
+linters:
+  enable:
+    - golint
+    - govet
+    - ineffassign
+    - goconst
+    - gocyclo
+
+issues:
+  exclude-use-default: false

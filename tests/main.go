@@ -19,7 +19,10 @@ func MockSendEmail(recipient, body, subject string) error {
 }
 
 func Setup(t *testing.T) (*gorm.DB, sqlmock.Sqlmock) {
-	godotenv.Load(".env.testing")
+	err := godotenv.Load(".env.testing")
+	if err != nil {
+		t.Fatalf("failed to load env variables")
+	}
 
 	db, mock := SetupMockDB(t)
 

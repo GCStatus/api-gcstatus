@@ -15,7 +15,7 @@ import (
 
 type MockCache struct {
 	AddFunc                    func(key string) (int64, error)
-	ExpireFunc                 func(key string, timeWindow time.Duration) error
+	ExpireFunc                 func(key string, timeWindow time.Duration)
 	GetPasswordThrottleFunc    func(key string) (string, error)
 	SetPasswordThrottleFunc    func(key string, duration time.Duration) error
 	RemovePasswordThrottleFunc func(email string) error
@@ -93,11 +93,10 @@ func TestLimitThrottleMiddleware(t *testing.T) {
 				AddFunc: func(key string) (int64, error) {
 					return tt.requestCount, tt.cacheError
 				},
-				ExpireFunc: func(key string, timeWindow time.Duration) error {
+				ExpireFunc: func(key string, timeWindow time.Duration) {
 					if tt.expectedCacheExpires {
 						assert.Equal(t, middlewares.TimeWindow, timeWindow)
 					}
-					return nil
 				},
 			}
 
