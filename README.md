@@ -51,7 +51,7 @@ docker run -d --name gcstatus-api -p 8080:8080 gcstatus-api
 
 _Navigate to http://localhost:8080 and voila! Welcome to GCStatus API._
 
-If you want to enter the container to see or change something, just run:
+*If you want to enter the container to see or change something, just run:*
 
 ```bash
 docker exec -it gcstatus-api zsh
