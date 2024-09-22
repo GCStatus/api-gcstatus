@@ -55,7 +55,7 @@ jobs:
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
-          args: run ./...
+          args: ./...
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
