@@ -1,6 +1,6 @@
 linters:
   enable:
-    - golint
+    - revive
     - govet
     - ineffassign
     - goconst
@@ -8,3 +8,6 @@ linters:
 
 issues:
   exclude-use-default: false
+
+output:
+  format: colored-line-number
