@@ -55,7 +55,7 @@ func TestLimitResetRequestMiddleware(t *testing.T) {
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			MockThrottlePasswordCache.GetPasswordThrottleCache = func(ctx context.Context, key string) (string, error) {
+			MockThrottlePasswordCache.GetPasswordThrottleCache = func(_ context.Context, key string) (string, error) {
 				if tt.cacheError != nil {
 					return "", tt.cacheError
 				}
@@ -67,7 +67,7 @@ func TestLimitResetRequestMiddleware(t *testing.T) {
 				return "", redis.Nil
 			}
 
-			MockThrottlePasswordCache.SetPasswordThrottleCache = func(ctx context.Context, key string, duration time.Duration) error {
+			MockThrottlePasswordCache.SetPasswordThrottleCache = func(_ context.Context, key string, duration time.Duration) error {
 				assert.Equal(t, time.Minute, duration)
 				return nil
 			}
