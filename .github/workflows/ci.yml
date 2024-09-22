@@ -71,8 +71,7 @@ jobs:
   release:
     name: Generate a new release
     needs: [tests]
-    permissions:
-      contents: write
+    permissions: write-all
     strategy:
       fail-fast: true
       matrix:

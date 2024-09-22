@@ -36,7 +36,7 @@ type EmailData struct {
 }
 
 func SendPasswordResetEmail(userEmail, resetToken string, sendFunc SendEmailFunc) error {
-	resetURL := fmt.Sprintf("https://gcstatus.cloud/password/reset/%s/?email=%s", resetToken, userEmail)
+	resetURL := fmt.Sprintf("https://gcstatus.tech/password/reset/%s/?email=%s", resetToken, userEmail)
 
 	data := EmailData{
 		ResetURL: resetURL,
