@@ -28,14 +28,14 @@ func TestSendPasswordResetEmail(t *testing.T) {
 			userEmail:    "test@example.com",
 			resetToken:   "test-token",
 			sendFunc:     MockSendEmail,
-			expectedBody: "https://gcstatus.tech/password/reset/test-token/?email=test@example.com",
+			expectedBody: "https://gcstatus.cloud/password/reset/test-token/?email=test@example.com",
 			expectError:  false,
 		},
 		"failed email sending": {
 			userEmail:    "fail@example.com",
 			resetToken:   "fail-token",
 			sendFunc:     MockSendEmail,
-			expectedBody: "https://gcstatus.tech/password/reset/fail-token/?email=fail@example.com",
+			expectedBody: "https://gcstatus.cloud/password/reset/fail-token/?email=fail@example.com",
 			expectError:  true,
 		},
 	}
@@ -53,7 +53,7 @@ func TestSendPasswordResetEmail(t *testing.T) {
 			}
 
 			if !tc.expectError {
-				resetURL := fmt.Sprintf("https://gcstatus.tech/password/reset/%s/?email=%s", tc.resetToken, tc.userEmail)
+				resetURL := fmt.Sprintf("https://gcstatus.cloud/password/reset/%s/?email=%s", tc.resetToken, tc.userEmail)
 				if !strings.Contains(tc.expectedBody, resetURL) {
 					t.Errorf("Expected reset URL %s in email body, but it was not found", resetURL)
 				}

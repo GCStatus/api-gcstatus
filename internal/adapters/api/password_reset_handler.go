@@ -134,5 +134,7 @@ func (h *PasswordResetHandler) ResetUserPassword(c *gin.Context) {
 		return
 	}
 
+	cache.GlobalCache.RemoveUserFromCache(user.ID)
+
 	c.JSON(http.StatusOK, gin.H{"message": "You password was successfully reseted!"})
 }

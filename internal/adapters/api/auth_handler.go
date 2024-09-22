@@ -33,13 +33,11 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	env := config.LoadConfig()
 
-	// Validate input
 	if err := c.ShouldBindJSON(&loginData); err != nil {
 		RespondWithError(c, http.StatusBadRequest, "Please provide valid credentials.")
 		return
 	}
 
-	// Authenticate user (email or nickname)
 	user, err := h.userService.AuthenticateUser(loginData.Identifier, loginData.Password)
 	if err != nil {
 		RespondWithError(c, http.StatusUnauthorized, "Invalid credentials. Please try again.")
@@ -51,7 +49,6 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	// Parse JWT TTL and other configurations from the service
 	expirationSeconds, err := h.authService.GetExpirationSeconds(env.JwtTtl)
 	if err != nil {
 		RespondWithError(c, http.StatusInternalServerError, "Could not parse token expiration.")
@@ -64,24 +61,20 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	// Generate JWT token
 	tokenString, err := h.authService.CreateJWTToken(user.ID, expirationSeconds)
 	if err != nil {
 		RespondWithError(c, http.StatusInternalServerError, "Could not create token.")
 		return
 	}
 
-	// Encrypt token string
 	encryptedToken, err := h.authService.EncryptToken(tokenString, env.JwtSecret)
 	if err != nil {
 		RespondWithError(c, http.StatusInternalServerError, fmt.Sprintf("Encryption error: %v", err))
 		return
 	}
 
-	// Set the JWT token and auth cookies
 	h.authService.SetAuthCookies(c, env.AccessTokenKey, encryptedToken, env.IsAuthKey, expirationSeconds, httpSecure, httpOnly, env.Domain)
 
-	// Respond with success
 	c.JSON(http.StatusOK, resources.Response{
 		Data: gin.H{"message": "Logged in successfully"},
 	})
@@ -102,60 +95,49 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	// Check if new_password matches password_confirmation
 	if registrationData.Password != registrationData.PasswordConfirmation {
 		RespondWithError(c, http.StatusBadRequest, "Password confirmation does not match.")
 		return
 	}
 
-	// Validate birthdate (must be at least 14 years old)
 	birthdate, err := time.Parse("2006-01-02", registrationData.Birthdate)
 	if err != nil {
 		RespondWithError(c, http.StatusBadRequest, "Invalid birthdate format.")
 		return
 	}
 
-	// Check if the user is at least 14 years old
 	if time.Since(birthdate).Hours() < 14*365*24 {
 		RespondWithError(c, http.StatusBadRequest, "You must be at least 14 years old to register.")
 		return
 	}
 
-	// Validate password
 	if !utils.ValidatePassword(registrationData.Password) {
 		RespondWithError(c, http.StatusBadRequest, "Password must be at least 8 characters long and include a lowercase letter, an uppercase letter, a number, and a symbol.")
 		return
 	}
 
-	// Check if email already exists
 	existingUserByEmail, err := h.userService.FindUserByEmailOrNickname(registrationData.Email)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		// If there is an error and it's NOT "record not found", handle it as an actual error
 		RespondWithError(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	// If the email exists, respond with a conflict error
 	if existingUserByEmail != nil {
 		RespondWithError(c, http.StatusConflict, "Email already in use.")
 		return
 	}
 
-	// Check if nickname already exists
 	existingUserByNickname, err := h.userService.FindUserByEmailOrNickname(registrationData.Nickname)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		// If there is an error and it's NOT "record not found", handle it as an actual error
 		RespondWithError(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	// If the nickname exists, respond with a conflict error
 	if existingUserByNickname != nil {
 		RespondWithError(c, http.StatusConflict, "Nickname already in use.")
 		return
 	}
 
-	// Proceed with user creation
 	hashedPassword, err := utils.HashPassword(registrationData.Password)
 	if err != nil {
 		RespondWithError(c, http.StatusInternalServerError, "Error hashing password.")
@@ -168,17 +150,17 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		Nickname:  registrationData.Nickname,
 		Birthdate: birthdate,
 		Password:  string(hashedPassword),
+		LevelID:   1,
+		Profile:   domain.Profile{Share: false},
 	}
 
-	if err := h.userService.CreateUser(&user); err != nil {
+	if err := h.userService.CreateWithProfile(&user); err != nil {
 		RespondWithError(c, http.StatusInternalServerError, "Error creating user.")
 		return
 	}
 
-	// Load config
 	env := config.LoadConfig()
 
-	// Parse JWT TTL and other configurations
 	expirationSeconds, err := h.authService.GetExpirationSeconds(env.JwtTtl)
 	if err != nil {
 		RespondWithError(c, http.StatusInternalServerError, "Could not parse token expiration.")
@@ -191,30 +173,25 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	// Generate JWT token
 	tokenString, err := h.authService.CreateJWTToken(user.ID, expirationSeconds)
 	if err != nil {
 		RespondWithError(c, http.StatusInternalServerError, "Could not create token.")
 		return
 	}
 
-	// Encrypt token string
 	encryptedToken, err := utils.Encrypt(tokenString, env.JwtSecret)
 	if err != nil {
 		RespondWithError(c, http.StatusInternalServerError, fmt.Sprintf("Encryption error: %v", err))
 		return
 	}
 
-	// Set the JWT token and auth cookies
 	h.authService.SetAuthCookies(c, env.AccessTokenKey, encryptedToken, env.IsAuthKey, expirationSeconds, httpSecure, httpOnly, env.Domain)
 
-	// Respond with success
 	c.JSON(http.StatusOK, resources.Response{
 		Data: gin.H{"message": "User registered successfully"},
 	})
 }
 
-// Logout implements the AuthRepository interface
 func (h *AuthHandler) Logout(c *gin.Context) {
 	env := config.LoadConfig()
 
@@ -224,10 +201,8 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 		return
 	}
 
-	// Clear the JWT token and auth cookies
 	h.authService.ClearAuthCookies(c, env.AccessTokenKey, env.IsAuthKey, httpSecure, httpOnly, env.Domain)
 
-	// Respond with success
 	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 }
 
@@ -238,23 +213,20 @@ func (h *AuthHandler) Me(c *gin.Context) {
 		return
 	}
 
-	// Assert that authUser is of type uint
 	userID, ok := authUser.(uint)
 	if !ok {
 		RespondWithError(c, http.StatusInternalServerError, "Invalid user ID format.")
 		return
 	}
 
-	// Try to get the user from the cache
 	user, found := cache.GlobalCache.GetUserFromCache(userID)
 	if !found {
-		// If user is not in the cache, retrieve from the service
 		user, err = h.userService.GetUserByID(userID)
 		if err != nil {
 			RespondWithError(c, http.StatusInternalServerError, err.Error())
 			return
 		}
-		// Store the user in the cache
+
 		cache.GlobalCache.SetUserInCache(user)
 	}
 

@@ -37,6 +37,7 @@ func (s *AuthService) GetExpirationSeconds(jwtTtl string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+
 	return jwtTtlDays * 86400, nil // Convert days to seconds
 }
 
@@ -46,10 +47,12 @@ func (s *AuthService) GetCookieSettings(httpSecureStr, httpOnlyStr string) (bool
 	if err != nil {
 		return true, true, err // default to secure and httpOnly cookies
 	}
+
 	httpOnly, err := strconv.ParseBool(httpOnlyStr)
 	if err != nil {
 		return true, true, err // default to secure and httpOnly cookies
 	}
+
 	return httpSecure, httpOnly, nil
 }
 
@@ -70,10 +73,7 @@ func (s *AuthService) EncryptToken(tokenString, jwtSecret string) (string, error
 
 // Set cookies
 func (s *AuthService) SetAuthCookies(c *gin.Context, tokenKey, tokenValue, authKey string, expirationSeconds int, secure, httpOnly bool, domain string) {
-	// Set JWT token cookie
 	c.SetCookie(tokenKey, tokenValue, expirationSeconds, "/", domain, secure, httpOnly)
-
-	// Set "is authenticated" cookie for client
 	c.SetCookie(authKey, "1", expirationSeconds, "/", domain, secure, false)
 }
 

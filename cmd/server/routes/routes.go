@@ -18,7 +18,7 @@ func SetupRouter(
 
 	// CORS configuration
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"https://*.gcstatus.tech", "https://gcstatus.tech"},
+		AllowOrigins:     []string{"https://*.gcstatus.cloud", "https://gcstatus.cloud"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "User-Agent", "Accept"},
 		ExposeHeaders:    []string{"Content-Length"},

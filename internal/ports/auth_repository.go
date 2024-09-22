@@ -1,4 +1,3 @@
-// Package ports provides interfaces for repository actions.
 package ports
 
 import "github.com/gin-gonic/gin"
