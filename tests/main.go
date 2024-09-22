@@ -2,12 +2,19 @@ package tests
 
 import (
 	"errors"
+	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+)
+
+var (
+	_, b, _, _ = runtime.Caller(0)
+	basepath   = filepath.Dir(b)
 )
 
 func MockSendEmail(recipient, body, subject string) error {
@@ -19,7 +26,10 @@ func MockSendEmail(recipient, body, subject string) error {
 }
 
 func Setup(t *testing.T) (*gorm.DB, sqlmock.Sqlmock) {
-	godotenv.Load(".env.testing")
+	err := LoadEnv()
+	if err != nil {
+		t.Fatalf("failed to load env variables: %v", err)
+	}
 
 	db, mock := SetupMockDB(t)
 
@@ -42,4 +52,11 @@ func SetupMockDB(t *testing.T) (*gorm.DB, sqlmock.Sqlmock) {
 	}
 
 	return gormDB, mock
+}
+
+func LoadEnv() error {
+	envPath := filepath.Join(basepath, "..", ".env.testing")
+	err := godotenv.Load(envPath)
+
+	return err
 }

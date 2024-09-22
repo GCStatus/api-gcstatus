@@ -128,7 +128,11 @@ func (h *PasswordResetHandler) ResetUserPassword(c *gin.Context) {
 		return
 	}
 
-	cache.GlobalCache.RemovePasswordThrottleCache(user.Email)
+	err = cache.GlobalCache.RemovePasswordThrottleCache(user.Email)
+	if err != nil {
+		RespondWithError(c, http.StatusInternalServerError, "Something went wrong. Please, if this affects you directly, contact support!")
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "You password was successfully reseted!"})
 }

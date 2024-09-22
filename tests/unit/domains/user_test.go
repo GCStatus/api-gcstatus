@@ -13,11 +13,6 @@ import (
 func TestCreateUser(t *testing.T) {
 	db, mock := tests.Setup(t)
 
-	defer func() {
-		dbConn, _ := db.DB()
-		dbConn.Close()
-	}()
-
 	user := domain.User{
 		Name:      "John Doe",
 		Email:     "johndoe@example.com",
@@ -52,11 +47,6 @@ func TestCreateUser(t *testing.T) {
 func TestGetUserByID(t *testing.T) {
 	db, mock := tests.Setup(t)
 
-	defer func() {
-		dbConn, _ := db.DB()
-		dbConn.Close()
-	}()
-
 	userID := uint(1)
 	mockUser := domain.User{
 		ID:        userID,
@@ -87,11 +77,6 @@ func TestGetUserByID(t *testing.T) {
 
 func TestSoftDeleteUser(t *testing.T) {
 	db, mock := tests.Setup(t)
-
-	defer func() {
-		dbConn, _ := db.DB()
-		dbConn.Close()
-	}()
 
 	userID := uint(1)
 	mock.ExpectBegin()

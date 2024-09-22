@@ -30,14 +30,18 @@ func LimitResetRequestMiddleware() gin.HandlerFunc {
 
 		_, err := cache.GlobalCache.GetPasswordThrottleCache(emailKey)
 		if err == redis.Nil {
-			cache.GlobalCache.SetPasswordThrottleCache(emailKey, oneMinute)
+			err = cache.GlobalCache.SetPasswordThrottleCache(emailKey, oneMinute)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create a password throttle."})
+				c.Abort()
+			}
 
 			c.Next()
 		} else if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
 			c.Abort()
 		} else {
-			c.JSON(http.StatusTooManyRequests, gin.H{"error": "You must wait for 60 seconds before sending the email again!"})
+			c.JSON(http.StatusTooManyRequests, gin.H{"message": "You must wait for 60 seconds before sending the email again!"})
 			c.Abort()
 		}
 	}

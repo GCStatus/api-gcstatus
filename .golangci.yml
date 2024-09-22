@@ -1,0 +1,18 @@
+linters:
+  enable:
+    - revive
+    - govet
+    - ineffassign
+    - goconst
+    - gocyclo
+
+linters-settings:
+  revive:
+    severity: warning
+    confidence: 0.8
+
+issues:
+  exclude-use-default: false
+
+output:
+  formats: colored-line-number

@@ -49,6 +49,16 @@ jobs:
       - name: Execute tests
         run: go test ./tests/...
 
+      - name: Execute go vet
+        run: go vet ./...
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          args: ./...
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   all_required_checks_passed:
     name: All required checks passed
     runs-on: ubuntu-latest
