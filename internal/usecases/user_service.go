@@ -22,6 +22,10 @@ func (s *UserService) CreateUser(user *domain.User) error {
 	return s.repo.CreateUser(user)
 }
 
+func (s *UserService) CreateWithProfile(user *domain.User) error {
+	return s.repo.CreateWithProfile(user)
+}
+
 func (s *UserService) GetUserByID(id uint) (*domain.User, error) {
 	return s.repo.GetUserByID(id)
 }
@@ -46,13 +50,12 @@ func (s *UserService) AuthenticateUser(emailOrNickname, password string) (*domai
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("user not found")
 		}
-		// Return any other error from the repository
+
 		return nil, err
 	}
 
 	// Compare the provided password with the hashed password
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		// Log the password comparison failure for debugging
 		return nil, errors.New("invalid credentials")
 	}
 

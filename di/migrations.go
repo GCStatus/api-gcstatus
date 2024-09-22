@@ -9,6 +9,7 @@ import (
 
 func MigrateModels(dbConn *gorm.DB) {
 	models := []interface{}{
+		&domain.Level{},
 		&domain.User{},
 		&domain.Profile{},
 		&domain.PasswordReset{},

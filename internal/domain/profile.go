@@ -8,17 +8,28 @@ import (
 
 type Profile struct {
 	gorm.Model
-	ID        uint      `gorm:"primaryKey" json:"id"`
-	Share     bool      `gorm:"not null" json:"share"`
-	Photo     string    `json:"photo"`
-	Phone     string    `json:"phone"`
-	Facebook  string    `json:"facebook"`
-	Instagram string    `json:"instagram"`
-	Twitter   string    `json:"twitter"`
-	Youtube   string    `json:"youtube"`
-	Twitch    string    `json:"twitch"`
-	Github    string    `json:"github"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	UserID    uint
+	ID        uint `gorm:"primaryKey"`
+	Share     bool `gorm:"not null" validate:"required,boolean"`
+	Photo     string
+	Phone     string
+	Facebook  string
+	Instagram string
+	Twitter   string
+	Youtube   string
+	Twitch    string
+	Github    string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	UserID    uint `gorm:"unique;constraint:OnDelete:SET NULL,OnUpdate:CASCADE;"`
+}
+
+func (p *Profile) ValidateProfile() error {
+	Init()
+
+	err := validate.Struct(p)
+	if err != nil {
+		return FormatValidationError(err)
+	}
+
+	return nil
 }

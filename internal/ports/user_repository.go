@@ -8,4 +8,5 @@ type UserRepository interface {
 	GetAllUsers() ([]domain.User, error)
 	FindUserByEmailOrNickname(EmailOrNickname string) (*domain.User, error)
 	UpdateUserPassword(userID uint, hashedPassword string) error
+	CreateWithProfile(user *domain.User) error
 }

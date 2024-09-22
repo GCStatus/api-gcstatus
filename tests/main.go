@@ -2,9 +2,11 @@ package tests
 
 import (
 	"errors"
+	"gcstatus/internal/domain"
 	"path/filepath"
 	"runtime"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/joho/godotenv"
@@ -33,6 +35,8 @@ func Setup(t *testing.T) (*gorm.DB, sqlmock.Sqlmock) {
 
 	db, mock := SetupMockDB(t)
 
+	Seed(db)
+
 	return db, mock
 }
 
@@ -59,4 +63,13 @@ func LoadEnv() error {
 	err := godotenv.Load(envPath)
 
 	return err
+}
+
+func Seed(db *gorm.DB) {
+	levels := []domain.Level{
+		{ID: 1, Experience: 0, Level: 1, Coins: 0, CreatedAt: time.Now(), UpdatedAt: time.Now()},
+		{ID: 2, Experience: 500, Level: 2, Coins: 100, CreatedAt: time.Now(), UpdatedAt: time.Now()},
+	}
+
+	db.Create(&levels)
 }
