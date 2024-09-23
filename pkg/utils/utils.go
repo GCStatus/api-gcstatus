@@ -15,6 +15,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -194,4 +195,31 @@ func GetFirstAndLastName(fullName string) (string, string) {
 	}
 
 	return firstName, lastName
+}
+
+func FormatValidationError(err error) []string {
+	if err == nil {
+		return []string{}
+	}
+
+	var errorMessages []string
+
+	if validationErrors, ok := err.(validator.ValidationErrors); ok {
+		for _, fieldError := range validationErrors {
+			errorMessage := fieldError.Field() + " is required and cannot be empty."
+			errorMessages = append(errorMessages, errorMessage)
+		}
+	} else {
+		errorMessages = append(errorMessages, err.Error())
+	}
+
+	return errorMessages
+}
+
+func IsHashEqualsValue(hash string, value string) (bool, error) {
+	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(value)); err != nil {
+		return false, errors.New("failed to compare hash")
+	}
+
+	return true, nil
 }

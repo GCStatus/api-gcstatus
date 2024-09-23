@@ -48,9 +48,9 @@ func (m *MockAuthRepository) GetCookieSettings(httpSecureStr, httpOnlyStr string
 	return true, true, nil
 }
 
-func (m *MockAuthRepository) ClearAuthCookies(c *gin.Context, tokenKey, authKey string, secure, httpOnly bool, domain string) {
-	c.SetCookie(tokenKey, "", -1, "/", domain, secure, httpOnly)
-	c.SetCookie(authKey, "", -1, "/", domain, secure, httpOnly)
+func (m *MockAuthRepository) ClearAuthCookies(c *gin.Context, tokenKey, authKey string, domain string) {
+	c.SetCookie(tokenKey, "", -1, "/", domain, false, false)
+	c.SetCookie(authKey, "", -1, "/", domain, false, false)
 }
 
 func (m *MockAuthRepository) SetAuthCookies(c *gin.Context, tokenKey, tokenValue, authKey string, expirationSeconds int, secure, httpOnly bool, domain string) {
@@ -406,7 +406,7 @@ func TestMockAuthRepository_ClearAuthCookies(t *testing.T) {
 			mockRepo := &MockAuthRepository{}
 			c, w := tests.SetupGinTestContext(http.MethodPost, "/", "")
 
-			mockRepo.ClearAuthCookies(c, tc.tokenKey, tc.authKey, tc.secure, tc.httpOnly, tc.domain)
+			mockRepo.ClearAuthCookies(c, tc.tokenKey, tc.authKey, tc.domain)
 
 			cookies := w.Result().Cookies()
 

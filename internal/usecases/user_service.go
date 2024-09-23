@@ -46,7 +46,6 @@ func (s *UserService) FindUserByEmailOrNickname(emailOrNickname string) (*domain
 func (s *UserService) AuthenticateUser(emailOrNickname, password string) (*domain.User, error) {
 	user, err := s.FindUserByEmailOrNickname(emailOrNickname)
 	if err != nil {
-		// Check if the error is due to the user not being found
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, errors.New("user not found")
 		}
@@ -54,7 +53,6 @@ func (s *UserService) AuthenticateUser(emailOrNickname, password string) (*domai
 		return nil, err
 	}
 
-	// Compare the provided password with the hashed password
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
 		return nil, errors.New("invalid credentials")
 	}

@@ -196,13 +196,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 func (h *AuthHandler) Logout(c *gin.Context) {
 	env := config.LoadConfig()
 
-	httpSecure, httpOnly, err := h.authService.GetCookieSettings(env.HttpSecure, env.HttpOnly)
-	if err != nil {
-		RespondWithError(c, http.StatusInternalServerError, "Could not parse cookie settings.")
-		return
-	}
-
-	h.authService.ClearAuthCookies(c, env.AccessTokenKey, env.IsAuthKey, httpSecure, httpOnly, env.Domain)
+	h.authService.ClearAuthCookies(c, env.AccessTokenKey, env.IsAuthKey, env.Domain)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 }

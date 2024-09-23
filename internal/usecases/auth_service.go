@@ -31,7 +31,6 @@ func (s *AuthService) Me(c *gin.Context) {
 	s.repo.Me(c)
 }
 
-// Parse expiration time
 func (s *AuthService) GetExpirationSeconds(jwtTtl string) (int, error) {
 	jwtTtlDays, err := strconv.Atoi(jwtTtl)
 	if err != nil {
@@ -41,22 +40,20 @@ func (s *AuthService) GetExpirationSeconds(jwtTtl string) (int, error) {
 	return jwtTtlDays * 86400, nil // Convert days to seconds
 }
 
-// Parse cookie security settings
 func (s *AuthService) GetCookieSettings(httpSecureStr, httpOnlyStr string) (bool, bool, error) {
 	httpSecure, err := strconv.ParseBool(httpSecureStr)
 	if err != nil {
-		return true, true, err // default to secure and httpOnly cookies
+		return true, true, err
 	}
 
 	httpOnly, err := strconv.ParseBool(httpOnlyStr)
 	if err != nil {
-		return true, true, err // default to secure and httpOnly cookies
+		return true, true, err
 	}
 
 	return httpSecure, httpOnly, nil
 }
 
-// Handle creating JWT tokens
 func (s *AuthService) CreateJWTToken(userID uint, expirationSeconds int) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": userID,
@@ -66,19 +63,16 @@ func (s *AuthService) CreateJWTToken(userID uint, expirationSeconds int) (string
 	return token.SignedString(config.JWTSecret)
 }
 
-// Encrypt the token string
 func (s *AuthService) EncryptToken(tokenString, jwtSecret string) (string, error) {
 	return utils.Encrypt(tokenString, jwtSecret)
 }
 
-// Set cookies
 func (s *AuthService) SetAuthCookies(c *gin.Context, tokenKey, tokenValue, authKey string, expirationSeconds int, secure, httpOnly bool, domain string) {
 	c.SetCookie(tokenKey, tokenValue, expirationSeconds, "/", domain, secure, httpOnly)
 	c.SetCookie(authKey, "1", expirationSeconds, "/", domain, secure, false)
 }
 
-// Clear cookies
-func (s *AuthService) ClearAuthCookies(c *gin.Context, tokenKey, authKey string, secure, httpOnly bool, domain string) {
-	c.SetCookie(tokenKey, "", -1, "/", domain, secure, httpOnly)
-	c.SetCookie(authKey, "", -1, "/", domain, secure, false)
+func (s *AuthService) ClearAuthCookies(c *gin.Context, tokenKey, authKey string, domain string) {
+	c.SetCookie(tokenKey, "", -1, "/", domain, false, false)
+	c.SetCookie(authKey, "", -1, "/", domain, false, false)
 }

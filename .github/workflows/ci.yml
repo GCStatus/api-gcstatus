@@ -47,7 +47,7 @@ jobs:
           go mod vendor
 
       - name: Execute tests
-        run: go test ./tests/...
+        run: go test ./tests/... -coverprofile=coverage.txt
 
       - name: Execute go vet
         run: go vet ./...
@@ -58,6 +58,11 @@ jobs:
           args: ./...
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload results to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   all_required_checks_passed:
     name: All required checks passed

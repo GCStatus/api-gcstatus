@@ -6,6 +6,9 @@
 
 - [ ] User authentication
   - [ ] Implement OAuth for Google and Facebook
+- [ ] AWS
+  - [ ] S3
+- [ ] Review the entire error throwing of platform to user-friendly
 
 ### Post-MVP
 
@@ -15,9 +18,6 @@
 - [ ] Documentation
   - [ ] Document API endpoints
   - [ ] Create an issue template
-- [ ] Adjust all keyframes to tailwind
-- [ ] Review entire responsivity
-- [ ] Review entire dark and light mode
 
 ### Future Ideas
 
@@ -59,3 +59,7 @@
 - [ ] Create a ticket for support
   - [ ] The ticket can be used to get support
   - [ ] The ticket can be used to report some suspicious activity
+- [ ] Create a staging API with github environments
+- [ ] AWS
+  - [ ] SQS
+  - [ ] SNS

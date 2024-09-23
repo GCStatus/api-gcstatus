@@ -39,6 +39,7 @@
   - [x] Create the register method
   - [x] Create the password forgot method
   - [x] Create the password reset method
+  - [x] Create the password reset method from user profile (with current password validation)
 - [x] Documentation
   - [x] Create a detailed readme and how to run API locally
   - [x] Create a contribution guide for open source contributors

@@ -16,7 +16,7 @@ func InitHandlers(
 	levelHandler *api.LevelHandler,
 ) {
 	authHandler = api.NewAuthHandler(authService, userService)
-	passwordResetHandler = api.NewPasswordResetHandler(passwordResetService, userService)
+	passwordResetHandler = api.NewPasswordResetHandler(passwordResetService, userService, authService)
 	levelHandler = api.NewLevelHandler(levelService)
 
 	return authHandler, passwordResetHandler, levelHandler

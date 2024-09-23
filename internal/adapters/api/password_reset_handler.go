@@ -1,12 +1,14 @@
 package api
 
 import (
+	"gcstatus/config"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/usecases"
 	"gcstatus/pkg/cache"
 	"gcstatus/pkg/email"
 	"gcstatus/pkg/utils"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -15,10 +17,19 @@ import (
 type PasswordResetHandler struct {
 	passwordResetService *usecases.PasswordResetService
 	userService          *usecases.UserService
+	authService          *usecases.AuthService
 }
 
-func NewPasswordResetHandler(passwordResetService *usecases.PasswordResetService, userService *usecases.UserService) *PasswordResetHandler {
-	return &PasswordResetHandler{passwordResetService: passwordResetService, userService: userService}
+func NewPasswordResetHandler(
+	passwordResetService *usecases.PasswordResetService,
+	userService *usecases.UserService,
+	authService *usecases.AuthService,
+) *PasswordResetHandler {
+	return &PasswordResetHandler{
+		passwordResetService: passwordResetService,
+		userService:          userService,
+		authService:          authService,
+	}
 }
 
 func (h *PasswordResetHandler) RequestPasswordReset(c *gin.Context) {
@@ -137,4 +148,75 @@ func (h *PasswordResetHandler) ResetUserPassword(c *gin.Context) {
 	cache.GlobalCache.RemoveUserFromCache(user.ID)
 
 	c.JSON(http.StatusOK, gin.H{"message": "You password was successfully reseted!"})
+}
+
+func (h *PasswordResetHandler) ResetPasswordProfile(c *gin.Context) {
+	var request struct {
+		Password                string `json:"password" binding:"required"`
+		NewPassword             string `json:"new_password" binding:"required"`
+		NewPasswordConfirmation string `json:"new_password_confirmation" binding:"required"`
+	}
+
+	env := config.LoadConfig()
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		errorMessages := utils.FormatValidationError(err)
+		RespondWithError(c, http.StatusBadRequest, "Invalid payload data. Please, provide a valid payload. Errors: "+strings.Join(errorMessages, " "))
+		return
+	}
+
+	if request.NewPassword != request.NewPasswordConfirmation {
+		RespondWithError(c, http.StatusBadRequest, "The password and password confirmation do not match.")
+		return
+	}
+
+	if !utils.ValidatePassword(request.NewPassword) {
+		RespondWithError(c, http.StatusBadRequest, "Password must be at least 8 characters long and include a lowercase letter, an uppercase letter, a number, and a symbol.")
+		return
+	}
+
+	authUser, err := utils.ExtractAuthenticatedUser(c, h.userService.GetUserByID)
+	if err != nil {
+		RespondWithError(c, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	userID, ok := authUser.(uint)
+	if !ok {
+		RespondWithError(c, http.StatusInternalServerError, "Invalid user ID format.")
+		return
+	}
+
+	user, found := cache.GlobalCache.GetUserFromCache(userID)
+	if !found {
+		user, err = h.userService.GetUserByID(userID)
+		if err != nil {
+			RespondWithError(c, http.StatusInternalServerError, err.Error())
+			return
+		}
+	}
+
+	if isEqual, err := utils.IsHashEqualsValue(user.Password, request.Password); err != nil || !isEqual {
+		if !isEqual {
+			RespondWithError(c, http.StatusBadRequest, "Your current password is invalid.")
+			return
+		}
+
+		if err != nil {
+			RespondWithError(c, http.StatusInternalServerError, "Something went wrong on you password verification. Please, try again.")
+			return
+		}
+	}
+
+	err = h.userService.UpdateUserPassword(user.ID, request.NewPassword)
+	if err != nil {
+		RespondWithError(c, http.StatusInternalServerError, "Failed to reset password: "+err.Error())
+		return
+	}
+
+	h.authService.ClearAuthCookies(c, env.AccessTokenKey, env.IsAuthKey, env.Domain)
+
+	cache.GlobalCache.RemoveUserFromCache(userID)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Your password was successfully changed!"})
 }

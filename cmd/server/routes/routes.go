@@ -62,6 +62,7 @@ func SetupRouter(
 	{
 		protected.GET("/me", authHandler.Me)
 		protected.GET("/levels", levelHandler.GetAll)
+		protected.PUT("/profile/password", passwordResetHandler.ResetPasswordProfile)
 	}
 
 	// Common routes

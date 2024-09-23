@@ -1,9 +1,12 @@
 package tests
 
 import (
+	"errors"
 	"gcstatus/pkg/utils"
 	"testing"
 
+	"github.com/go-playground/validator/v10"
+	"github.com/stretchr/testify/assert"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -183,6 +186,116 @@ func TestGetFirstAndLastName(t *testing.T) {
 			if firstName != test.firstName || lastName != test.lastName {
 				t.Errorf("Expected (%s, %s), got (%s, %s)", test.firstName, test.lastName, firstName, lastName)
 			}
+		})
+	}
+}
+
+func IsHashEqualsValueTest(t *testing.T) {
+	base := "admin1234"
+	baseInvalid := "abcdefg"
+
+	hashed, err := utils.HashPassword(base)
+	if err != nil {
+		t.Fatalf("failed to hash the base password: %s", err.Error())
+	}
+
+	tests := map[string]struct {
+		hash        string
+		value       string
+		expectErr   bool
+		expectEqual bool
+		errMessage  string
+	}{
+		"is equals": {
+			hash:        hashed,
+			value:       base,
+			expectErr:   false,
+			expectEqual: true,
+		},
+		"not equals": {
+			hash:        hashed,
+			value:       baseInvalid,
+			expectErr:   true,
+			expectEqual: false,
+			errMessage:  "failed to compare hash",
+		},
+		"error case with invalid hash": {
+			hash:        "invalid-hash",
+			value:       base,
+			expectErr:   true,
+			expectEqual: false,
+			errMessage:  "failed to compare hash",
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			equal, err := utils.IsHashEqualsValue(tc.hash, tc.value)
+
+			if tc.expectErr {
+				if assert.Error(t, err) {
+					assert.EqualError(t, err, tc.errMessage, "expected error message to match")
+				}
+			} else {
+				assert.NoError(t, err, "did not expect an error")
+				assert.Equal(t, tc.expectEqual, equal, "expectEqual check failed")
+			}
+		})
+	}
+}
+
+func TestFormatValidationError(t *testing.T) {
+	type SampleStruct struct {
+		Name  string `validate:"required"`
+		Email string `validate:"required,email"`
+	}
+
+	validate := validator.New()
+
+	tests := map[string]struct {
+		input        error
+		expected     []string
+		prepareInput func() error
+	}{
+		"as input validation error": {
+			prepareInput: func() error {
+				sample := SampleStruct{}
+				return validate.Struct(sample)
+			},
+			expected: []string{
+				"Name is required and cannot be empty.",
+				"Email is required and cannot be empty.",
+			},
+		},
+		"as a generic error": {
+			input: errors.New("some generic error"),
+			expected: []string{
+				"some generic error",
+			},
+		},
+		"as nil input": {
+			input:    nil,
+			expected: []string{},
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			var err error
+
+			if tc.prepareInput != nil {
+				err = tc.prepareInput()
+			} else {
+				err = tc.input
+			}
+
+			formattedErrors := utils.FormatValidationError(err)
+
+			assert.Equal(t, tc.expected, formattedErrors)
 		})
 	}
 }
