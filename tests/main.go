@@ -3,12 +3,15 @@ package tests
 import (
 	"errors"
 	"gcstatus/internal/domain"
+	"net/http/httptest"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -72,4 +75,16 @@ func Seed(db *gorm.DB) {
 	}
 
 	db.Create(&levels)
+}
+
+func SetupGinTestContext(method, url string, body string) (*gin.Context, *httptest.ResponseRecorder) {
+	gin.SetMode(gin.TestMode)
+
+	req := httptest.NewRequest(method, url, strings.NewReader(body))
+	w := httptest.NewRecorder()
+
+	c, _ := gin.CreateTestContext(w)
+	c.Request = req
+
+	return c, w
 }
