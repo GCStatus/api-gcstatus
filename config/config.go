@@ -27,6 +27,7 @@ type Config struct {
 	AwsMailRegion  string
 	AwsAccessKey   string
 	AwsSecretKey   string
+	CorsDomains    string
 }
 
 func LoadConfig() *Config {
@@ -54,6 +55,7 @@ func LoadConfig() *Config {
 		AwsMailRegion:  getEnv("AWS_MAIL_REGION", "us-west-2"),
 		AwsAccessKey:   getEnv("AWS_ACCESS_KEY", ""),
 		AwsSecretKey:   getEnv("AWS_SECRET_KEY", ""),
+		CorsDomains:    getEnv("CORS_DOMAINS", "http://localhost:5173"),
 	}
 }
 
