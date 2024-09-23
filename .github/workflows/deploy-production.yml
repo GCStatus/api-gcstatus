@@ -73,6 +73,7 @@ jobs:
               AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
               AWS_MAIL_FROM=${{ secrets.AWS_MAIL_FROM }}
               AWS_MAIL_REGION=${{ secrets.AWS_MAIL_REGION }}
+              CORS_DOMAINS=${{ secrets.CORS_DOMAINS }}
             EOF'
 
             docker rmi $IMAGE_ID || true
