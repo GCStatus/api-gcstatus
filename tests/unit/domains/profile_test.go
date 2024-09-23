@@ -231,7 +231,7 @@ func TestSoftDeleteProfile(t *testing.T) {
 		mockBehavior func(mock sqlmock.Sqlmock, profileID uint)
 		wantErr      bool
 	}{
-		"Can soft delete a level": {
+		"Can soft delete a profile": {
 			profileID: 1,
 			mockBehavior: func(mock sqlmock.Sqlmock, profileID uint) {
 				mock.ExpectBegin()

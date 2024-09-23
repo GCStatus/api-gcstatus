@@ -10,12 +10,12 @@ type UserResource struct {
 	Email      string           `json:"email"`
 	Level      uint             `json:"level"`
 	Experience uint             `json:"experience"`
-	Coins      uint             `json:"coins"`
 	Nickname   string           `json:"nickname"`
 	Birthdate  string           `json:"birthdate"`
 	CreatedAt  string           `json:"created_at"`
 	UpdatedAt  string           `json:"updated_at"`
 	Profile    *ProfileResource `json:"profile,omitempty"`
+	Wallet     *WalletResource  `json:"wallet"`
 }
 
 func TransformUser(user domain.User) UserResource {
@@ -23,7 +23,6 @@ func TransformUser(user domain.User) UserResource {
 		ID:         user.ID,
 		Name:       user.Name,
 		Email:      user.Email,
-		Coins:      user.Coins,
 		Nickname:   user.Nickname,
 		Experience: user.Experience,
 		Birthdate:  user.Birthdate.Format("2006-01-02T15:04:05"),
@@ -37,6 +36,10 @@ func TransformUser(user domain.User) UserResource {
 
 	if user.Level.ID != 0 {
 		userResource.Level = user.Level.Level
+	}
+
+	if user.Wallet.ID != 0 {
+		userResource.Wallet = TransformWallet(&user.Wallet)
 	}
 
 	return userResource

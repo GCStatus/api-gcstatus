@@ -30,13 +30,18 @@ func (repo *UserRepositoryMySQL) CreateWithProfile(user *domain.User) error {
 			return err
 		}
 
+		user.Wallet.UserID = user.ID
+		if err := tx.Create(&user.Wallet).Error; err != nil {
+			return err
+		}
+
 		return nil
 	})
 }
 
 func (repo *UserRepositoryMySQL) GetUserByID(id uint) (*domain.User, error) {
 	var user domain.User
-	err := repo.db.Preload("Level").Preload("Profile").First(&user, id).Error
+	err := repo.db.Preload("Wallet").Preload("Level").Preload("Profile").First(&user, id).Error
 	return &user, err
 }
 

@@ -27,10 +27,10 @@ func TestCreateUser(t *testing.T) {
 				Nickname:   "johnny",
 				Blocked:    false,
 				Experience: 500,
-				Coins:      1029,
 				Birthdate:  fixedTime,
 				Password:   "supersecretpassword",
 				LevelID:    1,
+				Wallet:     domain.Wallet{Amount: 0},
 			},
 			mockFunc: func() {
 				mock.ExpectBegin()
@@ -42,7 +42,6 @@ func TestCreateUser(t *testing.T) {
 					"johndoe@example.com",
 					"johnny",
 					500,
-					1029,
 					false,
 					fixedTime,
 					sqlmock.AnyArg(),
@@ -60,6 +59,7 @@ func TestCreateUser(t *testing.T) {
 				Birthdate: fixedTime,
 				Password:  "password123",
 				LevelID:   1,
+				Wallet:    domain.Wallet{Amount: 0},
 			},
 			mockFunc: func() {
 				mock.ExpectBegin()
@@ -70,7 +70,6 @@ func TestCreateUser(t *testing.T) {
 					"John Doe",
 					"johndoe@example.com",
 					"johnny",
-					sqlmock.AnyArg(),
 					sqlmock.AnyArg(),
 					sqlmock.AnyArg(),
 					fixedTime,
@@ -121,6 +120,7 @@ func TestGetUserByID(t *testing.T) {
 				Nickname:  "johnny",
 				Blocked:   false,
 				Birthdate: fixedTime,
+				Wallet:    domain.Wallet{Amount: 0},
 			},
 			mockFunc: func() {
 				rows := sqlmock.NewRows([]string{"id", "name", "email", "nickname", "blocked", "birthdate"}).
@@ -228,10 +228,10 @@ func TestUpdateUser(t *testing.T) {
 				Nickname:   "johnny",
 				Blocked:    false,
 				Experience: 500,
-				Coins:      1029,
 				Birthdate:  fixedTime,
 				Password:   "supersecretpassword",
 				LevelID:    1,
+				Wallet:     domain.Wallet{Amount: 0},
 			},
 			mockFunc: func() {
 				mock.ExpectBegin()
@@ -243,7 +243,6 @@ func TestUpdateUser(t *testing.T) {
 					"johndoe@example.com",
 					"johnny",
 					500,
-					1029,
 					false,
 					fixedTime,
 					sqlmock.AnyArg(),
@@ -262,10 +261,10 @@ func TestUpdateUser(t *testing.T) {
 				Nickname:   "jane",
 				Blocked:    false,
 				Experience: 600,
-				Coins:      2000,
 				Birthdate:  fixedTime,
 				Password:   "anotherpassword",
 				LevelID:    2,
+				Wallet:     domain.Wallet{Amount: 0},
 			},
 			mockFunc: func() {
 				mock.ExpectBegin()
@@ -277,7 +276,6 @@ func TestUpdateUser(t *testing.T) {
 					"janedoe@example.com",
 					"jane",
 					600,
-					2000,
 					false,
 					fixedTime,
 					sqlmock.AnyArg(),
@@ -323,6 +321,7 @@ func TestCreateUserWithMissingFields(t *testing.T) {
 				Nickname:  "nick",
 				Birthdate: time.Now(),
 				Password:  "password123",
+				Wallet:    domain.Wallet{Amount: 0},
 			},
 			wantErr: "Name is a required field, Email is a required field",
 		},

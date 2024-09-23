@@ -152,6 +152,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		Password:  string(hashedPassword),
 		LevelID:   1,
 		Profile:   domain.Profile{Share: false},
+		Wallet:    domain.Wallet{Amount: 0},
 	}
 
 	if err := h.userService.CreateWithProfile(&user); err != nil {
