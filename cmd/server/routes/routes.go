@@ -4,6 +4,7 @@ import (
 	"gcstatus/config"
 	"gcstatus/internal/middlewares"
 	"gcstatus/internal/usecases"
+	"strings"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -19,9 +20,14 @@ func SetupRouter(
 	r := gin.Default()
 	env := config.LoadConfig()
 
+	corsDomains := []string{}
+	for _, domain := range strings.Split(env.CorsDomains, ",") {
+		corsDomains = append(corsDomains, strings.TrimSpace(domain))
+	}
+
 	// CORS configuration
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{env.CorsDomains},
+		AllowOrigins:     corsDomains,
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "User-Agent", "Accept"},
 		ExposeHeaders:    []string{"Content-Length"},
