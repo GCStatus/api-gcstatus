@@ -53,5 +53,6 @@
   - [x] Request password for sensitive changes, such as email or nickname
   - [x] Update user email
   - [x] Update user nickname
+  - [x] Update user basics, such as name and birthdate
 
 ### Post MVP
