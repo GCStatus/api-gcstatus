@@ -181,16 +181,9 @@ func (h *PasswordResetHandler) ResetPasswordProfile(c *gin.Context) {
 		return
 	}
 
-	if isEqual, err := utils.IsHashEqualsValue(user.Password, request.Password); err != nil || !isEqual {
-		if !isEqual {
-			RespondWithError(c, http.StatusBadRequest, "Your current password is invalid.")
-			return
-		}
-
-		if err != nil {
-			RespondWithError(c, http.StatusInternalServerError, "Something went wrong on you password verification. Please, try again.")
-			return
-		}
+	if isEqual := utils.IsHashEqualsValue(user.Password, request.Password); !isEqual {
+		RespondWithError(c, http.StatusBadRequest, "Your current password is invalid.")
+		return
 	}
 
 	err = h.userService.UpdateUserPassword(user.ID, request.NewPassword)

@@ -1,6 +1,7 @@
 package db
 
 import (
+	"fmt"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/ports"
 
@@ -59,4 +60,30 @@ func (repo *UserRepositoryMySQL) FindUserByEmailOrNickname(emailOrNickname strin
 
 func (repo *UserRepositoryMySQL) UpdateUserPassword(userID uint, hashedPassword string) error {
 	return repo.db.Model(&domain.User{}).Where("id = ?", userID).Update("password", hashedPassword).Error
+}
+
+func (repo *UserRepositoryMySQL) UpdateUserNickAndEmail(userID uint, request ports.UpdateNickAndEmailRequest) error {
+	updateFields := map[string]interface{}{
+		"email":    request.Email,
+		"nickname": request.Nickname,
+	}
+
+	if err := repo.db.Model(&domain.User{}).Where("id = ?", userID).Updates(updateFields).Error; err != nil {
+		return fmt.Errorf("failed to update nick or email: %w", err)
+	}
+
+	return nil
+}
+
+func (repo *UserRepositoryMySQL) UpdateUserBasics(userID uint, request ports.UpdateUserBasicsRequest) error {
+	updateFields := map[string]interface{}{
+		"name":      request.Name,
+		"birthdate": request.Birthdate,
+	}
+
+	if err := repo.db.Model(&domain.User{}).Where("id = ?", userID).Updates(updateFields).Error; err != nil {
+		return fmt.Errorf("failed to update user basic informations: %+s", err.Error())
+	}
+
+	return nil
 }

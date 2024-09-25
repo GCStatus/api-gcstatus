@@ -34,6 +34,14 @@ func (s *UserService) GetAllUsers() ([]domain.User, error) {
 	return s.repo.GetAllUsers()
 }
 
+func (s *UserService) UpdateUserNickAndEmail(userID uint, request ports.UpdateNickAndEmailRequest) error {
+	return s.repo.UpdateUserNickAndEmail(userID, request)
+}
+
+func (s *UserService) UpdateUserBasics(userID uint, request ports.UpdateUserBasicsRequest) error {
+	return s.repo.UpdateUserBasics(userID, request)
+}
+
 func (s *UserService) FindUserByEmailOrNickname(emailOrNickname string) (*domain.User, error) {
 	user, err := s.repo.FindUserByEmailOrNickname(emailOrNickname)
 	if err != nil {

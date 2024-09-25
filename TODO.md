@@ -11,6 +11,9 @@
 - [ ] Review the entire error throwing of platform to user-friendly
 - [ ] User updation
   - [ ] Update user basics, such as name and birthdate
+- [ ] Email verification
+  - [ ] Block user access if email is not verified
+  - [ ] If user change email, set verified_at to null and block access again
 
 ### Post-MVP
 

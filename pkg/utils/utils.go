@@ -217,12 +217,12 @@ func FormatValidationError(err error) []string {
 	return errorMessages
 }
 
-func IsHashEqualsValue(hash string, value string) (bool, error) {
+func IsHashEqualsValue(hash string, value string) bool {
 	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(value)); err != nil {
-		return false, errors.New("failed to compare hash")
+		return false
 	}
 
-	return true, nil
+	return true
 }
 
 func Auth(c *gin.Context, fetchUser UserFetcher) (*domain.User, error) {

@@ -47,7 +47,7 @@ func LoadConfig() *Config {
 		DBName:          getEnv("DB_NAME", "gcstatus"),
 		AccessTokenKey:  getEnv("ACCESS_TOKEN_KEY", "_gc_9hp1b73cGDCmAPgaVTYOlS6cjPsnDYho"),
 		JwtSecret:       getEnv("JWT_SECRET", "5qY51df4G2WkfGhYxsB2bO5yXhc5RG9l"),
-		JwtTtl:          getEnv("JWT_TTL", "15"), // in days
+		JwtTtl:          getEnv("JWT_TTL", "7"), // in days
 		IsAuthKey:       getEnv("IS_AUTH_KEY", "_gc_auth"),
 		HttpSecure:      getEnv("HTTP_SECURE", "false"),
 		HttpOnly:        getEnv("HTTP_ONLY", "false"),

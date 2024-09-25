@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gcstatus/internal/adapters/db"
 	"gcstatus/internal/domain"
+	"gcstatus/internal/ports"
 	"gcstatus/tests"
 	"regexp"
 	"testing"
@@ -362,6 +363,160 @@ func TestUserRepositoryMySQL_UpdateUserPassword(t *testing.T) {
 			err := repo.UpdateUserPassword(tc.userID, tc.hashedPassword)
 
 			assert.Equal(t, tc.expectedErr, err)
+
+			assert.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
+func UserRepositoryMySQL_UpdateUserNickAndEmail(t *testing.T) {
+	gormDB, mock := tests.Setup(t)
+
+	repo := db.NewUserRepositoryMySQL(gormDB)
+
+	testCases := map[string]struct {
+		userID        uint
+		newNickname   string
+		newEmail      string
+		password      string
+		mockBehavior  func(newNickname string, newEmail string, userID uint)
+		expectedError error
+	}{
+		"success": {
+			userID:      1,
+			newNickname: "user2",
+			newEmail:    "user2@example.com",
+			password:    "validpass1234",
+			mockBehavior: func(newNickname string, newEmail string, userID uint) {
+				mock.ExpectBegin()
+				mock.ExpectExec(regexp.QuoteMeta("UPDATE `users` SET `nickname`=?,`email`=? WHERE id = ? AND `users`.`deleted_at` IS NULL")).
+					WithArgs(newNickname, newEmail, userID).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectCommit()
+			},
+			expectedError: nil,
+		},
+		"duplicated nickname": {
+			userID:      1,
+			newNickname: "user1",
+			newEmail:    "user2@example.com",
+			password:    "validpass1234",
+			mockBehavior: func(newNickname string, newEmail string, userID uint) {
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE nickname = ? AND id != ? AND `users`.`deleted_at` IS NULL")).
+					WithArgs(newNickname, userID).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(2))
+			},
+			expectedError: errors.New("nickname already in use"),
+		},
+		"duplicated email": {
+			userID:      1,
+			newNickname: "user2",
+			newEmail:    "user@example.com",
+			password:    "validpass1234",
+			mockBehavior: func(newNickname string, newEmail string, userID uint) {
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE email = ? AND id != ? AND `users`.`deleted_at` IS NULL")).
+					WithArgs(newEmail, userID).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(2))
+			},
+			expectedError: errors.New("email already in use"),
+		},
+		"db error": {
+			userID:      999,
+			newNickname: "user2",
+			newEmail:    "user2@example.com",
+			password:    "validpass1234",
+			mockBehavior: func(newNickname string, newEmail string, userID uint) {
+				mock.ExpectBegin()
+				mock.ExpectExec(regexp.QuoteMeta("UPDATE `users` SET `nickname`=?,`email`=? WHERE id = ? AND `users`.`deleted_at` IS NULL")).
+					WithArgs(newNickname, newEmail, userID).
+					WillReturnError(errors.New("db error"))
+				mock.ExpectRollback()
+			},
+			expectedError: errors.New("db error"),
+		},
+		"wrongpass": {
+			userID:      1,
+			newNickname: "user2",
+			newEmail:    "user2@example.com",
+			password:    "wrongpass",
+			mockBehavior: func(newNickname string, newEmail string, userID uint) {
+				mock.ExpectBegin()
+				mock.ExpectExec(regexp.QuoteMeta("UPDATE `users` SET `nickname`=?,`email`=? WHERE id = ? AND `users`.`deleted_at` IS NULL")).
+					WithArgs(newNickname, newEmail, userID).
+					WillReturnError(errors.New("password does not match"))
+				mock.ExpectRollback()
+			},
+			expectedError: errors.New("password does not match"),
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			tc.mockBehavior(tc.newNickname, tc.newEmail, tc.userID)
+
+			request := ports.UpdateNickAndEmailRequest{
+				Password: tc.password,
+				Nickname: tc.newNickname,
+				Email:    tc.newEmail,
+			}
+
+			err := repo.UpdateUserNickAndEmail(tc.userID, request)
+
+			assert.Equal(t, tc.expectedError, err)
+
+			assert.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
+func TestUserRepositoryMySQL_UpdateUserBasics(t *testing.T) {
+	fixedTime := time.Now()
+	gormDB, mock := tests.Setup(t)
+
+	repo := db.NewUserRepositoryMySQL(gormDB)
+
+	testCases := map[string]struct {
+		userID        uint
+		newName       string
+		newBirthdate  string
+		mockBehavior  func(newName string, newBirthdate string, userID uint)
+		expectedError error
+	}{
+		"success": {
+			userID:       1,
+			newName:      "user2",
+			newBirthdate: fixedTime.Format("2006-01-02"),
+			mockBehavior: func(newName string, newBirthdate string, userID uint) {
+				mock.ExpectBegin()
+				mock.ExpectExec(regexp.QuoteMeta("UPDATE `users` SET `birthdate`=?,`name`=?,`updated_at`=? WHERE id = ? AND `users`.`deleted_at` IS NULL")).
+					WithArgs(newBirthdate, newName, sqlmock.AnyArg(), userID).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectCommit()
+			},
+			expectedError: nil,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			tc.mockBehavior(tc.newName, tc.newBirthdate, tc.userID)
+
+			request := ports.UpdateUserBasicsRequest{
+				Name:      tc.newName,
+				Birthdate: tc.newBirthdate,
+			}
+
+			err := repo.UpdateUserBasics(tc.userID, request)
+
+			if tc.expectedError != nil {
+				assert.EqualError(t, err, tc.expectedError.Error())
+			} else {
+				assert.NoError(t, err)
+			}
 
 			assert.NoError(t, mock.ExpectationsWereMet())
 		})
