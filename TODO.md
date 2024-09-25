@@ -9,6 +9,8 @@
 - [ ] AWS
   - [ ] S3
 - [ ] Review the entire error throwing of platform to user-friendly
+- [ ] User updation
+  - [ ] Update user basics, such as name and birthdate
 
 ### Post-MVP
 
@@ -18,6 +20,15 @@
 - [ ] Documentation
   - [ ] Document API endpoints
   - [ ] Create an issue template
+- [ ] Filters for users
+  - [ ] Create a helper to clean bad words
+    - [ ] Implement on user nickname
+    - [ ] Implement on user name
+    - [ ] Implement on user email
+- [ ] Filters for posts, comments or messages
+  - [ ] Posts
+  - [ ] Comments
+  - [ ] Messages (?)
 
 ### Future Ideas
 
@@ -63,3 +74,10 @@
 - [ ] AWS
   - [ ] SQS
   - [ ] SNS
+- [ ] Create a chat between users
+  - [ ] User can be able to chat another users
+  - [ ] User can be able to create a group and chat them
+  - [ ] User can be able to change the group name and avatar
+  - [ ] User can be able to add and remove members (creator or admin)
+  - [ ] User can be able to add admins on groups (owner only)
+  - [ ] Chat should use realtime

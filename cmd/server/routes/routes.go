@@ -16,6 +16,7 @@ func SetupRouter(
 	authService *usecases.AuthService,
 	passwordResetService *usecases.PasswordResetService,
 	levelService *usecases.LevelService,
+	profileService *usecases.ProfileService,
 ) *gin.Engine {
 	r := gin.Default()
 	env := config.LoadConfig()
@@ -36,11 +37,12 @@ func SetupRouter(
 	}))
 
 	// Initialize the handlers
-	authHandler, passwordResetHandler, levelHandler := InitHandlers(
+	authHandler, passwordResetHandler, levelHandler, profileHandler := InitHandlers(
 		authService,
 		userService,
 		passwordResetService,
 		levelService,
+		profileService,
 	)
 
 	// Define the middlewares
@@ -63,6 +65,8 @@ func SetupRouter(
 		protected.GET("/me", authHandler.Me)
 		protected.GET("/levels", levelHandler.GetAll)
 		protected.PUT("/profile/password", passwordResetHandler.ResetPasswordProfile)
+		protected.PUT("/profile/picture", profileHandler.UpdatePicture)
+		protected.PUT("/profile/socials", profileHandler.UpdateSocials)
 	}
 
 	// Common routes

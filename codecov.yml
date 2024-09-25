@@ -1,0 +1,10 @@
+github_checks:
+  annotations: false
+
+coverage:
+  status:
+    project:
+      default:
+        if_ci_failed: ignore
+        threshold: 2%
+    patch: off

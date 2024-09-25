@@ -7,7 +7,7 @@ import (
 	"gcstatus/internal/domain"
 	"gcstatus/internal/resources"
 	"gcstatus/internal/usecases"
-	"gcstatus/pkg/cache"
+	"gcstatus/pkg/s3"
 	"gcstatus/pkg/utils"
 	"net/http"
 	"time"
@@ -202,30 +202,13 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 }
 
 func (h *AuthHandler) Me(c *gin.Context) {
-	authUser, err := utils.ExtractAuthenticatedUser(c, h.userService.GetUserByID)
+	user, err := utils.Auth(c, h.userService.GetUserByID)
 	if err != nil {
-		RespondWithError(c, http.StatusUnauthorized, err.Error())
+		RespondWithError(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	userID, ok := authUser.(uint)
-	if !ok {
-		RespondWithError(c, http.StatusInternalServerError, "Invalid user ID format.")
-		return
-	}
-
-	user, found := cache.GlobalCache.GetUserFromCache(userID)
-	if !found {
-		user, err = h.userService.GetUserByID(userID)
-		if err != nil {
-			RespondWithError(c, http.StatusInternalServerError, err.Error())
-			return
-		}
-
-		cache.GlobalCache.SetUserInCache(user)
-	}
-
-	transformedUser := resources.TransformUser(*user)
+	transformedUser := resources.TransformUser(*user, s3.GlobalS3Client)
 
 	c.JSON(http.StatusOK, resources.Response{
 		Data: transformedUser,

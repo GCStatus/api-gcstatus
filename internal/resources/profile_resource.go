@@ -1,7 +1,11 @@
 package resources
 
 import (
+	"context"
 	"gcstatus/internal/domain"
+	"gcstatus/pkg/s3"
+	"log"
+	"time"
 )
 
 type ProfileResource struct {
@@ -19,11 +23,16 @@ type ProfileResource struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
-func TransformProfile(profile domain.Profile) *ProfileResource {
+func TransformProfile(profile domain.Profile, s3Client s3.S3ClientInterface) *ProfileResource {
+	url, err := s3Client.GetPresignedURL(context.TODO(), profile.Photo, time.Hour*2)
+	if err != nil {
+		log.Printf("Error generating presigned URL: %v", err)
+	}
+
 	return &ProfileResource{
 		ID:        profile.ID,
 		Share:     profile.Share,
-		Photo:     profile.Photo,
+		Photo:     url,
 		Phone:     profile.Phone,
 		Facebook:  profile.Facebook,
 		Instagram: profile.Instagram,
