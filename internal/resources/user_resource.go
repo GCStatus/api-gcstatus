@@ -2,6 +2,7 @@ package resources
 
 import (
 	"gcstatus/internal/domain"
+	"gcstatus/pkg/s3"
 )
 
 type UserResource struct {
@@ -18,7 +19,7 @@ type UserResource struct {
 	Wallet     *WalletResource  `json:"wallet"`
 }
 
-func TransformUser(user domain.User) UserResource {
+func TransformUser(user domain.User, s3Client s3.S3ClientInterface) UserResource {
 	userResource := UserResource{
 		ID:         user.ID,
 		Name:       user.Name,
@@ -31,7 +32,7 @@ func TransformUser(user domain.User) UserResource {
 	}
 
 	if user.Profile.ID != 0 {
-		userResource.Profile = TransformProfile(user.Profile)
+		userResource.Profile = TransformProfile(user.Profile, s3Client)
 	}
 
 	if user.Level.ID != 0 {
@@ -45,10 +46,10 @@ func TransformUser(user domain.User) UserResource {
 	return userResource
 }
 
-func TransformUsers(users []domain.User) []UserResource {
+func TransformUsers(users []domain.User, s3Client s3.S3ClientInterface) []UserResource {
 	var resources []UserResource
 	for _, user := range users {
-		resources = append(resources, TransformUser(user))
+		resources = append(resources, TransformUser(user, s3Client))
 	}
 
 	return resources

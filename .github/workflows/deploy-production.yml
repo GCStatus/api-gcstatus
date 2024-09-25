@@ -74,6 +74,8 @@ jobs:
               AWS_MAIL_FROM=${{ secrets.AWS_MAIL_FROM }}
               AWS_MAIL_REGION=${{ secrets.AWS_MAIL_REGION }}
               CORS_DOMAINS=${{ secrets.CORS_DOMAINS }}
+              AWS_BUCKET=${{ secrets.AWS_BUCKET }}
+              AWS_BUCKET_REGION=${{ secrets.AWS_BUCKET_REGION }}
             EOF'
 
             docker rmi $IMAGE_ID || true

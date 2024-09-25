@@ -1,11 +1,29 @@
 package tests
 
 import (
+	"context"
+	"fmt"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/resources"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
+
+type MockS3Client struct{}
+
+func (m *MockS3Client) GetPresignedURL(ctx context.Context, objectKey string, expiry time.Duration) (string, error) {
+	return fmt.Sprintf("https://mock-presigned-url.com/%s", objectKey), nil
+}
+
+func (m *MockS3Client) RemoveFile(ctx context.Context, fileName string) error {
+	return nil
+}
+
+func (s *MockS3Client) UploadFile(ctx context.Context, folder, fileName string, fileContent []byte) (string, error) {
+	return fmt.Sprintf("https://mock-presigned-url.com/%s/%s", folder, fileName), nil
+}
 
 func TestTransformProfile(t *testing.T) {
 	staticTime := time.Date(2022, time.January, 1, 0, 0, 0, 0, time.UTC)
@@ -18,7 +36,7 @@ func TestTransformProfile(t *testing.T) {
 			input: domain.Profile{
 				ID:        1,
 				Share:     true,
-				Photo:     "https://placehold.co/600x400/EEE/31343C",
+				Photo:     "photo-key",
 				Phone:     "5511928342813",
 				Facebook:  "https://facebook.com/any",
 				Instagram: "https://instagram.com/any",
@@ -33,7 +51,7 @@ func TestTransformProfile(t *testing.T) {
 			expected: resources.ProfileResource{
 				ID:        1,
 				Share:     true,
-				Photo:     "https://placehold.co/600x400/EEE/31343C",
+				Photo:     "https://mock-presigned-url.com/photo-key",
 				Phone:     "5511928342813",
 				Facebook:  "https://facebook.com/any",
 				Instagram: "https://instagram.com/any",
@@ -51,44 +69,21 @@ func TestTransformProfile(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			profileResource := resources.TransformProfile(test.input)
+			mockS3Client := &MockS3Client{}
+			profileResource := resources.TransformProfile(test.input, mockS3Client)
 
-			if profileResource.ID != test.expected.ID {
-				t.Errorf("Expected ID %d, got %d", test.expected.ID, profileResource.ID)
-			}
-			if profileResource.Share != test.expected.Share {
-				t.Errorf("Expected Share %v, got %v", test.expected.Share, profileResource.Share)
-			}
-			if profileResource.Photo != test.expected.Photo {
-				t.Errorf("Expected Photo %s, got %s", test.expected.Photo, profileResource.Photo)
-			}
-			if profileResource.Phone != test.expected.Phone {
-				t.Errorf("Expected Phone %s, got %s", test.expected.Phone, profileResource.Phone)
-			}
-			if profileResource.Facebook != test.expected.Facebook {
-				t.Errorf("Expected Facebook %s, got %s", test.expected.Facebook, profileResource.Facebook)
-			}
-			if profileResource.Instagram != test.expected.Instagram {
-				t.Errorf("Expected Instagram %s, got %s", test.expected.Instagram, profileResource.Instagram)
-			}
-			if profileResource.Twitter != test.expected.Twitter {
-				t.Errorf("Expected Twitter %s, got %s", test.expected.Twitter, profileResource.Twitter)
-			}
-			if profileResource.Youtube != test.expected.Youtube {
-				t.Errorf("Expected Youtube %s, got %s", test.expected.Youtube, profileResource.Youtube)
-			}
-			if profileResource.Twitch != test.expected.Twitch {
-				t.Errorf("Expected Twitch %s, got %s", test.expected.Twitch, profileResource.Twitch)
-			}
-			if profileResource.Github != test.expected.Github {
-				t.Errorf("Expected Github %s, got %s", test.expected.Github, profileResource.Github)
-			}
-			if profileResource.CreatedAt != test.expected.CreatedAt {
-				t.Errorf("Expected CreatedAt %s, got %s", test.expected.CreatedAt, profileResource.CreatedAt)
-			}
-			if profileResource.UpdatedAt != test.expected.UpdatedAt {
-				t.Errorf("Expected UpdatedAt %s, got %s", test.expected.UpdatedAt, profileResource.UpdatedAt)
-			}
+			assert.Equal(t, test.expected.ID, profileResource.ID)
+			assert.Equal(t, test.expected.Share, profileResource.Share)
+			assert.Equal(t, test.expected.Photo, profileResource.Photo)
+			assert.Equal(t, test.expected.Phone, profileResource.Phone)
+			assert.Equal(t, test.expected.Facebook, profileResource.Facebook)
+			assert.Equal(t, test.expected.Instagram, profileResource.Instagram)
+			assert.Equal(t, test.expected.Twitter, profileResource.Twitter)
+			assert.Equal(t, test.expected.Youtube, profileResource.Youtube)
+			assert.Equal(t, test.expected.Twitch, profileResource.Twitch)
+			assert.Equal(t, test.expected.Github, profileResource.Github)
+			assert.Equal(t, test.expected.CreatedAt, profileResource.CreatedAt)
+			assert.Equal(t, test.expected.UpdatedAt, profileResource.UpdatedAt)
 		})
 	}
 }

@@ -10,10 +10,16 @@ import (
 
 func main() {
 	// Initialize dependencies (repository, service, etc.)
-	userService, authService, passwordResetService, levelService, _ := di.InitDependencies()
+	userService, authService, passwordResetService, levelService, profileService, _ := di.InitDependencies()
 
 	// Setup routes with dependency injection
-	r := routes.SetupRouter(userService, authService, passwordResetService, levelService)
+	r := routes.SetupRouter(
+		userService,
+		authService,
+		passwordResetService,
+		levelService,
+		profileService,
+	)
 
 	// Get port
 	port := os.Getenv("PORT")

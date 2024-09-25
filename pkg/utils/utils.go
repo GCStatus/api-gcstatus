@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"gcstatus/config"
 	"gcstatus/internal/domain"
+	"gcstatus/pkg/cache"
 	"io"
 	"os"
 	"regexp"
@@ -222,4 +223,46 @@ func IsHashEqualsValue(hash string, value string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func Auth(c *gin.Context, fetchUser UserFetcher) (*domain.User, error) {
+	authUser, err := ExtractAuthenticatedUser(c, fetchUser)
+	if err != nil {
+		return nil, fmt.Errorf("unauthorized: %v", err)
+	}
+
+	userID, ok := authUser.(uint)
+	if !ok {
+		return nil, fmt.Errorf("invalid user ID format")
+	}
+
+	user, found := cache.GlobalCache.GetUserFromCache(userID)
+	if found {
+		return user, nil
+	}
+
+	user, err = fetchUser(userID)
+	if err != nil {
+		return nil, fmt.Errorf("error fetching user: %v", err)
+	}
+
+	cache.GlobalCache.SetUserInCache(user)
+
+	return user, nil
+}
+
+func NullString(s *string) interface{} {
+	if s == nil || *s == "" {
+		return nil
+	}
+
+	return *s
+}
+
+func BoolPtr(b bool) *bool {
+	return &b
+}
+
+func StringPtr(s string) *string {
+	return &s
 }

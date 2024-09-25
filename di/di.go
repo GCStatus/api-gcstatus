@@ -4,6 +4,7 @@ import (
 	"gcstatus/config"
 	"gcstatus/internal/usecases"
 	"gcstatus/pkg/cache"
+	"gcstatus/pkg/s3"
 	"log"
 
 	"gorm.io/driver/mysql"
@@ -16,6 +17,7 @@ func InitDependencies() (
 	*usecases.AuthService,
 	*usecases.PasswordResetService,
 	*usecases.LevelService,
+	*usecases.ProfileService,
 	*gorm.DB,
 ) {
 	// Load config
@@ -31,12 +33,14 @@ func InitDependencies() (
 	// Auto-migrate the database
 	MigrateModels(dbConn)
 
+	// Setup clients for non-test environment
 	if cfg.ENV != "testing" {
 		cache.GlobalCache = cache.NewRedisCache()
+		s3.GlobalS3Client = s3.NewS3Client()
 	}
 
 	// Setup dependencies
-	userService, authService, passwordResetService, levelService := Setup(dbConn)
+	userService, authService, passwordResetService, levelService, profileService := Setup(dbConn)
 
-	return userService, authService, passwordResetService, levelService, dbConn
+	return userService, authService, passwordResetService, levelService, profileService, dbConn
 }

@@ -175,25 +175,10 @@ func (h *PasswordResetHandler) ResetPasswordProfile(c *gin.Context) {
 		return
 	}
 
-	authUser, err := utils.ExtractAuthenticatedUser(c, h.userService.GetUserByID)
+	user, err := utils.Auth(c, h.userService.GetUserByID)
 	if err != nil {
-		RespondWithError(c, http.StatusUnauthorized, err.Error())
+		RespondWithError(c, http.StatusInternalServerError, err.Error())
 		return
-	}
-
-	userID, ok := authUser.(uint)
-	if !ok {
-		RespondWithError(c, http.StatusInternalServerError, "Invalid user ID format.")
-		return
-	}
-
-	user, found := cache.GlobalCache.GetUserFromCache(userID)
-	if !found {
-		user, err = h.userService.GetUserByID(userID)
-		if err != nil {
-			RespondWithError(c, http.StatusInternalServerError, err.Error())
-			return
-		}
 	}
 
 	if isEqual, err := utils.IsHashEqualsValue(user.Password, request.Password); err != nil || !isEqual {
@@ -216,7 +201,7 @@ func (h *PasswordResetHandler) ResetPasswordProfile(c *gin.Context) {
 
 	h.authService.ClearAuthCookies(c, env.AccessTokenKey, env.IsAuthKey, env.Domain)
 
-	cache.GlobalCache.RemoveUserFromCache(userID)
+	cache.GlobalCache.RemoveUserFromCache(user.ID)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Your password was successfully changed!"})
 }

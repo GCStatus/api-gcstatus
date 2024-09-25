@@ -9,25 +9,27 @@ import (
 )
 
 type Config struct {
-	ENV            string
-	DBHost         string
-	DBPort         string
-	DBUser         string
-	DBPassword     string
-	DBName         string
-	AccessTokenKey string
-	JwtSecret      string
-	JwtTtl         string
-	IsAuthKey      string
-	HttpSecure     string
-	HttpOnly       string
-	Domain         string
-	RedisHost      string
-	AwsMailFrom    string
-	AwsMailRegion  string
-	AwsAccessKey   string
-	AwsSecretKey   string
-	CorsDomains    string
+	ENV             string
+	DBHost          string
+	DBPort          string
+	DBUser          string
+	DBPassword      string
+	DBName          string
+	AccessTokenKey  string
+	JwtSecret       string
+	JwtTtl          string
+	IsAuthKey       string
+	HttpSecure      string
+	HttpOnly        string
+	Domain          string
+	RedisHost       string
+	AwsMailFrom     string
+	AwsMailRegion   string
+	AwsAccessKey    string
+	AwsSecretKey    string
+	CorsDomains     string
+	AwsBucket       string
+	AwsBucketRegion string
 }
 
 func LoadConfig() *Config {
@@ -37,25 +39,27 @@ func LoadConfig() *Config {
 	}
 
 	return &Config{
-		ENV:            getEnv("ENV", "local"),
-		DBHost:         getEnv("DB_HOST", "localhost"),
-		DBPort:         getEnv("DB_PORT", "3306"),
-		DBUser:         getEnv("DB_USER", "root"),
-		DBPassword:     getEnv("DB_PASSWORD", ""),
-		DBName:         getEnv("DB_NAME", "gcstatus"),
-		AccessTokenKey: getEnv("ACCESS_TOKEN_KEY", "_gc_9hp1b73cGDCmAPgaVTYOlS6cjPsnDYho"),
-		JwtSecret:      getEnv("JWT_SECRET", "5qY51df4G2WkfGhYxsB2bO5yXhc5RG9l"),
-		JwtTtl:         getEnv("JWT_TTL", "15"), // in days
-		IsAuthKey:      getEnv("IS_AUTH_KEY", "_gc_auth"),
-		HttpSecure:     getEnv("HTTP_SECURE", "false"),
-		HttpOnly:       getEnv("HTTP_ONLY", "false"),
-		Domain:         getEnv("HTTP_DOMAIN", "localhost"),
-		RedisHost:      getEnv("REDIS_HOST", "localhost:6379"),
-		AwsMailFrom:    getEnv("AWS_MAIL_FROM", "localhost@localhost.com"),
-		AwsMailRegion:  getEnv("AWS_MAIL_REGION", "us-west-2"),
-		AwsAccessKey:   getEnv("AWS_ACCESS_KEY", ""),
-		AwsSecretKey:   getEnv("AWS_SECRET_KEY", ""),
-		CorsDomains:    getEnv("CORS_DOMAINS", "http://localhost:5173"),
+		ENV:             getEnv("ENV", "local"),
+		DBHost:          getEnv("DB_HOST", "localhost"),
+		DBPort:          getEnv("DB_PORT", "3306"),
+		DBUser:          getEnv("DB_USER", "root"),
+		DBPassword:      getEnv("DB_PASSWORD", ""),
+		DBName:          getEnv("DB_NAME", "gcstatus"),
+		AccessTokenKey:  getEnv("ACCESS_TOKEN_KEY", "_gc_9hp1b73cGDCmAPgaVTYOlS6cjPsnDYho"),
+		JwtSecret:       getEnv("JWT_SECRET", "5qY51df4G2WkfGhYxsB2bO5yXhc5RG9l"),
+		JwtTtl:          getEnv("JWT_TTL", "15"), // in days
+		IsAuthKey:       getEnv("IS_AUTH_KEY", "_gc_auth"),
+		HttpSecure:      getEnv("HTTP_SECURE", "false"),
+		HttpOnly:        getEnv("HTTP_ONLY", "false"),
+		Domain:          getEnv("HTTP_DOMAIN", "localhost"),
+		RedisHost:       getEnv("REDIS_HOST", "localhost:6379"),
+		AwsMailFrom:     getEnv("AWS_MAIL_FROM", "localhost@localhost.com"),
+		AwsMailRegion:   getEnv("AWS_MAIL_REGION", "us-west-2"),
+		AwsAccessKey:    getEnv("AWS_ACCESS_KEY", ""),
+		AwsSecretKey:    getEnv("AWS_SECRET_KEY", ""),
+		CorsDomains:     getEnv("CORS_DOMAINS", "http://localhost:5173"),
+		AwsBucket:       getEnv("AWS_BUCKET", ""),
+		AwsBucketRegion: getEnv("AWS_BUCKET_REGION", ""),
 	}
 }
 

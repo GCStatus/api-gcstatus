@@ -4,6 +4,7 @@ import (
 	"gcstatus/internal/domain"
 	"gcstatus/internal/resources"
 	"gcstatus/internal/usecases"
+	"gcstatus/pkg/s3"
 	"net/http"
 	"strconv"
 
@@ -40,7 +41,7 @@ func (h *UserHandler) GetAllUsers(c *gin.Context) {
 		return
 	}
 
-	transformedUsers := resources.TransformUsers(users)
+	transformedUsers := resources.TransformUsers(users, s3.GlobalS3Client)
 
 	response := resources.Response{
 		Data: transformedUsers,

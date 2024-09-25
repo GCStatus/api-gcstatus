@@ -183,7 +183,8 @@ func TestTransformUser(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			userResource := resources.TransformUser(test.inputUser)
+			mockS3Client := &MockS3Client{}
+			userResource := resources.TransformUser(test.inputUser, mockS3Client)
 
 			if userResource.ID != test.expected.ID {
 				t.Errorf("Expected ID %d, got %d", test.expected.ID, userResource.ID)
@@ -279,7 +280,8 @@ func TestTransformUsers(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			userResources := resources.TransformUsers(test.inputUsers)
+			mockS3Client := &MockS3Client{}
+			userResources := resources.TransformUsers(test.inputUsers, mockS3Client)
 
 			if len(userResources) != len(test.expected) {
 				t.Errorf("Expected %d resources, got %d", len(test.expected), len(userResources))
