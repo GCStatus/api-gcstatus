@@ -37,7 +37,7 @@ func SetupRouter(
 	}))
 
 	// Initialize the handlers
-	authHandler, passwordResetHandler, levelHandler, profileHandler := InitHandlers(
+	authHandler, passwordResetHandler, levelHandler, profileHandler, userHandler := InitHandlers(
 		authService,
 		userService,
 		passwordResetService,
@@ -64,9 +64,13 @@ func SetupRouter(
 	{
 		protected.GET("/me", authHandler.Me)
 		protected.GET("/levels", levelHandler.GetAll)
+
 		protected.PUT("/profile/password", passwordResetHandler.ResetPasswordProfile)
 		protected.PUT("/profile/picture", profileHandler.UpdatePicture)
 		protected.PUT("/profile/socials", profileHandler.UpdateSocials)
+
+		protected.PUT("/user/update/basics", userHandler.UpdateUserBasics)
+		protected.PUT("/user/update/sensitive", userHandler.UpdateUserNickAndEmail)
 	}
 
 	// Common routes

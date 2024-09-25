@@ -49,5 +49,10 @@
   - [x] User should have the coins quantity
   - [x] Create user wallet
   - [x] Migrate the user coins quantity for a has one relation for wallet
+- [x] Update user
+  - [x] Request password for sensitive changes, such as email or nickname
+  - [x] Update user email
+  - [x] Update user nickname
+  - [x] Update user basics, such as name and birthdate
 
 ### Post MVP

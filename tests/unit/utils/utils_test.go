@@ -202,29 +202,22 @@ func IsHashEqualsValueTest(t *testing.T) {
 	tests := map[string]struct {
 		hash        string
 		value       string
-		expectErr   bool
 		expectEqual bool
-		errMessage  string
 	}{
 		"is equals": {
 			hash:        hashed,
 			value:       base,
-			expectErr:   false,
 			expectEqual: true,
 		},
 		"not equals": {
 			hash:        hashed,
 			value:       baseInvalid,
-			expectErr:   true,
 			expectEqual: false,
-			errMessage:  "failed to compare hash",
 		},
 		"error case with invalid hash": {
 			hash:        "invalid-hash",
 			value:       base,
-			expectErr:   true,
 			expectEqual: false,
-			errMessage:  "failed to compare hash",
 		},
 	}
 
@@ -232,16 +225,10 @@ func IsHashEqualsValueTest(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			equal, err := utils.IsHashEqualsValue(tc.hash, tc.value)
+			equal := utils.IsHashEqualsValue(tc.hash, tc.value)
 
-			if tc.expectErr {
-				if assert.Error(t, err) {
-					assert.EqualError(t, err, tc.errMessage, "expected error message to match")
-				}
-			} else {
-				assert.NoError(t, err, "did not expect an error")
-				assert.Equal(t, tc.expectEqual, equal, "expectEqual check failed")
-			}
+			assert.NoError(t, err, "did not expect an error")
+			assert.Equal(t, tc.expectEqual, equal, "expectEqual check failed")
 		})
 	}
 }

@@ -3,7 +3,9 @@ package tests
 import (
 	"errors"
 	"gcstatus/internal/domain"
+	"gcstatus/internal/ports"
 	"testing"
+	"time"
 )
 
 type MockUserRepository struct {
@@ -55,6 +57,59 @@ func (m *MockUserRepository) UpdateUserPassword(userID uint, hashedPassword stri
 		return errors.New("user not found")
 	}
 	user.Password = hashedPassword
+	return nil
+}
+
+func (m *MockUserRepository) UpdateUserNickAndEmail(userID uint, request ports.UpdateNickAndEmailRequest) error {
+	user, exists := m.users[userID]
+	if !exists {
+		return errors.New("user not found")
+	}
+
+	if user.Password != request.Password {
+		return errors.New("password does not match")
+	}
+
+	for id, u := range m.users {
+		if id != userID {
+			if u.Email == request.Email {
+				return errors.New("email already in use")
+			}
+			if u.Nickname == request.Nickname {
+				return errors.New("nickname already in use")
+			}
+		}
+	}
+
+	user.Nickname = request.Nickname
+	user.Email = request.Email
+
+	m.users[userID] = user
+	return nil
+}
+
+func (m *MockUserRepository) UpdateUserBasics(userID uint, request ports.UpdateUserBasicsRequest) error {
+	user, exists := m.users[userID]
+	if !exists {
+		return errors.New("user not found")
+	}
+
+	birthdate, err := time.Parse("2006-01-02T15:04:05", request.Birthdate)
+	if err != nil {
+		birthdate, err = time.Parse("2006-01-02", request.Birthdate)
+		if err != nil {
+			return errors.New("birthdate incorrectly formatted")
+		}
+	}
+
+	if time.Since(birthdate).Hours() < 14*365*24 {
+		return errors.New("user lower than 14 years")
+	}
+
+	user.Name = request.Name
+	user.Birthdate = birthdate
+	m.users[userID] = user
+
 	return nil
 }
 
@@ -318,6 +373,189 @@ func TestMockUserRepository_UpdateUserPassword(t *testing.T) {
 				}
 				if mockRepo.users[tc.userID].Password != tc.newPassword {
 					t.Fatalf("expected password to be updated, but it wasn't")
+				}
+			}
+		})
+	}
+}
+
+func TestMockUserRepository_UpdateUserNickAndEmail(t *testing.T) {
+	mockRepo := NewMockUserRepository()
+
+	err := mockRepo.CreateUser(&domain.User{
+		ID:       1,
+		Email:    "user@example.com",
+		Nickname: "user1",
+		Password: "password123",
+	})
+	if err != nil {
+		t.Fatalf("failed to create the user: %s", err.Error())
+	}
+
+	err = mockRepo.CreateUser(&domain.User{
+		ID:       2,
+		Email:    "duplicate@example.com",
+		Nickname: "duplicateNick",
+		Password: "password456",
+	})
+	if err != nil {
+		t.Fatalf("failed to create the second user: %s", err.Error())
+	}
+
+	testCases := map[string]struct {
+		userID        uint
+		newEmail      string
+		newNickname   string
+		password      string
+		expectedError bool
+		expectedMsg   string
+	}{
+		"success": {
+			userID:        1,
+			newNickname:   "user2",
+			newEmail:      "user2@example.com",
+			password:      "password123",
+			expectedError: false,
+		},
+		"invalid user ID": {
+			userID:        999,
+			newNickname:   "user2",
+			newEmail:      "user2@example.com",
+			password:      "password123",
+			expectedError: true,
+			expectedMsg:   "user not found",
+		},
+		"duplicated email": {
+			userID:        1,
+			newNickname:   "user2",
+			newEmail:      "duplicate@example.com",
+			password:      "password123",
+			expectedError: true,
+			expectedMsg:   "email already in use",
+		},
+		"duplicated nickname": {
+			userID:        1,
+			newNickname:   "duplicateNick",
+			newEmail:      "user2@example.com",
+			password:      "password123",
+			expectedError: true,
+			expectedMsg:   "nickname already in use",
+		},
+		"password does not match": {
+			userID:        1,
+			newNickname:   "user2",
+			newEmail:      "user2@example.com",
+			password:      "wrongpassword",
+			expectedError: true,
+			expectedMsg:   "password does not match",
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			request := ports.UpdateNickAndEmailRequest{
+				Password: tc.password,
+				Nickname: tc.newNickname,
+				Email:    tc.newEmail,
+			}
+
+			err := mockRepo.UpdateUserNickAndEmail(tc.userID, request)
+
+			if tc.expectedError {
+				if err == nil {
+					t.Fatalf("expected error, got nil")
+				}
+				if err.Error() != tc.expectedMsg {
+					t.Fatalf("expected error message: %s, got: %s", tc.expectedMsg, err.Error())
+				}
+			} else {
+				if err != nil {
+					t.Fatalf("expected no error, got %v", err)
+				}
+				updatedUser := mockRepo.users[tc.userID]
+				if updatedUser.Email != tc.newEmail {
+					t.Fatalf("expected email to be updated to %s, but got %s", tc.newEmail, updatedUser.Email)
+				}
+				if updatedUser.Nickname != tc.newNickname {
+					t.Fatalf("expected nickname to be updated to %s, but got %s", tc.newNickname, updatedUser.Nickname)
+				}
+			}
+		})
+	}
+}
+
+func TestMockUserRepository_UpdateUserBasics(t *testing.T) {
+	mockRepo := NewMockUserRepository()
+	fixedTime := time.Now()
+
+	err := mockRepo.CreateUser(&domain.User{
+		ID:        1,
+		Name:      "User",
+		Birthdate: fixedTime,
+	})
+	if err != nil {
+		t.Fatalf("failed to create the user: %s", err.Error())
+	}
+
+	testCases := map[string]struct {
+		userID        uint
+		newName       string
+		newBirthdate  string
+		expectedError bool
+		expectedMsg   string
+	}{
+		"success": {
+			userID:        1,
+			newName:       "User 2",
+			newBirthdate:  "2000-01-01T00:00:00",
+			expectedError: false,
+		},
+		"invalid user ID": {
+			userID:        999,
+			newName:       "User 2",
+			newBirthdate:  "2000-01-01T00:00:00",
+			expectedError: true,
+			expectedMsg:   "user not found",
+		},
+		"less than 14": {
+			userID:        1,
+			newName:       "User 2",
+			newBirthdate:  time.Now().Format("2006-01-02T15:04:05"),
+			expectedError: true,
+			expectedMsg:   "user lower than 14 years",
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			request := ports.UpdateUserBasicsRequest{
+				Name:      tc.newName,
+				Birthdate: tc.newBirthdate,
+			}
+
+			err := mockRepo.UpdateUserBasics(tc.userID, request)
+
+			if tc.expectedError {
+				if err == nil {
+					t.Fatalf("expected error, got nil")
+				}
+				if err.Error() != tc.expectedMsg {
+					t.Fatalf("expected error message: %s, got: %s", tc.expectedMsg, err.Error())
+				}
+			} else {
+				if err != nil {
+					t.Fatalf("expected no error, got %v", err)
+				}
+				updatedUser := mockRepo.users[tc.userID]
+				if updatedUser.Name != tc.newName {
+					t.Fatalf("expected name to be updated to %s, but got %s", tc.newName, updatedUser.Name)
+				}
+				if updatedUser.Birthdate.Format("2006-01-02T15:04:05") != tc.newBirthdate {
+					t.Fatalf("expected birthdate to be updated to %s, but got %s", tc.newBirthdate, updatedUser.Birthdate.Format("2006-01-02T15:04:05"))
 				}
 			}
 		})

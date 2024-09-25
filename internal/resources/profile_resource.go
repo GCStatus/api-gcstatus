@@ -24,7 +24,7 @@ type ProfileResource struct {
 }
 
 func TransformProfile(profile domain.Profile, s3Client s3.S3ClientInterface) *ProfileResource {
-	url, err := s3Client.GetPresignedURL(context.TODO(), profile.Photo, time.Hour*2)
+	url, err := s3Client.GetPresignedURL(context.TODO(), profile.Photo, time.Hour*24*7) // 7 days
 	if err != nil {
 		log.Printf("Error generating presigned URL: %v", err)
 	}
