@@ -14,6 +14,7 @@ type Level struct {
 	Coins      uint `gorm:"not null" validate:"required,numeric"`
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
+	Rewards    []Reward `gorm:"polymorphic:Sourceable;"`
 }
 
 func (l *Level) ValidateLevel() error {

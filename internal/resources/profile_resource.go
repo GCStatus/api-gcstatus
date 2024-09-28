@@ -4,6 +4,7 @@ import (
 	"context"
 	"gcstatus/internal/domain"
 	"gcstatus/pkg/s3"
+	"gcstatus/pkg/utils"
 	"log"
 	"time"
 )
@@ -40,7 +41,7 @@ func TransformProfile(profile domain.Profile, s3Client s3.S3ClientInterface) *Pr
 		Youtube:   profile.Youtube,
 		Twitch:    profile.Twitch,
 		Github:    profile.Github,
-		CreatedAt: profile.CreatedAt.Format("2006-01-02T15:04:05"),
-		UpdatedAt: profile.UpdatedAt.Format("2006-01-02T15:04:05"),
+		CreatedAt: utils.FormatTimestamp(profile.CreatedAt),
+		UpdatedAt: utils.FormatTimestamp(profile.UpdatedAt),
 	}
 }

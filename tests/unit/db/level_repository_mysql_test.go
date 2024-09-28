@@ -4,6 +4,7 @@ import (
 	"gcstatus/internal/adapters/db"
 	"gcstatus/internal/domain"
 	"gcstatus/tests"
+	"regexp"
 	"testing"
 	"time"
 
@@ -28,6 +29,18 @@ func TestLevelRepositoryMySQL_GetAll(t *testing.T) {
 					AddRow(1, 0, 1, 0, time.Now(), time.Now()).
 					AddRow(2, 500, 2, 100, time.Now(), time.Now())
 				mock.ExpectQuery("^SELECT \\* FROM `levels`").WillReturnRows(rows)
+
+				rewardRows := sqlmock.NewRows([]string{"id", "sourceable_type", "sourceable_id", "rewardable_type", "rewardable_id"}).
+					AddRow(1, "levels", 1, "titles", 10).
+					AddRow(2, "levels", 2, "titles", 20)
+				mock.ExpectQuery("^SELECT \\* FROM `rewards`").
+					WithArgs("levels", 1, 2).WillReturnRows(rewardRows)
+
+				titlesRows := sqlmock.NewRows([]string{"id", "title", "description", "purchasable", "status"}).
+					AddRow(1, "Title 1", "Title 1", false, "available").
+					AddRow(2, "Title 2", "Title 2", false, "available")
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `titles` WHERE id IN (?,?) AND `titles`.`deleted_at` IS NULL")).
+					WillReturnRows(titlesRows)
 			},
 			expectedLen: 2,
 			expectedErr: nil,
@@ -74,6 +87,11 @@ func TestLevelRepositoryMySQL_FindById(t *testing.T) {
 					AddRow(1, 0, 1, 0, time.Now(), time.Now())
 				mock.ExpectQuery("^SELECT \\* FROM `levels` WHERE `levels`.`id` = \\? AND `levels`.`deleted_at` IS NULL ORDER BY `levels`.`id` LIMIT \\?").
 					WithArgs(1, 1).WillReturnRows(rows)
+
+				rewardRows := sqlmock.NewRows([]string{"id", "sourceable_id", "sourceable_type", "rewardable_id", "rewardable_type"}).
+					AddRow(1, 1, "levels", 1, "titles")
+				mock.ExpectQuery("^SELECT \\* FROM `rewards` WHERE `sourceable_type` = \\? AND `rewards`.`sourceable_id` = \\? AND `rewards`.`deleted_at` IS NULL").
+					WithArgs("levels", 1).WillReturnRows(rewardRows)
 			},
 			expectedLevel: &domain.Level{ID: 1, Experience: 0, Level: 1, Coins: 0},
 			expectedErr:   nil,

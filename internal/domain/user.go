@@ -22,6 +22,8 @@ type User struct {
 	LevelID    uint    `gorm:"default:1"`
 	Level      Level
 	Wallet     Wallet
+	Titles     []UserTitle     `json:"titles" gorm:"foreignKey:UserID"`
+	Progresses []TitleProgress `json:"title_progresses" gorm:"foreignKey:UserID"`
 }
 
 func (u *User) ValidateUser() error {

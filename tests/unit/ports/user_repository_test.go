@@ -4,6 +4,7 @@ import (
 	"errors"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/ports"
+	"gcstatus/pkg/utils"
 	"testing"
 	"time"
 )
@@ -522,7 +523,7 @@ func TestMockUserRepository_UpdateUserBasics(t *testing.T) {
 		"less than 14": {
 			userID:        1,
 			newName:       "User 2",
-			newBirthdate:  time.Now().Format("2006-01-02T15:04:05"),
+			newBirthdate:  utils.FormatTimestamp(time.Now()),
 			expectedError: true,
 			expectedMsg:   "user lower than 14 years",
 		},
@@ -554,8 +555,8 @@ func TestMockUserRepository_UpdateUserBasics(t *testing.T) {
 				if updatedUser.Name != tc.newName {
 					t.Fatalf("expected name to be updated to %s, but got %s", tc.newName, updatedUser.Name)
 				}
-				if updatedUser.Birthdate.Format("2006-01-02T15:04:05") != tc.newBirthdate {
-					t.Fatalf("expected birthdate to be updated to %s, but got %s", tc.newBirthdate, updatedUser.Birthdate.Format("2006-01-02T15:04:05"))
+				if utils.FormatTimestamp(updatedUser.Birthdate) != tc.newBirthdate {
+					t.Fatalf("expected birthdate to be updated to %s, but got %s", tc.newBirthdate, utils.FormatTimestamp(updatedUser.Birthdate))
 				}
 			}
 		})
