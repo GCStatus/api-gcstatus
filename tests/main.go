@@ -74,7 +74,11 @@ func Seed(db *gorm.DB) {
 		{ID: 2, Experience: 500, Level: 2, Coins: 100, CreatedAt: time.Now(), UpdatedAt: time.Now()},
 	}
 
-	db.Create(&levels)
+	titles := []domain.Title{
+		{ID: 1, Title: "Title 1", Description: "Title 1", Purchasable: false, Status: "available"},
+	}
+
+	db.Create(&titles).Create(&levels)
 }
 
 func SetupGinTestContext(method, url string, body string) (*gin.Context, *httptest.ResponseRecorder) {

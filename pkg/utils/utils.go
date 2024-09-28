@@ -14,6 +14,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -265,4 +266,14 @@ func BoolPtr(b bool) *bool {
 
 func StringPtr(s string) *string {
 	return &s
+}
+
+func FormatTimestamp(t time.Time) string {
+	return t.Format("2006-01-02T15:04:05")
+}
+
+func NormalizeWhitespace(str string) string {
+	re := regexp.MustCompile(`\s+`)
+
+	return strings.TrimSpace(re.ReplaceAllString(str, " "))
 }

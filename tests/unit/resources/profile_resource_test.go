@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/resources"
+	"gcstatus/pkg/utils"
 	"testing"
 	"time"
 
@@ -59,8 +60,8 @@ func TestTransformProfile(t *testing.T) {
 				Youtube:   "https://youtube.com/any",
 				Twitch:    "https://twitch.com/any",
 				Github:    "https://github.com/any",
-				CreatedAt: staticTime.Format("2006-01-02T15:04:05"),
-				UpdatedAt: staticTime.Format("2006-01-02T15:04:05"),
+				CreatedAt: utils.FormatTimestamp(staticTime),
+				UpdatedAt: utils.FormatTimestamp(staticTime),
 			},
 		},
 	}

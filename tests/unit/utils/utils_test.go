@@ -4,6 +4,7 @@ import (
 	"errors"
 	"gcstatus/pkg/utils"
 	"testing"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
@@ -283,6 +284,54 @@ func TestFormatValidationError(t *testing.T) {
 			formattedErrors := utils.FormatValidationError(err)
 
 			assert.Equal(t, tc.expected, formattedErrors)
+		})
+	}
+}
+
+func TestFormatTimestamp(t *testing.T) {
+	fixedTime := time.Now()
+
+	tests := map[string]struct {
+		date time.Time
+	}{
+		"valid date": {
+			date: fixedTime,
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			timestamp := utils.FormatTimestamp(tc.date)
+
+			assert.Equal(t, timestamp, fixedTime.Format("2006-01-02T15:04:05"))
+		})
+	}
+}
+
+func TestNormalizeWhitespace(t *testing.T) {
+	tests := map[string]struct {
+		toNormalize  string
+		expectReturn string
+	}{
+		"can normalize string": {
+			toNormalize: `
+				Hello,
+				World.
+				This is a test!
+			`,
+			expectReturn: "Hello, World. This is a test!",
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			normalized := utils.NormalizeWhitespace(tc.toNormalize)
+
+			assert.Equal(t, normalized, tc.expectReturn)
 		})
 	}
 }

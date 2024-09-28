@@ -84,13 +84,28 @@ func TestUserRepositoryMySQL_GetUserByID(t *testing.T) {
 				mock.ExpectQuery("^SELECT \\* FROM `profiles` WHERE `profiles`.`user_id` = \\? AND `profiles`.`deleted_at` IS NULL").
 					WithArgs(1).WillReturnRows(profileRows)
 
+				titleRows := sqlmock.NewRows([]string{"id", "user_id", "title_id"}).
+					AddRow(1, 1, 1)
+				mock.ExpectQuery("^SELECT \\* FROM `user_titles` WHERE `user_titles`.`user_id` = \\? AND `user_titles`.`deleted_at` IS NULL").
+					WithArgs(1).WillReturnRows(titleRows)
+
+				titlesRows := sqlmock.NewRows([]string{"id", "title", "description", "purchasable", "status"}).
+					AddRow(1, "Title 1", "Title 1", false, "available")
+				mock.ExpectQuery("^SELECT \\* FROM `titles` WHERE `titles`.`id` = \\? AND `titles`.`deleted_at` IS NULL").
+					WithArgs(1).WillReturnRows(titlesRows)
+
 				walletRows := sqlmock.NewRows([]string{"id", "user_id"}).
 					AddRow(1, 1)
 				mock.ExpectQuery("^SELECT \\* FROM `wallets` WHERE `wallets`.`user_id` = \\? AND `wallets`.`deleted_at` IS NULL").
 					WithArgs(1).WillReturnRows(walletRows)
 			},
-			expectedUser: &domain.User{ID: 1, Profile: domain.Profile{ID: 1}, Wallet: domain.Wallet{ID: 1}},
-			expectedErr:  nil,
+			expectedUser: &domain.User{
+				ID:      1,
+				Profile: domain.Profile{ID: 1},
+				Wallet:  domain.Wallet{ID: 1},
+				Titles:  []domain.UserTitle{{ID: 1, UserID: 1, TitleID: 1}},
+			},
+			expectedErr: nil,
 		},
 		"not found ID": {
 			id: 999,

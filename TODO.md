@@ -12,6 +12,15 @@
 - [ ] Email verification
   - [ ] Block user access if email is not verified
   - [ ] If user change email, set verified_at to null and block access again
+- [ ] Abstract all use cases and rules to services
+- [ ] Integrate with Kibana for logs
+- [ ] Buy titles
+  - [x] Create method to buy titles
+  - [x] Check if user has enough coins
+  - [x] Reward user with title
+  - [x] Chargeback user amount on wallet if has ocurred any error with process to give title to user
+  - [ ] Create a transaction for this operation
+  - [ ] Send an email for that operation or transaction
 
 ### Post-MVP
 

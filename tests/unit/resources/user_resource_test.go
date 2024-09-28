@@ -3,6 +3,7 @@ package tests
 import (
 	"gcstatus/internal/domain"
 	"gcstatus/internal/resources"
+	"gcstatus/pkg/utils"
 	"testing"
 	"time"
 )
@@ -36,9 +37,9 @@ func TestTransformUser(t *testing.T) {
 				Nickname:   "Johnny",
 				Level:      1,
 				Experience: 500,
-				Birthdate:  fixedTime.Format("2006-01-02T15:04:05"),
-				CreatedAt:  fixedTime.Format("2006-01-02T15:04:05"),
-				UpdatedAt:  fixedTime.Format("2006-01-02T15:04:05"),
+				Birthdate:  utils.FormatTimestamp(fixedTime),
+				CreatedAt:  utils.FormatTimestamp(fixedTime),
+				UpdatedAt:  utils.FormatTimestamp(fixedTime),
 				Profile: &resources.ProfileResource{
 					ID:    1,
 					Photo: "https://google.com",
@@ -70,9 +71,9 @@ func TestTransformUser(t *testing.T) {
 				Email:      "jane@example.com",
 				Nickname:   "Janey",
 				Experience: 500,
-				Birthdate:  fixedTime.Format("2006-01-02T15:04:05"),
-				CreatedAt:  fixedTime.Format("2006-01-02T15:04:05"),
-				UpdatedAt:  fixedTime.Format("2006-01-02T15:04:05"),
+				Birthdate:  utils.FormatTimestamp(fixedTime),
+				CreatedAt:  utils.FormatTimestamp(fixedTime),
+				UpdatedAt:  utils.FormatTimestamp(fixedTime),
 				Profile:    nil,
 				Level:      1,
 				Wallet: &resources.WalletResource{
@@ -103,9 +104,9 @@ func TestTransformUser(t *testing.T) {
 				Nickname:   "Janey",
 				Level:      0,
 				Experience: 500,
-				Birthdate:  fixedTime.Format("2006-01-02T15:04:05"),
-				CreatedAt:  fixedTime.Format("2006-01-02T15:04:05"),
-				UpdatedAt:  fixedTime.Format("2006-01-02T15:04:05"),
+				Birthdate:  utils.FormatTimestamp(fixedTime),
+				CreatedAt:  utils.FormatTimestamp(fixedTime),
+				UpdatedAt:  utils.FormatTimestamp(fixedTime),
 				Profile: &resources.ProfileResource{
 					ID:    1,
 					Photo: "https://google.com",
@@ -136,9 +137,9 @@ func TestTransformUser(t *testing.T) {
 				Email:      "no-name@example.com",
 				Experience: 500,
 				Nickname:   "NoName",
-				Birthdate:  time.Date(1985, time.March, 15, 0, 0, 0, 0, time.UTC).Format("2006-01-02T15:04:05"),
-				CreatedAt:  fixedTime.Format("2006-01-02T15:04:05"),
-				UpdatedAt:  fixedTime.Format("2006-01-02T15:04:05"),
+				Birthdate:  utils.FormatTimestamp(time.Date(1985, time.March, 15, 0, 0, 0, 0, time.UTC)),
+				CreatedAt:  utils.FormatTimestamp(fixedTime),
+				UpdatedAt:  utils.FormatTimestamp(fixedTime),
 				Profile:    &resources.ProfileResource{ID: 2},
 				Wallet: &resources.WalletResource{
 					ID:     1,
@@ -166,9 +167,9 @@ func TestTransformUser(t *testing.T) {
 				Email:      "jane@example.com",
 				Nickname:   "Janey",
 				Experience: 500,
-				Birthdate:  time.Date(1985, time.March, 15, 0, 0, 0, 0, time.UTC).Format("2006-01-02T15:04:05"),
-				CreatedAt:  fixedTime.Format("2006-01-02T15:04:05"),
-				UpdatedAt:  fixedTime.Format("2006-01-02T15:04:05"),
+				Birthdate:  utils.FormatTimestamp(time.Date(1985, time.March, 15, 0, 0, 0, 0, time.UTC)),
+				CreatedAt:  utils.FormatTimestamp(fixedTime),
+				UpdatedAt:  utils.FormatTimestamp(fixedTime),
 				Profile:    &resources.ProfileResource{ID: 2},
 				Wallet: &resources.WalletResource{
 					ID:     0,
@@ -258,9 +259,9 @@ func TestTransformUsers(t *testing.T) {
 					Email:      "john@example.com",
 					Nickname:   "Johnny",
 					Experience: 500,
-					Birthdate:  time.Date(1990, time.January, 1, 0, 0, 0, 0, time.UTC).Format("2006-01-02T15:04:05"),
-					CreatedAt:  fixedTime.Format("2006-01-02T15:04:05"),
-					UpdatedAt:  fixedTime.Format("2006-01-02T15:04:05"),
+					Birthdate:  utils.FormatTimestamp(time.Date(1990, time.January, 1, 0, 0, 0, 0, time.UTC)),
+					CreatedAt:  utils.FormatTimestamp(fixedTime),
+					UpdatedAt:  utils.FormatTimestamp(fixedTime),
 				},
 				{
 					ID:         2,
@@ -268,9 +269,9 @@ func TestTransformUsers(t *testing.T) {
 					Email:      "jane@example.com",
 					Nickname:   "Janey",
 					Experience: 500,
-					Birthdate:  time.Date(1985, time.March, 15, 0, 0, 0, 0, time.UTC).Format("2006-01-02T15:04:05"),
-					CreatedAt:  fixedTime.Format("2006-01-02T15:04:05"),
-					UpdatedAt:  fixedTime.Format("2006-01-02T15:04:05"),
+					Birthdate:  utils.FormatTimestamp(time.Date(1985, time.March, 15, 0, 0, 0, 0, time.UTC)),
+					CreatedAt:  utils.FormatTimestamp(fixedTime),
+					UpdatedAt:  utils.FormatTimestamp(fixedTime),
 				},
 			},
 		},
@@ -300,13 +301,13 @@ func TestTransformUsers(t *testing.T) {
 				if userResources[i].Nickname != user.Nickname {
 					t.Errorf("Expected Nickname %s, got %s", user.Nickname, userResources[i].Nickname)
 				}
-				if userResources[i].Birthdate != user.Birthdate.Format("2006-01-02T15:04:05") {
+				if userResources[i].Birthdate != utils.FormatTimestamp(user.Birthdate) {
 					t.Errorf("Expected Birthdate %s, got %s", user.Birthdate, userResources[i].Birthdate)
 				}
-				if userResources[i].CreatedAt != user.CreatedAt.Format("2006-01-02T15:04:05") {
+				if userResources[i].CreatedAt != utils.FormatTimestamp(user.CreatedAt) {
 					t.Errorf("Expected CreatedAt %s, got %s", user.CreatedAt, userResources[i].CreatedAt)
 				}
-				if userResources[i].UpdatedAt != user.UpdatedAt.Format("2006-01-02T15:04:05") {
+				if userResources[i].UpdatedAt != utils.FormatTimestamp(user.UpdatedAt) {
 					t.Errorf("Expected UpdatedAt %s, got %s", user.UpdatedAt, userResources[i].UpdatedAt)
 				}
 				if userResources[i].Level != user.Level.Level {

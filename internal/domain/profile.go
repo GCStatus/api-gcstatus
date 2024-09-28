@@ -6,6 +6,10 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	ProfileTitleRequirementKey = "update_profile_picture"
+)
+
 type Profile struct {
 	gorm.Model
 	ID        uint `gorm:"primaryKey"`

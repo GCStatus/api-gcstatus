@@ -18,6 +18,9 @@ func InitDependencies() (
 	*usecases.PasswordResetService,
 	*usecases.LevelService,
 	*usecases.ProfileService,
+	*usecases.TitleService,
+	*usecases.TaskService,
+	*usecases.WalletService,
 	*gorm.DB,
 ) {
 	// Load config
@@ -40,7 +43,22 @@ func InitDependencies() (
 	}
 
 	// Setup dependencies
-	userService, authService, passwordResetService, levelService, profileService := Setup(dbConn)
+	userService,
+		authService,
+		passwordResetService,
+		levelService,
+		profileService,
+		titleService,
+		taskService,
+		walletService := Setup(dbConn)
 
-	return userService, authService, passwordResetService, levelService, profileService, dbConn
+	return userService,
+		authService,
+		passwordResetService,
+		levelService,
+		profileService,
+		titleService,
+		taskService,
+		walletService,
+		dbConn
 }

@@ -9,11 +9,16 @@ import (
 
 func MigrateModels(dbConn *gorm.DB) {
 	models := []interface{}{
+		&domain.Reward{},
 		&domain.Level{},
 		&domain.Wallet{},
 		&domain.User{},
 		&domain.Profile{},
 		&domain.PasswordReset{},
+		&domain.Title{},
+		&domain.TitleRequirement{},
+		&domain.TitleProgress{},
+		&domain.UserTitle{},
 	}
 
 	for _, model := range models {

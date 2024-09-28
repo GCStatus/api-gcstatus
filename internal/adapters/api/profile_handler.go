@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"fmt"
+	"gcstatus/internal/domain"
 	"gcstatus/internal/ports"
 	"gcstatus/internal/usecases"
 	"gcstatus/pkg/cache"
@@ -19,15 +20,18 @@ import (
 type ProfileHandler struct {
 	profileService *usecases.ProfileService
 	userService    *usecases.UserService
+	taskService    *usecases.TaskService
 }
 
 func NewProfileHandler(
 	profileService *usecases.ProfileService,
 	userService *usecases.UserService,
+	taskService *usecases.TaskService,
 ) *ProfileHandler {
 	return &ProfileHandler{
 		profileService: profileService,
 		userService:    userService,
+		taskService:    taskService,
 	}
 }
 
@@ -102,6 +106,11 @@ func (h *ProfileHandler) UpdatePicture(c *gin.Context) {
 	if err != nil {
 		RespondWithError(c, http.StatusInternalServerError, "Failed to update your profile picture: "+err.Error())
 		return
+	}
+
+	err = h.taskService.TrackTitleProgress(user.ID, domain.ProfileTitleRequirementKey, 1)
+	if err != nil {
+		log.Fatalf("failed to track title progress for user %+v. Error: %+s", user.ID, err.Error())
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Your profile picture was successfully updated!"})

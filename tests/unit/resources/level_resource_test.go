@@ -3,6 +3,7 @@ package tests
 import (
 	"gcstatus/internal/domain"
 	"gcstatus/internal/resources"
+	"gcstatus/pkg/utils"
 	"testing"
 	"time"
 )
@@ -27,7 +28,7 @@ func TestTransformLevel(t *testing.T) {
 				Level:      1,
 				Experience: 500,
 				Coins:      100,
-				CreatedAt:  fixedTime.Format("2006-01-02T15:04:05"),
+				CreatedAt:  utils.FormatTimestamp(fixedTime),
 			},
 		},
 		"missing level": {
@@ -41,7 +42,7 @@ func TestTransformLevel(t *testing.T) {
 				ID:         1,
 				Experience: 500,
 				Coins:      100,
-				CreatedAt:  fixedTime.Format("2006-01-02T15:04:05"),
+				CreatedAt:  utils.FormatTimestamp(fixedTime),
 			},
 		},
 	}
@@ -102,14 +103,14 @@ func TestTransformLevels(t *testing.T) {
 					Level:      1,
 					Experience: 500,
 					Coins:      100,
-					CreatedAt:  fixedTime.Format("2006-01-02T15:04:05"),
+					CreatedAt:  utils.FormatTimestamp(fixedTime),
 				},
 				{
 					ID:         2,
 					Level:      2,
 					Experience: 1000,
 					Coins:      150,
-					CreatedAt:  fixedTime.Format("2006-01-02T15:04:05"),
+					CreatedAt:  utils.FormatTimestamp(fixedTime),
 				},
 			},
 		},
@@ -138,7 +139,7 @@ func TestTransformLevels(t *testing.T) {
 				if levelResources[i].Experience != level.Experience {
 					t.Errorf("Expected Experience %d, got %d", level.Experience, levelResources[i].Experience)
 				}
-				if levelResources[i].CreatedAt != level.CreatedAt.Format("2006-01-02T15:04:05") {
+				if levelResources[i].CreatedAt != utils.FormatTimestamp(level.CreatedAt) {
 					t.Errorf("Expected CreatedAt %s, got %s", level.CreatedAt, levelResources[i].CreatedAt)
 				}
 			}

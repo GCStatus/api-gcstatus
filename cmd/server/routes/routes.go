@@ -17,6 +17,9 @@ func SetupRouter(
 	passwordResetService *usecases.PasswordResetService,
 	levelService *usecases.LevelService,
 	profileService *usecases.ProfileService,
+	titleService *usecases.TitleService,
+	taskService *usecases.TaskService,
+	walletService *usecases.WalletService,
 ) *gin.Engine {
 	r := gin.Default()
 	env := config.LoadConfig()
@@ -37,12 +40,15 @@ func SetupRouter(
 	}))
 
 	// Initialize the handlers
-	authHandler, passwordResetHandler, levelHandler, profileHandler, userHandler := InitHandlers(
+	authHandler, passwordResetHandler, levelHandler, profileHandler, userHandler, titleHandler := InitHandlers(
 		authService,
 		userService,
 		passwordResetService,
 		levelService,
 		profileService,
+		titleService,
+		taskService,
+		walletService,
 	)
 
 	// Define the middlewares
@@ -64,6 +70,10 @@ func SetupRouter(
 	{
 		protected.GET("/me", authHandler.Me)
 		protected.GET("/levels", levelHandler.GetAll)
+
+		protected.GET("/titles", titleHandler.GetAll)
+		protected.PUT("/titles/:id/toggle", titleHandler.ToggleEnableTitle)
+		protected.POST("/titles/:id/buy", titleHandler.BuyTitle)
 
 		protected.PUT("/profile/password", passwordResetHandler.ResetPasswordProfile)
 		protected.PUT("/profile/picture", profileHandler.UpdatePicture)

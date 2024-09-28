@@ -3,6 +3,7 @@ package resources
 import (
 	"gcstatus/internal/domain"
 	"gcstatus/pkg/s3"
+	"gcstatus/pkg/utils"
 )
 
 type UserResource struct {
@@ -16,6 +17,7 @@ type UserResource struct {
 	CreatedAt  string           `json:"created_at"`
 	UpdatedAt  string           `json:"updated_at"`
 	Profile    *ProfileResource `json:"profile,omitempty"`
+	Title      *TitleResource   `json:"title,omitempty"`
 	Wallet     *WalletResource  `json:"wallet"`
 }
 
@@ -26,9 +28,9 @@ func TransformUser(user domain.User, s3Client s3.S3ClientInterface) UserResource
 		Email:      user.Email,
 		Nickname:   user.Nickname,
 		Experience: user.Experience,
-		Birthdate:  user.Birthdate.Format("2006-01-02T15:04:05"),
-		CreatedAt:  user.CreatedAt.Format("2006-01-02T15:04:05"),
-		UpdatedAt:  user.UpdatedAt.Format("2006-01-02T15:04:05"),
+		Birthdate:  utils.FormatTimestamp(user.Birthdate),
+		CreatedAt:  utils.FormatTimestamp(user.CreatedAt),
+		UpdatedAt:  utils.FormatTimestamp(user.UpdatedAt),
 	}
 
 	if user.Profile.ID != 0 {
@@ -41,6 +43,20 @@ func TransformUser(user domain.User, s3Client s3.S3ClientInterface) UserResource
 
 	if user.Wallet.ID != 0 {
 		userResource.Wallet = TransformWallet(&user.Wallet)
+	}
+
+	if len(user.Titles) > 0 {
+		for _, userTitle := range user.Titles {
+			if userTitle.Enabled {
+				userResource.Title = &TitleResource{
+					ID:          userTitle.Title.ID,
+					Title:       userTitle.Title.Title,
+					Description: userTitle.Title.Description,
+				}
+
+				break
+			}
+		}
 	}
 
 	return userResource
