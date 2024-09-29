@@ -30,6 +30,7 @@
   - [x] Set up custom domain and SSL certificate with certbot
   - [x] Set up nginx server
 - [x] AWS
+  - [x] Integrate S3
   - [x] Integrate EC2
   - [x] Integrate RDS
   - [x] Integrate SES
@@ -54,5 +55,12 @@
   - [x] Update user email
   - [x] Update user nickname
   - [x] Update user basics, such as name and birthdate
+- [x] Buy titles
+  - [x] Create method to buy titles
+  - [x] Check if user has enough coins
+  - [x] Reward user with title
+  - [x] Chargeback user amount on wallet if has ocurred any error with process to give title to user
+  - [x] Create a transaction for this operation
+  - [x] Send an email for that operation or transaction
 
 ### Post MVP

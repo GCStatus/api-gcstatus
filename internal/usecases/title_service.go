@@ -13,8 +13,8 @@ func NewTitleService(repo ports.TitleRepository) *TitleService {
 	return &TitleService{repo: repo}
 }
 
-func (h *TitleService) GetAll(userID uint) ([]domain.Title, error) {
-	return h.repo.GetAll(userID)
+func (h *TitleService) GetAllForUser(userID uint) ([]domain.Title, error) {
+	return h.repo.GetAllForUser(userID)
 }
 
 func (h *TitleService) ToggleEnableTitle(userID, titleID uint) error {

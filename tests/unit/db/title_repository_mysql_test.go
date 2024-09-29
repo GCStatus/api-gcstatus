@@ -13,7 +13,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestTitleRepositoryMySQL_GetAll(t *testing.T) {
+func TestTitleRepositoryMySQL_GetAllForUser(t *testing.T) {
 	gormDB, mock := tests.Setup(t)
 	repo := db.NewTitleRepositoryMySQL(gormDB)
 
@@ -106,7 +106,7 @@ func TestTitleRepositoryMySQL_GetAll(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			tc.mockSetup()
 
-			titles, err := repo.GetAll(tc.userID)
+			titles, err := repo.GetAllForUser(tc.userID)
 
 			assert.Equal(t, tc.expectedError, err)
 			assert.Equal(t, tc.expectedTitles, titles)

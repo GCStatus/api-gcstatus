@@ -3,6 +3,7 @@ package db
 import (
 	"errors"
 	"gcstatus/internal/domain"
+	"gcstatus/internal/ports"
 
 	"gorm.io/gorm"
 )
@@ -11,7 +12,7 @@ type TaskRepositoryMySQL struct {
 	db *gorm.DB
 }
 
-func NewTaskRepositoryMySQL(db *gorm.DB) *TaskRepositoryMySQL {
+func NewTaskRepositoryMySQL(db *gorm.DB) ports.TaskRepository {
 	return &TaskRepositoryMySQL{db: db}
 }
 
