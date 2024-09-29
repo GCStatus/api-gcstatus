@@ -6,21 +6,19 @@
 
 - [ ] User authentication
   - [ ] Implement OAuth for Google and Facebook
-- [ ] AWS
-  - [ ] S3
 - [ ] Review the entire error throwing of platform to user-friendly
 - [ ] Email verification
   - [ ] Block user access if email is not verified
   - [ ] If user change email, set verified_at to null and block access again
 - [ ] Abstract all use cases and rules to services
 - [ ] Integrate with Kibana for logs
-- [ ] Buy titles
-  - [x] Create method to buy titles
-  - [x] Check if user has enough coins
-  - [x] Reward user with title
-  - [x] Chargeback user amount on wallet if has ocurred any error with process to give title to user
-  - [ ] Create a transaction for this operation
-  - [ ] Send an email for that operation or transaction
+- [ ] Create notifications
+  - [ ] Notify users for new transaction
+- [ ] Award titles on level pass if applicable
+- [ ] Award titles on missions complete if applicable
+- [ ] Create jobs to run some sevices async
+  - [ ] Email send
+  - [ ] Create secondary records, such as transactions or notifications
 
 ### Post-MVP
 
@@ -84,6 +82,7 @@
 - [ ] AWS
   - [ ] SQS
   - [ ] SNS
+  - [ ] Lambda
 - [ ] Create a chat between users
   - [ ] User can be able to chat another users
   - [ ] User can be able to create a group and chat them
@@ -91,3 +90,11 @@
   - [ ] User can be able to add and remove members (creator or admin)
   - [ ] User can be able to add admins on groups (owner only)
   - [ ] Chat should use realtime
+- [ ] Create quizz that could reward with some coins and experience, maybe titles
+- [ ] Award with coins and experience on comment, heart a game, or something else
+  - [ ] Heart a game;
+  - [ ] Make a comment on game details
+  - [ ] Make a comment on blogs
+  - [ ] Check how to prevent spam (award only once for each awardable)
+- [ ] Admin system
+  - [ ] ...

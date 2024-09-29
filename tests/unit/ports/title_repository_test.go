@@ -19,7 +19,7 @@ func NewMockTitleRepository() *MockTitleRepository {
 	}
 }
 
-func (m *MockTitleRepository) GetAll(userID uint) ([]domain.Title, error) {
+func (m *MockTitleRepository) GetAllForUser(userID uint) ([]domain.Title, error) {
 	var titles []domain.Title
 	titleIDs := m.userTitles[userID]
 
@@ -69,7 +69,7 @@ func (m *MockTitleRepository) ToggleEnableTitle(userID uint, titleID uint) error
 	return errors.New("title not found")
 }
 
-func (m *MockTitleRepository) MockTitleRepository_GetAll(t *testing.T) {
+func (m *MockTitleRepository) MockTitleRepository_GetAllForUser(t *testing.T) {
 	fixedTime := time.Now()
 
 	testCases := map[string]struct {
@@ -148,7 +148,7 @@ func (m *MockTitleRepository) MockTitleRepository_GetAll(t *testing.T) {
 
 			tc.mockCreateTitles(mockRepo)
 
-			titles, err := mockRepo.GetAll(tc.userID)
+			titles, err := mockRepo.GetAllForUser(tc.userID)
 			if err != nil {
 				t.Fatalf("expected no error, got %v", err)
 			}

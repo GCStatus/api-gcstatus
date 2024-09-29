@@ -1,9 +1,12 @@
 package api
 
 import (
+	"fmt"
+	"gcstatus/internal/domain"
 	"gcstatus/internal/resources"
 	"gcstatus/internal/usecases"
 	"gcstatus/pkg/cache"
+	"gcstatus/pkg/email"
 	"gcstatus/pkg/utils"
 	"log"
 	"net/http"
@@ -13,10 +16,11 @@ import (
 )
 
 type TitleHandler struct {
-	titleService  *usecases.TitleService
-	userService   *usecases.UserService
-	walletService *usecases.WalletService
-	taskService   *usecases.TaskService
+	titleService       *usecases.TitleService
+	userService        *usecases.UserService
+	walletService      *usecases.WalletService
+	taskService        *usecases.TaskService
+	transactionService *usecases.TransactionService
 }
 
 func NewTitleHandler(
@@ -24,29 +28,37 @@ func NewTitleHandler(
 	userService *usecases.UserService,
 	walletService *usecases.WalletService,
 	taskService *usecases.TaskService,
+	transactionService *usecases.TransactionService,
 ) *TitleHandler {
 	return &TitleHandler{
-		titleService:  titleService,
-		userService:   userService,
-		walletService: walletService,
-		taskService:   taskService,
+		titleService:       titleService,
+		userService:        userService,
+		walletService:      walletService,
+		taskService:        taskService,
+		transactionService: transactionService,
 	}
 }
 
-func (h *TitleHandler) GetAll(c *gin.Context) {
+func (h *TitleHandler) GetAllForUser(c *gin.Context) {
 	user, err := utils.Auth(c, h.userService.GetUserByID)
 	if err != nil {
 		RespondWithError(c, http.StatusInternalServerError, "Failed to fetch titles: "+err.Error())
 		return
 	}
 
-	titles, err := h.titleService.GetAll(user.ID)
+	titles, err := h.titleService.GetAllForUser(user.ID)
 	if err != nil {
 		RespondWithError(c, http.StatusInternalServerError, "Failed to fetch title: "+err.Error())
 		return
 	}
 
-	transformedTitles := resources.TransformTitles(titles)
+	var transformedTitles []resources.TitleResource
+
+	if len(titles) > 0 {
+		transformedTitles = resources.TransformTitles(titles)
+	} else {
+		transformedTitles = []resources.TitleResource{}
+	}
 
 	response := resources.Response{
 		Data: transformedTitles,
@@ -134,6 +146,21 @@ func (h *TitleHandler) BuyTitle(c *gin.Context) {
 
 		log.Fatalf("failed to process the title to user: %+v", err)
 		return
+	}
+
+	transaction := &domain.Transaction{
+		Amount:            uint(*title.Cost),
+		Description:       fmt.Sprintf("Purchase of title %s by %v coins.", title.Title, uint(*title.Cost)),
+		UserID:            user.ID,
+		TransactionTypeID: domain.SubtractionTransactionTypeID,
+	}
+
+	if err = h.transactionService.CreateTransaction(transaction); err != nil {
+		log.Fatalf("failed to create a transaction for user title purchase: %+v", err)
+	}
+
+	if err = email.SendTransactionEmail(user, transaction, email.Send); err != nil {
+		log.Fatalf("failed to send transaction email: %+v", err)
 	}
 
 	cache.GlobalCache.RemoveUserFromCache(user.ID)

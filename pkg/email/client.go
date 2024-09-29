@@ -17,16 +17,13 @@ type SendEmailFunc func(recipient, body, subject string) error
 func Send(recipient string, body string, subject string) error {
 	env := envConfig.LoadConfig()
 
-	// Load the default AWS config
 	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion(env.AwsMailRegion))
 	if err != nil {
 		return fmt.Errorf("failed to load configuration, %v", err)
 	}
 
-	// Create an SES client using the loaded configuration
 	svc := ses.NewFromConfig(cfg)
 
-	// Create the email request
 	input := &ses.SendEmailInput{
 		Destination: &types.Destination{
 			ToAddresses: []string{

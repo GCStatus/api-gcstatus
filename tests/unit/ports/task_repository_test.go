@@ -10,17 +10,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// MockTaskRepository simulates TaskRepository behavior
 type MockTaskRepository struct {
 	Requirements []domain.TitleRequirement
 	Progress     map[uint]*domain.TitleProgress
-	UserTitles   map[uint]map[uint]bool // userID -> titleID -> hasTitle
+	UserTitles   map[uint]map[uint]bool
 }
 
-// Ensure MockTaskRepository implements the TaskRepository interface
 var _ ports.TaskRepository = &MockTaskRepository{}
 
-// NewMockTaskRepository creates a new mock repository
 func NewMockTaskRepository() *MockTaskRepository {
 	return &MockTaskRepository{
 		Requirements: []domain.TitleRequirement{},
@@ -39,7 +36,6 @@ func (m *MockTaskRepository) GetTitleRequirementsByKey(actionKey string) ([]doma
 func (m *MockTaskRepository) GetOrCreateTitleProgress(userID, requirementID uint) (*domain.TitleProgress, error) {
 	progress, exists := m.Progress[requirementID]
 	if !exists {
-		// Simulate creating new progress
 		progress = &domain.TitleProgress{
 			UserID:             userID,
 			TitleRequirementID: requirementID,

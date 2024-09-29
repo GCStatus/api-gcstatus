@@ -20,6 +20,7 @@ func SetupRouter(
 	titleService *usecases.TitleService,
 	taskService *usecases.TaskService,
 	walletService *usecases.WalletService,
+	transactionService *usecases.TransactionService,
 ) *gin.Engine {
 	r := gin.Default()
 	env := config.LoadConfig()
@@ -40,7 +41,13 @@ func SetupRouter(
 	}))
 
 	// Initialize the handlers
-	authHandler, passwordResetHandler, levelHandler, profileHandler, userHandler, titleHandler := InitHandlers(
+	authHandler,
+		passwordResetHandler,
+		levelHandler,
+		profileHandler,
+		userHandler,
+		titleHandler,
+		transactionHandler := InitHandlers(
 		authService,
 		userService,
 		passwordResetService,
@@ -49,6 +56,7 @@ func SetupRouter(
 		titleService,
 		taskService,
 		walletService,
+		transactionService,
 	)
 
 	// Define the middlewares
@@ -71,7 +79,7 @@ func SetupRouter(
 		protected.GET("/me", authHandler.Me)
 		protected.GET("/levels", levelHandler.GetAll)
 
-		protected.GET("/titles", titleHandler.GetAll)
+		protected.GET("/titles", titleHandler.GetAllForUser)
 		protected.PUT("/titles/:id/toggle", titleHandler.ToggleEnableTitle)
 		protected.POST("/titles/:id/buy", titleHandler.BuyTitle)
 
@@ -81,6 +89,8 @@ func SetupRouter(
 
 		protected.PUT("/user/update/basics", userHandler.UpdateUserBasics)
 		protected.PUT("/user/update/sensitive", userHandler.UpdateUserNickAndEmail)
+
+		protected.GET("/transactions", transactionHandler.GetAllForUser)
 	}
 
 	// Common routes

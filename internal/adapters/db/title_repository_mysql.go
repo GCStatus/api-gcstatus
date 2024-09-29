@@ -15,7 +15,7 @@ func NewTitleRepositoryMySQL(db *gorm.DB) ports.TitleRepository {
 	return &TitleRepositoryMySQL{db: db}
 }
 
-func (h *TitleRepositoryMySQL) GetAll(userID uint) ([]domain.Title, error) {
+func (h *TitleRepositoryMySQL) GetAllForUser(userID uint) ([]domain.Title, error) {
 	var titles []domain.Title
 
 	err := h.db.Model(&domain.Title{}).Where(
