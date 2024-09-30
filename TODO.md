@@ -12,13 +12,16 @@
   - [ ] If user change email, set verified_at to null and block access again
 - [ ] Abstract all use cases and rules to services
 - [ ] Integrate with Kibana for logs
-- [ ] Create notifications
-  - [ ] Notify users for new transaction
 - [ ] Award titles on level pass if applicable
 - [ ] Award titles on missions complete if applicable
 - [ ] Create jobs to run some sevices async
   - [ ] Email send
   - [ ] Create secondary records, such as transactions or notifications
+- [ ] Review all exceptions thrown
+- [ ] AWS
+  - [ ] SQS
+  - [ ] Change notifications and transactions generation to SQS
+  - [ ] Create async processes
 
 ### Post-MVP
 

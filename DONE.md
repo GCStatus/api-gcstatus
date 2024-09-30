@@ -62,5 +62,16 @@
   - [x] Chargeback user amount on wallet if has ocurred any error with process to give title to user
   - [x] Create a transaction for this operation
   - [x] Send an email for that operation or transaction
+- [x] Create notifications
+  - [x] Notify users for new transaction
+  - [x] Get all user notifications
+  - [x] Create a notification on service
+  - [x] Delete notification
+  - [x] Mark notification as read
+  - [x] Mark notification as unread
+  - [x] Mark all notifications as read
+  - [x] Mark all notifications as unread
+  - [x] Check if notification belongs to user
+  - [x] Delete all user notifications
 
 ### Post MVP

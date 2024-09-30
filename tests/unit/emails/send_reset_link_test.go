@@ -1,20 +1,11 @@
-package email_test
+package tests
 
 import (
-	"errors"
 	"fmt"
 	"gcstatus/pkg/email"
 	"strings"
 	"testing"
 )
-
-func MockSendEmail(recipient, body, subject string) error {
-	if recipient == "fail@example.com" {
-		return errors.New("failed to send email")
-	}
-
-	return nil
-}
 
 func TestSendPasswordResetEmail(t *testing.T) {
 	tests := map[string]struct {

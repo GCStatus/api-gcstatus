@@ -204,7 +204,7 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 func (h *AuthHandler) Me(c *gin.Context) {
 	user, err := utils.Auth(c, h.userService.GetUserByID)
 	if err != nil {
-		RespondWithError(c, http.StatusInternalServerError, err.Error())
+		RespondWithError(c, http.StatusUnauthorized, err.Error())
 		return
 	}
 

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/resources"
@@ -16,11 +17,12 @@ import (
 )
 
 type TitleHandler struct {
-	titleService       *usecases.TitleService
-	userService        *usecases.UserService
-	walletService      *usecases.WalletService
-	taskService        *usecases.TaskService
-	transactionService *usecases.TransactionService
+	titleService        *usecases.TitleService
+	userService         *usecases.UserService
+	walletService       *usecases.WalletService
+	taskService         *usecases.TaskService
+	transactionService  *usecases.TransactionService
+	notificationService *usecases.NotificationService
 }
 
 func NewTitleHandler(
@@ -29,20 +31,22 @@ func NewTitleHandler(
 	walletService *usecases.WalletService,
 	taskService *usecases.TaskService,
 	transactionService *usecases.TransactionService,
+	notificationService *usecases.NotificationService,
 ) *TitleHandler {
 	return &TitleHandler{
-		titleService:       titleService,
-		userService:        userService,
-		walletService:      walletService,
-		taskService:        taskService,
-		transactionService: transactionService,
+		titleService:        titleService,
+		userService:         userService,
+		walletService:       walletService,
+		taskService:         taskService,
+		transactionService:  transactionService,
+		notificationService: notificationService,
 	}
 }
 
 func (h *TitleHandler) GetAllForUser(c *gin.Context) {
 	user, err := utils.Auth(c, h.userService.GetUserByID)
 	if err != nil {
-		RespondWithError(c, http.StatusInternalServerError, "Failed to fetch titles: "+err.Error())
+		RespondWithError(c, http.StatusUnauthorized, "Unauthorized: "+err.Error())
 		return
 	}
 
@@ -78,7 +82,7 @@ func (h *TitleHandler) ToggleEnableTitle(c *gin.Context) {
 
 	user, err := utils.Auth(c, h.userService.GetUserByID)
 	if err != nil {
-		RespondWithError(c, http.StatusInternalServerError, "Failed to fetch user: "+err.Error())
+		RespondWithError(c, http.StatusUnauthorized, "Unauthorized: "+err.Error())
 		return
 	}
 
@@ -104,7 +108,7 @@ func (h *TitleHandler) BuyTitle(c *gin.Context) {
 
 	user, err := utils.Auth(c, h.userService.GetUserByID)
 	if err != nil {
-		RespondWithError(c, http.StatusInternalServerError, "Failed to fetch titles: "+err.Error())
+		RespondWithError(c, http.StatusUnauthorized, "Unauthorized: "+err.Error())
 		return
 	}
 
@@ -157,6 +161,27 @@ func (h *TitleHandler) BuyTitle(c *gin.Context) {
 
 	if err = h.transactionService.CreateTransaction(transaction); err != nil {
 		log.Fatalf("failed to create a transaction for user title purchase: %+v", err)
+	}
+
+	notificationContent := &domain.NotificationData{
+		Title:     fmt.Sprintf("You bought %s title by %v coins!", title.Title, uint(*title.Cost)),
+		ActionUrl: "/profile/?section=transactions",
+		Icon:      "CiCoinInsert",
+	}
+
+	dataJson, err := json.Marshal(notificationContent)
+	if err != nil {
+		log.Fatalf("failed to marshal notification content: %+v", err)
+	}
+
+	notification := &domain.Notification{
+		Type:   "NewTitlePurchase",
+		Data:   string(dataJson),
+		UserID: user.ID,
+	}
+
+	if err = h.notificationService.CreateNotification(notification); err != nil {
+		log.Fatalf("failed to save the title purchase notification: %+v", err)
 	}
 
 	if err = email.SendTransactionEmail(user, transaction, email.Send); err != nil {
