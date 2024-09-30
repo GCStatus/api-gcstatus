@@ -19,6 +19,7 @@ func main() {
 		taskService,
 		walletService,
 		transactionService,
+		notificationService,
 		_ := di.InitDependencies()
 
 	// Setup routes with dependency injection
@@ -32,6 +33,7 @@ func main() {
 		taskService,
 		walletService,
 		transactionService,
+		notificationService,
 	)
 
 	// Get port

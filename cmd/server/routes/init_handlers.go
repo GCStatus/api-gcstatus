@@ -15,6 +15,7 @@ func InitHandlers(
 	taskService *usecases.TaskService,
 	walletService *usecases.WalletService,
 	transactionService *usecases.TransactionService,
+	notificationService *usecases.NotificationService,
 ) (
 	authHandler *api.AuthHandler,
 	passwordResetHandler *api.PasswordResetHandler,
@@ -23,14 +24,23 @@ func InitHandlers(
 	userHandler *api.UserHandler,
 	titleHandler *api.TitleHandler,
 	transactionHandler *api.TransactionHandler,
+	notificationHandler *api.NotificationHandler,
 ) {
 	userHandler = api.NewUserHandler(userService)
 	authHandler = api.NewAuthHandler(authService, userService)
 	passwordResetHandler = api.NewPasswordResetHandler(passwordResetService, userService, authService)
 	levelHandler = api.NewLevelHandler(levelService)
 	profileHandler = api.NewProfileHandler(profileService, userService, taskService)
-	titleHandler = api.NewTitleHandler(titleService, userService, walletService, taskService, transactionService)
+	titleHandler = api.NewTitleHandler(titleService, userService, walletService, taskService, transactionService, notificationService)
 	transactionHandler = api.NewTransactionHandler(transactionService, userService)
+	notificationHandler = api.NewNotificationHandler(notificationService, userService)
 
-	return authHandler, passwordResetHandler, levelHandler, profileHandler, userHandler, titleHandler, transactionHandler
+	return authHandler,
+		passwordResetHandler,
+		levelHandler,
+		profileHandler,
+		userHandler,
+		titleHandler,
+		transactionHandler,
+		notificationHandler
 }

@@ -1,4 +1,4 @@
-package email_test
+package tests
 
 import (
 	"gcstatus/pkg/email"

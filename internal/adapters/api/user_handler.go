@@ -84,7 +84,7 @@ func (h *UserHandler) UpdateUserNickAndEmail(c *gin.Context) {
 
 	user, err := utils.Auth(c, h.userService.GetUserByID)
 	if err != nil {
-		RespondWithError(c, http.StatusInternalServerError, err.Error())
+		RespondWithError(c, http.StatusUnauthorized, "Unauthorized: "+err.Error())
 		return
 	}
 
@@ -139,7 +139,7 @@ func (h *UserHandler) UpdateUserBasics(c *gin.Context) {
 
 	user, err := utils.Auth(c, h.userService.GetUserByID)
 	if err != nil {
-		RespondWithError(c, http.StatusInternalServerError, err.Error())
+		RespondWithError(c, http.StatusUnauthorized, "Unauthorized: "+err.Error())
 		return
 	}
 

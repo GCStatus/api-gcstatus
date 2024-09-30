@@ -17,6 +17,7 @@ func Setup(dbConn *gorm.DB) (
 	*usecases.TaskService,
 	*usecases.WalletService,
 	*usecases.TransactionService,
+	*usecases.NotificationService,
 ) {
 	// Create repository instances
 	userRepo := db.NewUserRepositoryMySQL(dbConn)
@@ -27,6 +28,7 @@ func Setup(dbConn *gorm.DB) (
 	taskRepo := db.NewTaskRepositoryMySQL(dbConn)
 	walletRepo := db.NewWalletRepositoryMySQL(dbConn)
 	transactionRepo := db.NewTransactionRepositoryMySQL(dbConn)
+	notificationRepo := db.NewNotificationRepositoryMySQL(dbConn)
 
 	// Create service instances
 	userService := usecases.NewUserService(userRepo)
@@ -38,6 +40,7 @@ func Setup(dbConn *gorm.DB) (
 	taskService := usecases.NewTaskService(taskRepo)
 	walletService := usecases.NewWalletService(walletRepo)
 	transactionService := usecases.NewTransactionService(transactionRepo)
+	notificationService := usecases.NewNotificationService(notificationRepo)
 
 	return userService,
 		authService,
@@ -47,5 +50,6 @@ func Setup(dbConn *gorm.DB) (
 		titleService,
 		taskService,
 		walletService,
-		transactionService
+		transactionService,
+		notificationService
 }
