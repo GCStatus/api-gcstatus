@@ -2,7 +2,7 @@ package tests
 
 import (
 	"gcstatus/internal/domain"
-	"gcstatus/pkg/email"
+	"gcstatus/pkg/ses"
 	"strings"
 	"testing"
 	"time"
@@ -20,7 +20,7 @@ func TestSendNewTransactionEmail(t *testing.T) {
 	tests := map[string]struct {
 		user         *domain.User
 		transaction  *domain.Transaction
-		sendFunc     email.SendEmailFunc
+		sendFunc     ses.SendEmailFunc
 		expectedBody string
 		expectError  bool
 	}{
@@ -42,7 +42,7 @@ func TestSendNewTransactionEmail(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			err := email.SendTransactionEmail(tc.user, tc.transaction, tc.sendFunc)
+			err := ses.SendTransactionEmail(tc.user, tc.transaction, tc.sendFunc)
 
 			if tc.expectError && err == nil {
 				t.Errorf("Expected error but got nil")

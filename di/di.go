@@ -1,10 +1,12 @@
 package di
 
 import (
+	"context"
 	"gcstatus/config"
 	"gcstatus/internal/usecases"
 	"gcstatus/pkg/cache"
 	"gcstatus/pkg/s3"
+	"gcstatus/pkg/sqs"
 	"log"
 
 	"gorm.io/driver/mysql"
@@ -38,12 +40,6 @@ func InitDependencies() (
 	// Auto-migrate the database
 	MigrateModels(dbConn)
 
-	// Setup clients for non-test environment
-	if cfg.ENV != "testing" {
-		cache.GlobalCache = cache.NewRedisCache()
-		s3.GlobalS3Client = s3.NewS3Client()
-	}
-
 	// Setup dependencies
 	userService,
 		authService,
@@ -55,6 +51,24 @@ func InitDependencies() (
 		walletService,
 		transactionService,
 		notificationService := Setup(dbConn)
+
+	// Setup clients for non-test environment
+	if cfg.ENV != "testing" {
+		sqsClient := sqs.NewSQSClient()
+		cache.GlobalCache = cache.NewRedisCache()
+		s3.GlobalS3Client = s3.NewS3Client()
+		sqs.GlobalSQSClient = sqsClient
+
+		consumer := sqs.NewSQSConsumer(
+			sqsClient.GetAWSClient(),
+			cfg.AwsSqsUrl,
+			userService,
+			transactionService,
+			notificationService,
+		)
+
+		go consumer.Start(context.Background())
+	}
 
 	return userService,
 		authService,

@@ -30,6 +30,8 @@ type Config struct {
 	CorsDomains     string
 	AwsBucket       string
 	AwsBucketRegion string
+	AwsSqsRegion    string
+	AwsSqsUrl       string
 }
 
 func LoadConfig() *Config {
@@ -60,6 +62,8 @@ func LoadConfig() *Config {
 		CorsDomains:     getEnv("CORS_DOMAINS", "http://localhost:5173"),
 		AwsBucket:       getEnv("AWS_BUCKET", ""),
 		AwsBucketRegion: getEnv("AWS_BUCKET_REGION", ""),
+		AwsSqsRegion:    getEnv("AWS_SQS_REGION", ""),
+		AwsSqsUrl:       getEnv("AWS_SQS_URL", ""),
 	}
 }
 

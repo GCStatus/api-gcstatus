@@ -18,10 +18,6 @@
   - [ ] Email send
   - [ ] Create secondary records, such as transactions or notifications
 - [ ] Review all exceptions thrown
-- [ ] AWS
-  - [ ] SQS
-  - [ ] Change notifications and transactions generation to SQS
-  - [ ] Create async processes
 
 ### Post-MVP
 
@@ -40,6 +36,7 @@
   - [ ] Posts
   - [ ] Comments
   - [ ] Messages (?)
+- [ ] Refresh token
 
 ### Future Ideas
 
@@ -99,5 +96,13 @@
   - [ ] Make a comment on game details
   - [ ] Make a comment on blogs
   - [ ] Check how to prevent spam (award only once for each awardable)
+- [ ] Create a method to receive all main data from API for HOME
+  - [ ] Method should return notifications
+  - [ ] Method should return home banners
+  - [ ] Method should return 9 popular games
+  - [ ] Method should return the next most awaited release (and should stay for one week as released)
+  - [ ] Method should return 9 hot games
+  - [ ] Method should return 9 most liked games
+  - [ ] Method should return 9 upcoming games
 - [ ] Admin system
   - [ ] ...
