@@ -73,5 +73,9 @@
   - [x] Mark all notifications as unread
   - [x] Check if notification belongs to user
   - [x] Delete all user notifications
+- [x] AWS
+  - [x] SQS
+  - [x] Change notifications and transactions generation to SQS
+  - [x] Create async processes
 
 ### Post MVP

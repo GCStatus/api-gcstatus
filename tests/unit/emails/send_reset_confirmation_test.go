@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"gcstatus/pkg/email"
+	"gcstatus/pkg/ses"
 	"strings"
 	"testing"
 )
@@ -10,7 +10,7 @@ func TestSendPasswordResetConfirmationEmail(t *testing.T) {
 	tests := map[string]struct {
 		userEmail    string
 		Name         string
-		sendFunc     email.SendEmailFunc
+		sendFunc     ses.SendEmailFunc
 		expectedBody string
 		expectError  bool
 	}{
@@ -32,7 +32,7 @@ func TestSendPasswordResetConfirmationEmail(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			err := email.SendPasswordResetConfirmationEmail(tc.userEmail, tc.Name, tc.sendFunc)
+			err := ses.SendPasswordResetConfirmationEmail(tc.userEmail, tc.Name, tc.sendFunc)
 
 			if tc.expectError && err == nil {
 				t.Errorf("Expected error but got nil")

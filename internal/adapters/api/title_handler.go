@@ -2,12 +2,10 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
-	"gcstatus/internal/domain"
 	"gcstatus/internal/resources"
 	"gcstatus/internal/usecases"
 	"gcstatus/pkg/cache"
-	"gcstatus/pkg/email"
+	"gcstatus/pkg/sqs"
 	"gcstatus/pkg/utils"
 	"log"
 	"net/http"
@@ -152,40 +150,24 @@ func (h *TitleHandler) BuyTitle(c *gin.Context) {
 		return
 	}
 
-	transaction := &domain.Transaction{
-		Amount:            uint(*title.Cost),
-		Description:       fmt.Sprintf("Purchase of title %s by %v coins.", title.Title, uint(*title.Cost)),
-		UserID:            user.ID,
-		TransactionTypeID: domain.SubtractionTransactionTypeID,
+	purchaseMessage := map[string]any{
+		"type": "PurchaseTitle",
+		"body": map[string]any{
+			"user_id":  user.ID,
+			"title_id": title.ID,
+			"cost":     uint(*title.Cost),
+			"title":    title.Title,
+		},
 	}
 
-	if err = h.transactionService.CreateTransaction(transaction); err != nil {
-		log.Fatalf("failed to create a transaction for user title purchase: %+v", err)
-	}
-
-	notificationContent := &domain.NotificationData{
-		Title:     fmt.Sprintf("You bought %s title by %v coins!", title.Title, uint(*title.Cost)),
-		ActionUrl: "/profile/?section=transactions",
-		Icon:      "CiCoinInsert",
-	}
-
-	dataJson, err := json.Marshal(notificationContent)
+	messageBody, err := json.Marshal(purchaseMessage)
 	if err != nil {
-		log.Fatalf("failed to marshal notification content: %+v", err)
+		log.Fatalf("failed to serialize purchase message to JSON: %+v", err)
 	}
 
-	notification := &domain.Notification{
-		Type:   "NewTitlePurchase",
-		Data:   string(dataJson),
-		UserID: user.ID,
-	}
-
-	if err = h.notificationService.CreateNotification(notification); err != nil {
-		log.Fatalf("failed to save the title purchase notification: %+v", err)
-	}
-
-	if err = email.SendTransactionEmail(user, transaction, email.Send); err != nil {
-		log.Fatalf("failed to send transaction email: %+v", err)
+	err = sqs.GlobalSQSClient.SendMessage(c.Request.Context(), sqs.GetAwsPurchaseQueue(), string(messageBody))
+	if err != nil {
+		log.Fatalf("failed to enqueue purchase message to SQS: %+v", err)
 	}
 
 	cache.GlobalCache.RemoveUserFromCache(user.ID)

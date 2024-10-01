@@ -5,7 +5,7 @@ import (
 	"gcstatus/internal/domain"
 	"gcstatus/internal/usecases"
 	"gcstatus/pkg/cache"
-	"gcstatus/pkg/email"
+	"gcstatus/pkg/ses"
 	"gcstatus/pkg/utils"
 	"net/http"
 	"strings"
@@ -69,7 +69,7 @@ func (h *PasswordResetHandler) RequestPasswordReset(c *gin.Context) {
 		return
 	}
 
-	if err := email.SendPasswordResetEmail(requestPasswordResetData.Email, token, email.Send); err != nil {
+	if err := ses.SendPasswordResetEmail(requestPasswordResetData.Email, token, ses.Send); err != nil {
 		RespondWithError(c, http.StatusInternalServerError, "We could not send you a reset email. Please, try again or contact the support.")
 		return
 	}
@@ -134,7 +134,7 @@ func (h *PasswordResetHandler) ResetUserPassword(c *gin.Context) {
 		return
 	}
 
-	if err := email.SendPasswordResetConfirmationEmail(user.Email, user.Name, email.Send); err != nil {
+	if err := ses.SendPasswordResetConfirmationEmail(user.Email, user.Name, ses.Send); err != nil {
 		RespondWithError(c, http.StatusInternalServerError, "Unable to send the email reset confirmation.")
 		return
 	}
