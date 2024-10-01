@@ -76,6 +76,8 @@ jobs:
               CORS_DOMAINS=${{ secrets.CORS_DOMAINS }}
               AWS_BUCKET=${{ secrets.AWS_BUCKET }}
               AWS_BUCKET_REGION=${{ secrets.AWS_BUCKET_REGION }}
+              AWS_SQS_REGION=${{ secrets.AWS_SQS_REGION }}
+              AWS_SQS_URL=${{ secrets.AWS_SQS_URL }}
             EOF'
 
             docker rmi $IMAGE_ID || true
