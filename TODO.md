@@ -18,6 +18,10 @@
   - [ ] Email send
   - [ ] Create secondary records, such as transactions or notifications
 - [ ] Review all exceptions thrown
+- [ ] Missions and titles
+  - [ ] Review the action keys for missions and titles
+  - [ ] Planning all missions and titles type
+  - [ ] Planning all daily/weekly/monthly missions
 
 ### Post-MVP
 
@@ -37,6 +41,7 @@
   - [ ] Comments
   - [ ] Messages (?)
 - [ ] Refresh token
+- [ ] MFA - 2FA
 
 ### Future Ideas
 

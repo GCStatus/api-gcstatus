@@ -54,12 +54,49 @@ func (s *TaskService) TrackTitleProgress(userID uint, actionKey string, incremen
 	return nil
 }
 
+func (s *TaskService) TrackMissionProgress(userID uint, actionKey string, increment int) error {
+	requirements, err := s.GetMissionRequirementsByKey(actionKey)
+	if err != nil {
+		return err
+	}
+
+	for _, requirement := range requirements {
+		progress, err := s.GetOrCreateMissionProgress(userID, requirement.ID)
+		if err != nil {
+			return err
+		}
+
+		if !progress.Completed {
+			progress.Progress += increment
+			if progress.Progress >= requirement.Goal {
+				progress.Progress = requirement.Goal
+				progress.Completed = true
+			}
+
+			err = s.UpdateMissionProgress(progress)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
 func (s *TaskService) GetTitleRequirementsByKey(actionKey string) ([]domain.TitleRequirement, error) {
 	return s.repo.GetTitleRequirementsByKey(actionKey)
 }
 
+func (s *TaskService) GetMissionRequirementsByKey(actionKey string) ([]domain.MissionRequirement, error) {
+	return s.repo.GetMissionRequirementsByKey(actionKey)
+}
+
 func (s *TaskService) GetOrCreateTitleProgress(userID uint, requirementID uint) (*domain.TitleProgress, error) {
 	return s.repo.GetOrCreateTitleProgress(userID, requirementID)
+}
+
+func (s *TaskService) GetOrCreateMissionProgress(userID uint, requirementID uint) (*domain.MissionProgress, error) {
+	return s.repo.GetOrCreateMissionProgress(userID, requirementID)
 }
 
 func (s *TaskService) UserHasTitle(userID uint, titleID uint) (bool, error) {
@@ -72,4 +109,8 @@ func (s *TaskService) AwardTitleToUser(userID uint, titleID uint) error {
 
 func (s *TaskService) UpdateTitleProgress(progress *domain.TitleProgress) error {
 	return s.repo.UpdateTitleProgress(progress)
+}
+
+func (s *TaskService) UpdateMissionProgress(progress *domain.MissionProgress) error {
+	return s.repo.UpdateMissionProgress(progress)
 }

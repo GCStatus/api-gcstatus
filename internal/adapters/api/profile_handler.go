@@ -2,12 +2,14 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/ports"
 	"gcstatus/internal/usecases"
 	"gcstatus/pkg/cache"
 	"gcstatus/pkg/s3"
+	"gcstatus/pkg/sqs"
 	"gcstatus/pkg/utils"
 	"log"
 	"mime/multipart"
@@ -20,18 +22,15 @@ import (
 type ProfileHandler struct {
 	profileService *usecases.ProfileService
 	userService    *usecases.UserService
-	taskService    *usecases.TaskService
 }
 
 func NewProfileHandler(
 	profileService *usecases.ProfileService,
 	userService *usecases.UserService,
-	taskService *usecases.TaskService,
 ) *ProfileHandler {
 	return &ProfileHandler{
 		profileService: profileService,
 		userService:    userService,
-		taskService:    taskService,
 	}
 }
 
@@ -108,10 +107,7 @@ func (h *ProfileHandler) UpdatePicture(c *gin.Context) {
 		return
 	}
 
-	err = h.taskService.TrackTitleProgress(user.ID, domain.ProfileTitleRequirementKey, 1)
-	if err != nil {
-		log.Fatalf("failed to track title progress for user %+v. Error: %+s", user.ID, err.Error())
-	}
+	h.createTrackProfilePictureSQS(c, user)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Your profile picture was successfully updated!"})
 }
@@ -140,4 +136,23 @@ func (h *ProfileHandler) UpdateSocials(c *gin.Context) {
 	cache.GlobalCache.RemoveUserFromCache(user.ID)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Your profile socials was successfully updated!"})
+}
+
+func (h *ProfileHandler) createTrackProfilePictureSQS(c *gin.Context, user *domain.User) {
+	trackProgressMessage := map[string]any{
+		"type": "TrackProgressProfilePicture",
+		"body": map[string]any{
+			"user_id":   user.ID,
+			"increment": 1,
+		},
+	}
+
+	trackProgressMessageBody, err := json.Marshal(trackProgressMessage)
+	if err != nil {
+		log.Fatalf("failed to serialize track progress profile picture message to JSON: %+v", err)
+	}
+
+	if err := sqs.GlobalSQSClient.SendMessage(c.Request.Context(), sqs.GetAwsQueue(), string(trackProgressMessageBody)); err != nil {
+		log.Fatalf("failed to enqueue track progress profile picture message to SQS: %+v", err)
+	}
 }

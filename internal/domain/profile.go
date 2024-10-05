@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	ProfileTitleRequirementKey = "update_profile_picture"
+	ProfilePictureTitleRequirementKey = "update_profile_picture"
 )
 
 type Profile struct {

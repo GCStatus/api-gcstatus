@@ -27,7 +27,7 @@ func (h *LevelRepositoryMySQL) GetAll() ([]*domain.Level, error) {
 	for _, level := range levels {
 		for _, reward := range level.Rewards {
 			switch reward.RewardableType {
-			case "titles":
+			case domain.RewardableTypeTitles:
 				titleIDs = append(titleIDs, reward.RewardableID)
 			}
 		}
@@ -50,7 +50,7 @@ func (h *LevelRepositoryMySQL) GetAll() ([]*domain.Level, error) {
 		for i := range level.Rewards {
 			reward := &level.Rewards[i]
 			switch reward.RewardableType {
-			case "titles":
+			case domain.RewardableTypeTitles:
 				if title, ok := titleMap[reward.RewardableID]; ok {
 					reward.Rewardable = &title
 				}

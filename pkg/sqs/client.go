@@ -47,7 +47,7 @@ func (s *SQSClient) GetAWSClient() *sqs.Client {
 	return s.client
 }
 
-func GetAwsPurchaseQueue() string {
+func GetAwsQueue() string {
 	env := envconfig.LoadConfig()
 
 	return env.AwsSqsUrl

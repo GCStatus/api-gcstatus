@@ -1,9 +1,11 @@
 package db
 
 import (
+	"encoding/json"
 	"fmt"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/ports"
+	"log"
 
 	"gorm.io/gorm"
 )
@@ -90,4 +92,146 @@ func (repo *UserRepositoryMySQL) UpdateUserBasics(userID uint, request ports.Upd
 	}
 
 	return nil
+}
+
+func (h *UserRepositoryMySQL) AddExperience(
+	userID uint,
+	experienceGained uint,
+	awardTitleToUserFunc func(userID uint, titleID uint) error,
+) error {
+	var user domain.User
+	if err := h.db.Preload("Level").Preload("Wallet").First(&user, userID).Error; err != nil {
+		return err
+	}
+
+	var levels []domain.Level
+	if err := h.db.Preload("Rewards").Order("level ASC").Find(&levels).Error; err != nil {
+		return err
+	}
+
+	user.Experience += experienceGained
+
+	for {
+		var currentLevel *domain.Level
+		for _, level := range levels {
+			if level.ID == user.LevelID {
+				currentLevel = &level
+				break
+			}
+		}
+
+		var nextLevel *domain.Level
+		if currentLevel != nil {
+			for _, level := range levels {
+				if level.Level == currentLevel.Level+1 {
+					nextLevel = &level
+					break
+				}
+			}
+		}
+
+		if nextLevel == nil {
+			break
+		}
+
+		if user.Experience >= nextLevel.Experience {
+			user.Level = *nextLevel
+			user.LevelID = nextLevel.ID
+			user.Experience -= nextLevel.Experience
+			user.Wallet.Amount += int(nextLevel.Coins)
+
+			h.createTransactionForLevelUp(*nextLevel, user.ID)
+			h.createNotificationForLevelUp(*nextLevel, user.ID)
+
+			for _, reward := range nextLevel.Rewards {
+				if reward.RewardableType == "titles" {
+					if err := awardTitleToUserFunc(user.ID, reward.RewardableID); err != nil {
+						return fmt.Errorf("error awarding title: %w", err)
+					}
+
+					h.createNotificationForRewardTitle(reward, user.ID)
+				}
+			}
+
+			if err := h.db.Model(&user).Updates(map[string]any{
+				"LevelID":    user.LevelID,
+				"Experience": user.Experience,
+			}).Error; err != nil {
+				return fmt.Errorf("error updating user level in the database: %w", err)
+			}
+
+			if err := h.db.Model(&user.Wallet).Updates(map[string]any{
+				"Amount": user.Wallet.Amount,
+			}).Error; err != nil {
+				return fmt.Errorf("failed to update coins for user wallet: %w", err)
+			}
+		} else {
+			break
+		}
+	}
+
+	if err := h.db.Save(&user).Error; err != nil {
+		return fmt.Errorf("error saving user at the end: %w", err)
+	}
+
+	return nil
+}
+
+func (h *UserRepositoryMySQL) createTransactionForLevelUp(nextLevel domain.Level, userID uint) {
+	transaction := &domain.Transaction{
+		Amount:            nextLevel.Coins,
+		Description:       fmt.Sprintf("Received coins from level up to Level %d.", nextLevel.Level),
+		UserID:            userID,
+		TransactionTypeID: domain.AdditionTransactionTypeID,
+	}
+
+	if err := h.db.Create(&transaction).Error; err != nil {
+		log.Printf("Failed to save the transaction of level up: %+v", err)
+	}
+}
+
+func (h *UserRepositoryMySQL) createNotificationForLevelUp(nextLevel domain.Level, userID uint) {
+	notificationContent := &domain.NotificationData{
+		Title:     fmt.Sprintf("Congratulations! You've reached level %d!", nextLevel.Level),
+		ActionUrl: "/profile/?section=levels",
+		Icon:      "FaMedal",
+	}
+
+	dataJson, err := json.Marshal(notificationContent)
+	if err != nil {
+		log.Printf("Failed to marshal notification content: %+v", err)
+	}
+
+	notification := &domain.Notification{
+		Type:   "NewLevelNotification",
+		Data:   string(dataJson),
+		UserID: userID,
+	}
+
+	if err := h.db.Create(&notification).Error; err != nil {
+		log.Printf("Failed to save the title award notification: %+v", err)
+	}
+}
+
+func (h *UserRepositoryMySQL) createNotificationForRewardTitle(reward domain.Reward, userID uint) {
+	notificationContent := &domain.NotificationData{
+		Title:     fmt.Sprintf("Congratulations! You've unlocked the title: %d", reward.RewardableID),
+		ActionUrl: "/profile/?section=titles",
+		Icon:      "FaMedal",
+	}
+
+	dataJson, err := json.Marshal(notificationContent)
+	if err != nil {
+		log.Printf("Failed to marshal notification content: %+v", err)
+	}
+
+	notification := &domain.Notification{
+		Type:   "NewTitleNotification",
+		Data:   string(dataJson),
+		UserID: userID,
+	}
+
+	if err := h.db.Create(&notification).Error; err != nil {
+		log.Printf("Failed to save the title award notification: %+v", err)
+	}
 }

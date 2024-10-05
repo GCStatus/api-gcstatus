@@ -2,20 +2,33 @@ package tests
 
 import (
 	"errors"
+	"fmt"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/ports"
 	"gcstatus/pkg/utils"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 type MockUserRepository struct {
-	users map[uint]*domain.User
+	users  map[uint]*domain.User
+	levels []domain.Level
+}
+
+func mockLevels() []domain.Level {
+	return []domain.Level{
+		{ID: 1, Level: 1, Experience: 0, Coins: 10},
+		{ID: 2, Level: 2, Experience: 100, Coins: 20},
+		{ID: 3, Level: 3, Experience: 300, Coins: 30},
+	}
 }
 
 func NewMockUserRepository() *MockUserRepository {
 	return &MockUserRepository{
-		users: make(map[uint]*domain.User),
+		users:  make(map[uint]*domain.User),
+		levels: mockLevels(),
 	}
 }
 
@@ -119,6 +132,62 @@ func (m *MockUserRepository) CreateWithProfile(user *domain.User) error {
 		return errors.New("invalid user or profile data")
 	}
 	m.users[user.ID] = user
+	return nil
+}
+
+func (m *MockUserRepository) AddExperience(userID uint, experienceAmount uint, awardTitleToUserFunc func(userID uint, titleID uint) error) error {
+	user, exists := m.users[userID]
+	if !exists {
+		return errors.New("user not found")
+	}
+
+	user.Experience += experienceAmount
+
+	for {
+		var currentLevel *domain.Level
+		for _, level := range m.levels {
+			if level.ID == user.LevelID {
+				currentLevel = &level
+				break
+			}
+		}
+
+		if currentLevel == nil {
+			return fmt.Errorf("current level not found for user %d", userID)
+		}
+
+		var nextLevel *domain.Level
+		for _, level := range m.levels {
+			if level.Level == currentLevel.Level+1 {
+				nextLevel = &level
+				break
+			}
+		}
+
+		if nextLevel == nil {
+			break
+		}
+
+		if user.Experience >= nextLevel.Experience {
+			for _, reward := range nextLevel.Rewards {
+				if reward.RewardableType == "titles" {
+					if err := awardTitleToUserFunc(user.ID, reward.RewardableID); err != nil {
+						return fmt.Errorf("error awarding title: %w", err)
+					}
+				}
+			}
+
+			user.Level = *nextLevel
+			user.LevelID = nextLevel.ID
+			user.Experience -= nextLevel.Experience
+			user.Wallet.Amount += int(nextLevel.Coins)
+		} else {
+			break
+		}
+	}
+
+	m.users[userID] = user
+
 	return nil
 }
 
@@ -558,6 +627,115 @@ func TestMockUserRepository_UpdateUserBasics(t *testing.T) {
 				if utils.FormatTimestamp(updatedUser.Birthdate) != tc.newBirthdate {
 					t.Fatalf("expected birthdate to be updated to %s, but got %s", tc.newBirthdate, utils.FormatTimestamp(updatedUser.Birthdate))
 				}
+			}
+		})
+	}
+}
+
+func TestMockUserRepository_AddExperience(t *testing.T) {
+	type mockAwardTitleFuncCall struct {
+		userID  uint
+		titleID uint
+		err     error
+	}
+
+	testCases := map[string]struct {
+		userID              uint
+		experienceAmount    uint
+		users               map[uint]*domain.User
+		levels              []domain.Level
+		mockAwardTitleCalls []mockAwardTitleFuncCall
+		expectedError       error
+		expectedExperience  uint
+		expectedLevelID     uint
+		expectedCoins       int
+	}{
+		"user not found": {
+			userID:              1,
+			experienceAmount:    100,
+			users:               map[uint]*domain.User{},
+			levels:              []domain.Level{},
+			expectedError:       errors.New("user not found"),
+			expectedExperience:  0,
+			expectedLevelID:     0,
+			expectedCoins:       0,
+			mockAwardTitleCalls: nil,
+		},
+		"level up with reward title": {
+			userID:           1,
+			experienceAmount: 500,
+			users: map[uint]*domain.User{
+				1: {ID: 1, Experience: 100, LevelID: 1, Wallet: domain.Wallet{Amount: 0}},
+			},
+			levels: []domain.Level{
+				{ID: 1, Level: 1, Experience: 100},
+				{ID: 2, Level: 2, Experience: 400, Coins: 100, Rewards: []domain.Reward{
+					{RewardableType: "titles", RewardableID: 1},
+				}},
+			},
+			expectedError:      nil,
+			expectedExperience: 200,
+			expectedLevelID:    2,
+			expectedCoins:      100,
+			mockAwardTitleCalls: []mockAwardTitleFuncCall{
+				{userID: 1, titleID: 1, err: nil},
+			},
+		},
+		"no level up, insufficient experience": {
+			userID:           1,
+			experienceAmount: 50,
+			users: map[uint]*domain.User{
+				1: {ID: 1, Experience: 50, LevelID: 1, Wallet: domain.Wallet{Amount: 0}},
+			},
+			levels: []domain.Level{
+				{ID: 1, Level: 1, Experience: 100},
+				{ID: 2, Level: 2, Experience: 400, Coins: 100},
+			},
+			expectedError:       nil,
+			expectedExperience:  100,
+			expectedLevelID:     1,
+			expectedCoins:       0,
+			mockAwardTitleCalls: nil,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			mockRepo := MockUserRepository{
+				users:  tc.users,
+				levels: tc.levels,
+			}
+
+			var awardedTitles []mockAwardTitleFuncCall
+			awardTitleToUserFunc := func(userID uint, titleID uint) error {
+				for _, call := range tc.mockAwardTitleCalls {
+					if call.userID == userID && call.titleID == titleID {
+						awardedTitles = append(awardedTitles, call)
+						return call.err
+					}
+				}
+				return nil
+			}
+
+			err := mockRepo.AddExperience(tc.userID, tc.experienceAmount, awardTitleToUserFunc)
+
+			if tc.expectedError != nil {
+				assert.EqualError(t, err, tc.expectedError.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+
+			if user, exists := mockRepo.users[tc.userID]; exists {
+				assert.Equal(t, tc.expectedExperience, user.Experience)
+				assert.Equal(t, tc.expectedLevelID, user.LevelID)
+				assert.Equal(t, tc.expectedCoins, user.Wallet.Amount)
+			}
+
+			assert.Equal(t, len(tc.mockAwardTitleCalls), len(awardedTitles))
+			for i, call := range tc.mockAwardTitleCalls {
+				assert.Equal(t, call.userID, awardedTitles[i].userID)
+				assert.Equal(t, call.titleID, awardedTitles[i].titleID)
+				assert.Equal(t, call.err, awardedTitles[i].err)
 			}
 		})
 	}

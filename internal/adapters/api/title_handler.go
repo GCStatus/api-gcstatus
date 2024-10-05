@@ -165,7 +165,7 @@ func (h *TitleHandler) BuyTitle(c *gin.Context) {
 		log.Fatalf("failed to serialize purchase message to JSON: %+v", err)
 	}
 
-	err = sqs.GlobalSQSClient.SendMessage(c.Request.Context(), sqs.GetAwsPurchaseQueue(), string(messageBody))
+	err = sqs.GlobalSQSClient.SendMessage(c.Request.Context(), sqs.GetAwsQueue(), string(messageBody))
 	if err != nil {
 		log.Fatalf("failed to enqueue purchase message to SQS: %+v", err)
 	}
