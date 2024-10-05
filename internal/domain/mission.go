@@ -26,7 +26,7 @@ type Mission struct {
 	Coins               uint      `gorm:"not null" validate:"required,numeric"`
 	Experience          uint      `gorm:"not null" validate:"required,numeric"`
 	Frequency           string    `gorm:"not null;default:one-time" validate:"required"`
-	ResetTime           time.Time `gorm:"not null;default:current_timestamp"`
+	ResetTime           time.Time `gorm:"not null;autoCreateTime"`
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
 	MissionRequirements []MissionRequirement `gorm:"foreignKey:MissionID"`
