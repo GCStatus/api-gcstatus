@@ -19,7 +19,7 @@ func (h *TitleRepositoryMySQL) GetAllForUser(userID uint) ([]domain.Title, error
 	var titles []domain.Title
 
 	err := h.db.Model(&domain.Title{}).Where(
-		"status != ? AND status != ?",
+		"status NOT IN (?, ?)",
 		domain.TitleUnavailable,
 		domain.TitleCanceled,
 	).

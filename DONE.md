@@ -34,6 +34,7 @@
   - [x] Integrate EC2
   - [x] Integrate RDS
   - [x] Integrate SES
+  - [x] Integrate SQS
   - [x] Integrate ElastiCache with Redis OSS
 - [x] Auth
   - [x] Create the login method
@@ -50,6 +51,8 @@
   - [x] User should have the coins quantity
   - [x] Create user wallet
   - [x] Migrate the user coins quantity for a has one relation for wallet
+  - [x] Create missions to earn coins
+  - [x] Create daily tasks to earn free coins
 - [x] Update user
   - [x] Request password for sensitive changes, such as email or nickname
   - [x] Update user email
@@ -77,5 +80,19 @@
   - [x] SQS
   - [x] Change notifications and transactions generation to SQS
   - [x] Create async processes
+- [x] Missions system
+  - [x] Create missions for the users
+  - [x] Add possibility to create missions for specic users
+  - [x] Missions can have the possibility to reward with coins and experience
+  - [x] Create transaction for coins addition on mission complete
+  - [x] Create notification for mission complete
+  - [x] Add message to SQS
+- [x] Award titles on level pass if applicable
+- [x] Award titles on missions complete if applicable
+- [x] Title system
+  - [x] Create titles requirements
+  - [x] Add posibility to purchase some titles by coins
+  - [x] Some titles could be earned by doing missions/quests
+  - [x] Some titles could be earned just getting some level
 
 ### Post MVP

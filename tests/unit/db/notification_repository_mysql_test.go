@@ -210,13 +210,13 @@ func TestNotificationRepositoryMySQL_GetNotificationByID(t *testing.T) {
 	notificationData := getNotificationData(t)
 
 	testCases := map[string]struct {
-		titleID              uint
+		notificationID       uint
 		mockSetup            func()
 		expectedError        error
 		expectedNotification domain.Notification
 	}{
-		"success - title found": {
-			titleID: 1,
+		"success - notification found": {
+			notificationID: 1,
 			mockSetup: func() {
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `notifications` WHERE `notifications`.`id` = ? AND `notifications`.`deleted_at` IS NULL ORDER BY `notifications`.`id` LIMIT ?")).
 					WithArgs(1, 1).
@@ -234,8 +234,8 @@ func TestNotificationRepositoryMySQL_GetNotificationByID(t *testing.T) {
 			},
 			expectedError: nil,
 		},
-		"error - title not found": {
-			titleID: 2,
+		"error - notification not found": {
+			notificationID: 2,
 			mockSetup: func() {
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `notifications` WHERE `notifications`.`id` = ? AND `notifications`.`deleted_at` IS NULL ORDER BY `notifications`.`id` LIMIT ?")).
 					WithArgs(2, 1).
@@ -245,7 +245,7 @@ func TestNotificationRepositoryMySQL_GetNotificationByID(t *testing.T) {
 			expectedError:        gorm.ErrRecordNotFound,
 		},
 		"error - db failure": {
-			titleID: 3,
+			notificationID: 3,
 			mockSetup: func() {
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `notifications` WHERE `notifications`.`id` = ? AND `notifications`.`deleted_at` IS NULL ORDER BY `notifications`.`id` LIMIT ?")).
 					WithArgs(3, 1).
@@ -260,10 +260,10 @@ func TestNotificationRepositoryMySQL_GetNotificationByID(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			tc.mockSetup()
 
-			title, err := repo.GetNotificationByID(tc.titleID)
+			notification, err := repo.GetNotificationByID(tc.notificationID)
 
 			assert.Equal(t, tc.expectedError, err)
-			assert.Equal(t, tc.expectedNotification, title)
+			assert.Equal(t, tc.expectedNotification, notification)
 
 			assert.NoError(t, mock.ExpectationsWereMet())
 		})

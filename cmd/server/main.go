@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"gcstatus/cmd/server/routes"
 	"gcstatus/di"
+	"gcstatus/internal/crons"
 	"log"
 	"os"
+
+	"github.com/robfig/cron/v3"
 )
 
 func main() {
@@ -20,7 +23,8 @@ func main() {
 		walletService,
 		transactionService,
 		notificationService,
-		_ := di.InitDependencies()
+		missionService,
+		db := di.InitDependencies()
 
 	// Setup routes with dependency injection
 	r := routes.SetupRouter(
@@ -34,7 +38,19 @@ func main() {
 		walletService,
 		transactionService,
 		notificationService,
+		missionService,
 	)
+
+	c := cron.New()
+
+	if _, err := c.AddFunc("@midnight", func() {
+		crons.ResetMissions(db)
+	}); err != nil {
+		log.Fatalf("Failed to start cron: %+v", err)
+	}
+
+	// Start the cron scheduler
+	c.Start()
 
 	// Get port
 	port := os.Getenv("PORT")

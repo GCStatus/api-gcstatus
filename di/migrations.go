@@ -22,6 +22,11 @@ func MigrateModels(dbConn *gorm.DB) {
 		&domain.TransactionType{},
 		&domain.Transaction{},
 		&domain.Notification{},
+		&domain.Mission{},
+		&domain.MissionRequirement{},
+		&domain.MissionProgress{},
+		&domain.UserMission{},
+		&domain.UserMissionAssignment{},
 	}
 
 	for _, model := range models {

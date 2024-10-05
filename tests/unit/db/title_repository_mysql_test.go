@@ -26,7 +26,7 @@ func TestTitleRepositoryMySQL_GetAllForUser(t *testing.T) {
 		"success - titles found": {
 			userID: 1,
 			mockSetup: func() {
-				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `titles` WHERE (status != ? AND status != ?) AND `titles`.`deleted_at` IS NULL")).
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `titles` WHERE status NOT IN (?, ?) AND `titles`.`deleted_at` IS NULL")).
 					WithArgs(domain.TitleUnavailable, domain.TitleCanceled).
 					WillReturnRows(sqlmock.NewRows([]string{"id", "title", "status"}).
 						AddRow(1, "Title 1", "Available").
@@ -83,7 +83,7 @@ func TestTitleRepositoryMySQL_GetAllForUser(t *testing.T) {
 		"no titles found": {
 			userID: 2,
 			mockSetup: func() {
-				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `titles` WHERE (status != ? AND status != ?) AND `titles`.`deleted_at` IS NULL")).
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `titles` WHERE status NOT IN (?, ?) AND `titles`.`deleted_at` IS NULL")).
 					WithArgs(domain.TitleUnavailable, domain.TitleCanceled).
 					WillReturnRows(sqlmock.NewRows([]string{}))
 			},
@@ -93,7 +93,7 @@ func TestTitleRepositoryMySQL_GetAllForUser(t *testing.T) {
 		"error - db failure": {
 			userID: 3,
 			mockSetup: func() {
-				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `titles` WHERE (status != ? AND status != ?) AND `titles`.`deleted_at` IS NULL")).
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `titles` WHERE status NOT IN (?, ?) AND `titles`.`deleted_at` IS NULL")).
 					WithArgs(domain.TitleUnavailable, domain.TitleCanceled).
 					WillReturnError(errors.New("db error"))
 			},

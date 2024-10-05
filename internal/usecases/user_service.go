@@ -42,6 +42,10 @@ func (s *UserService) UpdateUserBasics(userID uint, request ports.UpdateUserBasi
 	return s.repo.UpdateUserBasics(userID, request)
 }
 
+func (s *UserService) AddExperience(userID uint, experienceAmount uint, awardTitleToUserFunc func(userID uint, titleID uint) error) error {
+	return s.repo.AddExperience(userID, experienceAmount, awardTitleToUserFunc)
+}
+
 func (s *UserService) FindUserByEmailOrNickname(emailOrNickname string) (*domain.User, error) {
 	user, err := s.repo.FindUserByEmailOrNickname(emailOrNickname)
 	if err != nil {

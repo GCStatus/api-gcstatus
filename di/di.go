@@ -13,7 +13,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// InitDependencies sets up the database connection, repository, and services
 func InitDependencies() (
 	*usecases.UserService,
 	*usecases.AuthService,
@@ -25,9 +24,9 @@ func InitDependencies() (
 	*usecases.WalletService,
 	*usecases.TransactionService,
 	*usecases.NotificationService,
+	*usecases.MissionService,
 	*gorm.DB,
 ) {
-	// Load config
 	cfg := config.LoadConfig()
 
 	// Setup DB connection
@@ -50,7 +49,8 @@ func InitDependencies() (
 		taskService,
 		walletService,
 		transactionService,
-		notificationService := Setup(dbConn)
+		notificationService,
+		missionService := Setup(dbConn)
 
 	// Setup clients for non-test environment
 	if cfg.ENV != "testing" {
@@ -65,6 +65,9 @@ func InitDependencies() (
 			userService,
 			transactionService,
 			notificationService,
+			taskService,
+			missionService,
+			walletService,
 		)
 
 		go consumer.Start(context.Background())
@@ -80,5 +83,6 @@ func InitDependencies() (
 		walletService,
 		transactionService,
 		notificationService,
+		missionService,
 		dbConn
 }

@@ -11,30 +11,41 @@ import (
 )
 
 type MockTaskRepository struct {
-	Requirements []domain.TitleRequirement
-	Progress     map[uint]*domain.TitleProgress
-	UserTitles   map[uint]map[uint]bool
+	TitleRequirements   []domain.TitleRequirement
+	MissionRequirements []domain.MissionRequirement
+	TitleProgress       map[uint]*domain.TitleProgress
+	MissionProgress     map[uint]*domain.MissionProgress
+	UserTitles          map[uint]map[uint]bool
 }
 
 var _ ports.TaskRepository = &MockTaskRepository{}
 
 func NewMockTaskRepository() *MockTaskRepository {
 	return &MockTaskRepository{
-		Requirements: []domain.TitleRequirement{},
-		Progress:     make(map[uint]*domain.TitleProgress),
-		UserTitles:   make(map[uint]map[uint]bool),
+		TitleRequirements:   []domain.TitleRequirement{},
+		MissionRequirements: []domain.MissionRequirement{},
+		TitleProgress:       make(map[uint]*domain.TitleProgress),
+		MissionProgress:     make(map[uint]*domain.MissionProgress),
+		UserTitles:          make(map[uint]map[uint]bool),
 	}
 }
 
 func (m *MockTaskRepository) GetTitleRequirementsByKey(actionKey string) ([]domain.TitleRequirement, error) {
-	if len(m.Requirements) == 0 {
+	if len(m.TitleRequirements) == 0 {
 		return nil, errors.New("no requirements found")
 	}
-	return m.Requirements, nil
+	return m.TitleRequirements, nil
+}
+
+func (m *MockTaskRepository) GetMissionRequirementsByKey(actionKey string) ([]domain.MissionRequirement, error) {
+	if len(m.MissionRequirements) == 0 {
+		return nil, errors.New("no requirements found")
+	}
+	return m.MissionRequirements, nil
 }
 
 func (m *MockTaskRepository) GetOrCreateTitleProgress(userID, requirementID uint) (*domain.TitleProgress, error) {
-	progress, exists := m.Progress[requirementID]
+	progress, exists := m.TitleProgress[requirementID]
 	if !exists {
 		progress = &domain.TitleProgress{
 			UserID:             userID,
@@ -44,13 +55,33 @@ func (m *MockTaskRepository) GetOrCreateTitleProgress(userID, requirementID uint
 			CreatedAt:          time.Now(),
 			UpdatedAt:          time.Now(),
 		}
-		m.Progress[requirementID] = progress
+		m.TitleProgress[requirementID] = progress
+	}
+	return progress, nil
+}
+
+func (m *MockTaskRepository) GetOrCreateMissionProgress(userID, requirementID uint) (*domain.MissionProgress, error) {
+	progress, exists := m.MissionProgress[requirementID]
+	if !exists {
+		progress = &domain.MissionProgress{
+			UserID:               userID,
+			MissionRequirementID: requirementID,
+			Progress:             0,
+			Completed:            false,
+			CreatedAt:            time.Now(),
+			UpdatedAt:            time.Now(),
+		}
+		m.MissionProgress[requirementID] = progress
 	}
 	return progress, nil
 }
 
 func (m *MockTaskRepository) UpdateTitleProgress(progress *domain.TitleProgress) error {
-	m.Progress[progress.TitleRequirementID] = progress
+	m.TitleProgress[progress.TitleRequirementID] = progress
+	return nil
+}
+func (m *MockTaskRepository) UpdateMissionProgress(progress *domain.MissionProgress) error {
+	m.MissionProgress[progress.MissionRequirementID] = progress
 	return nil
 }
 
@@ -82,15 +113,56 @@ func MockTaskRepository_TestGetTitleRequirementsByKey(t *testing.T) {
 		{
 			name: "no requirements",
 			setup: func() {
-				mockRepo.Requirements = []domain.TitleRequirement{}
+				mockRepo.TitleRequirements = []domain.TitleRequirement{}
 			},
 			expectedError: "no requirements found",
 		},
 		{
 			name: "requirements found",
 			setup: func() {
-				mockRepo.Requirements = []domain.TitleRequirement{
+				mockRepo.TitleRequirements = []domain.TitleRequirement{
 					{ID: 1, TitleID: 1, Key: "test_action", Goal: 10},
+				}
+			},
+			expectedError: "",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			_, err := mockRepo.GetTitleRequirementsByKey("test_action")
+			if tc.expectedError != "" {
+				assert.Error(t, err)
+				assert.Equal(t, tc.expectedError, err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+func MockTaskRepository_TestGetMissionRequirementsByKey(t *testing.T) {
+	mockRepo := NewMockTaskRepository()
+
+	testCases := []struct {
+		name          string
+		setup         func()
+		expectedError string
+	}{
+		{
+			name: "no requirements",
+			setup: func() {
+				mockRepo.MissionRequirements = []domain.MissionRequirement{}
+			},
+			expectedError: "no requirements found",
+		},
+		{
+			name: "requirements found",
+			setup: func() {
+				mockRepo.MissionRequirements = []domain.MissionRequirement{
+					{ID: 1, MissionID: 1, Key: "test_action", Goal: 10},
 				}
 			},
 			expectedError: "",
@@ -127,7 +199,7 @@ func MockTaskRepository_TestGetOrCreateTitleProgress(t *testing.T) {
 			userID:        1,
 			requirementID: 100,
 			setup: func() {
-				mockRepo.Progress = make(map[uint]*domain.TitleProgress)
+				mockRepo.TitleProgress = make(map[uint]*domain.TitleProgress)
 			},
 			expectedExists: false,
 		},
@@ -136,7 +208,7 @@ func MockTaskRepository_TestGetOrCreateTitleProgress(t *testing.T) {
 			userID:        1,
 			requirementID: 100,
 			setup: func() {
-				mockRepo.Progress[100] = &domain.TitleProgress{
+				mockRepo.TitleProgress[100] = &domain.TitleProgress{
 					UserID:             1,
 					TitleRequirementID: 100,
 					Progress:           5,
@@ -152,6 +224,56 @@ func MockTaskRepository_TestGetOrCreateTitleProgress(t *testing.T) {
 			tc.setup()
 
 			progress, err := mockRepo.GetOrCreateTitleProgress(tc.userID, tc.requirementID)
+			assert.NoError(t, err)
+			if tc.expectedExists {
+				assert.Equal(t, 5, progress.Progress)
+			} else {
+				assert.Equal(t, 0, progress.Progress)
+			}
+		})
+	}
+}
+
+func MockTaskRepository_TestGetOrCreateMissionProgress(t *testing.T) {
+	mockRepo := NewMockTaskRepository()
+
+	testCases := []struct {
+		name           string
+		userID         uint
+		requirementID  uint
+		setup          func()
+		expectedExists bool
+	}{
+		{
+			name:          "create new progress",
+			userID:        1,
+			requirementID: 100,
+			setup: func() {
+				mockRepo.MissionProgress = make(map[uint]*domain.MissionProgress)
+			},
+			expectedExists: false,
+		},
+		{
+			name:          "return existing progress",
+			userID:        1,
+			requirementID: 100,
+			setup: func() {
+				mockRepo.MissionProgress[100] = &domain.MissionProgress{
+					UserID:               1,
+					MissionRequirementID: 100,
+					Progress:             5,
+					Completed:            false,
+				}
+			},
+			expectedExists: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			progress, err := mockRepo.GetOrCreateMissionProgress(tc.userID, tc.requirementID)
 			assert.NoError(t, err)
 			if tc.expectedExists {
 				assert.Equal(t, 5, progress.Progress)
@@ -180,7 +302,7 @@ func MockTaskRepository_TestUpdateTitleProgress(t *testing.T) {
 				Completed:          true,
 			},
 			setup: func() {
-				mockRepo.Progress[100] = &domain.TitleProgress{
+				mockRepo.TitleProgress[100] = &domain.TitleProgress{
 					UserID:             1,
 					TitleRequirementID: 100,
 					Progress:           5,
@@ -199,6 +321,49 @@ func MockTaskRepository_TestUpdateTitleProgress(t *testing.T) {
 			assert.NoError(t, err)
 
 			updatedProgress, _ := mockRepo.GetOrCreateTitleProgress(1, 100)
+			assert.Equal(t, tc.expectedAmount, updatedProgress.Progress)
+			assert.True(t, updatedProgress.Completed)
+		})
+	}
+}
+
+func MockTaskRepository_TestUpdateMissionProgress(t *testing.T) {
+	mockRepo := NewMockTaskRepository()
+
+	testCases := []struct {
+		name           string
+		progress       domain.MissionProgress
+		setup          func()
+		expectedAmount int
+	}{
+		{
+			name: "update existing progress",
+			progress: domain.MissionProgress{
+				UserID:               1,
+				MissionRequirementID: 100,
+				Progress:             10,
+				Completed:            true,
+			},
+			setup: func() {
+				mockRepo.MissionProgress[100] = &domain.MissionProgress{
+					UserID:               1,
+					MissionRequirementID: 100,
+					Progress:             5,
+					Completed:            false,
+				}
+			},
+			expectedAmount: 10,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tc.setup()
+
+			err := mockRepo.UpdateMissionProgress(&tc.progress)
+			assert.NoError(t, err)
+
+			updatedProgress, _ := mockRepo.GetOrCreateMissionProgress(1, 100)
 			assert.Equal(t, tc.expectedAmount, updatedProgress.Progress)
 			assert.True(t, updatedProgress.Completed)
 		})

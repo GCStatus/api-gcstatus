@@ -22,6 +22,12 @@ func (r *TaskRepositoryMySQL) GetTitleRequirementsByKey(actionKey string) ([]dom
 	return requirements, err
 }
 
+func (r *TaskRepositoryMySQL) GetMissionRequirementsByKey(actionKey string) ([]domain.MissionRequirement, error) {
+	var requirements []domain.MissionRequirement
+	err := r.db.Where("`key` = ?", actionKey).Find(&requirements).Error
+	return requirements, err
+}
+
 func (r *TaskRepositoryMySQL) GetOrCreateTitleProgress(userID uint, TitleRequirementID uint) (*domain.TitleProgress, error) {
 	var progress domain.TitleProgress
 
@@ -40,7 +46,29 @@ func (r *TaskRepositoryMySQL) GetOrCreateTitleProgress(userID uint, TitleRequire
 	return &progress, err
 }
 
+func (r *TaskRepositoryMySQL) GetOrCreateMissionProgress(userID uint, MissionRequirementID uint) (*domain.MissionProgress, error) {
+	var progress domain.MissionProgress
+
+	err := r.db.
+		Joins("JOIN mission_requirements ON mission_requirements.id = mission_progresses.mission_requirement_id").
+		Joins("JOIN missions ON missions.id = mission_requirements.mission_id").
+		Where("mission_requirements.id = ? AND mission_progresses.user_id = ?", MissionRequirementID, userID).
+		Where("missions.status NOT IN (?, ?)", domain.MissionUnavailable, domain.MissionCanceled).
+		FirstOrCreate(&progress, domain.MissionProgress{
+			UserID:               userID,
+			MissionRequirementID: MissionRequirementID,
+			Progress:             0,
+			Completed:            false,
+		}).Error
+
+	return &progress, err
+}
+
 func (r *TaskRepositoryMySQL) UpdateTitleProgress(progress *domain.TitleProgress) error {
+	return r.db.Save(progress).Error
+}
+
+func (r *TaskRepositoryMySQL) UpdateMissionProgress(progress *domain.MissionProgress) error {
 	return r.db.Save(progress).Error
 }
 

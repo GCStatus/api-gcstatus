@@ -48,14 +48,10 @@ func (h *PurchaseMessageHandler) HandlePurchaseMessage(ctx context.Context, mess
 		Title   string `json:"title"`
 	}
 
-	log.Printf("Message payload: %+v. PurchaseMSG: %+v", messageWrapper, purchaseMsg)
-
 	if err := json.Unmarshal(messageWrapper.Body, &purchaseMsg); err != nil {
 		log.Printf("Error unmarshalling purchase body: %v", err)
 		return
 	}
-
-	log.Printf("Unmarshalled purchase message: %+v", purchaseMsg)
 
 	transaction := &domain.Transaction{
 		Amount:            purchaseMsg.Cost,

@@ -12,12 +12,14 @@
   - [ ] If user change email, set verified_at to null and block access again
 - [ ] Abstract all use cases and rules to services
 - [ ] Integrate with Kibana for logs
-- [ ] Award titles on level pass if applicable
-- [ ] Award titles on missions complete if applicable
 - [ ] Create jobs to run some sevices async
   - [ ] Email send
   - [ ] Create secondary records, such as transactions or notifications
 - [ ] Review all exceptions thrown
+- [ ] Missions and titles
+  - [ ] Review the action keys for missions and titles
+  - [ ] Planning all missions and titles type
+  - [ ] Planning all daily/weekly/monthly missions
 
 ### Post-MVP
 
@@ -37,6 +39,7 @@
   - [ ] Comments
   - [ ] Messages (?)
 - [ ] Refresh token
+- [ ] MFA - 2FA
 
 ### Future Ideas
 
@@ -46,26 +49,13 @@
 - [ ] Add some games on the website
 - [ ] Quiz & polls: about the most exciting game release on future or something else
 - [ ] Integrate with social medias
-- [ ] Missions system
-  - [ ] Create missions for the users
-  - [ ] Add possibility to create missions for specic users
-  - [ ] Missions can have the possibility to reward with coins and experience
-  - [ ] Missions can have the possibility to have a quiz associated
 - [ ] Coin system
-  - [ ] Create missions to earn coins
-  - [ ] Create daily tasks to earn free coins
   - [ ] Create a system to reward user to do something on platform, like comment in a game
     - [ ] Block user to earn coins for commenting the same game (or reduce the amount for each task doing)
   - [ ] Add possibility to buy coins
   - [ ] Some quizzez can reward with coins
 - [ ] Title system
-  - [ ] Create titles requirements
-  - [ ] Add posibility to purchase some titles by coins
-  - [ ] Some titles could be earned by doing missions/quests
-  - [ ] Some titles could be earned just getting some level
   - [ ] Some titles could be earned by hitting a percentage of a quiz
-- [ ] User transactions
-  - [ ] Make a system to check user transactions with coins
 - [ ] Orders
   - [ ] Make an order system to purchase coins
 - [ ] Create another user profiles page
@@ -80,7 +70,6 @@
   - [ ] The ticket can be used to report some suspicious activity
 - [ ] Create a staging API with github environments
 - [ ] AWS
-  - [ ] SQS
   - [ ] SNS
   - [ ] Lambda
 - [ ] Create a chat between users

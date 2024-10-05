@@ -22,6 +22,7 @@ func SetupRouter(
 	walletService *usecases.WalletService,
 	transactionService *usecases.TransactionService,
 	notificationService *usecases.NotificationService,
+	missionService *usecases.MissionService,
 ) *gin.Engine {
 	r := gin.Default()
 	env := config.LoadConfig()
@@ -49,7 +50,8 @@ func SetupRouter(
 		userHandler,
 		titleHandler,
 		transactionHandler,
-		notificationHandler := InitHandlers(
+		notificationHandler,
+		missionHandler := InitHandlers(
 		authService,
 		userService,
 		passwordResetService,
@@ -60,6 +62,7 @@ func SetupRouter(
 		walletService,
 		transactionService,
 		notificationService,
+		missionService,
 	)
 
 	// Define the middlewares
@@ -102,6 +105,9 @@ func SetupRouter(
 		protected.PUT("/notifications/all/unread", notificationHandler.MarkAllAsUnread)
 		protected.DELETE("/notifications/:id", notificationHandler.DeleteNotification)
 		protected.DELETE("/notifications/all", notificationHandler.DeleteAllNotifications)
+
+		protected.GET("/missions", missionHandler.GetAllForUser)
+		protected.POST("/missions/:id/complete", missionHandler.CompleteMission)
 	}
 
 	// Common routes

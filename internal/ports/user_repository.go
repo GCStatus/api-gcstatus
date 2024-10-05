@@ -1,6 +1,8 @@
 package ports
 
-import "gcstatus/internal/domain"
+import (
+	"gcstatus/internal/domain"
+)
 
 type UpdateNickAndEmailRequest struct {
 	Password string `json:"password" binding:"required"`
@@ -22,4 +24,5 @@ type UserRepository interface {
 	CreateWithProfile(user *domain.User) error
 	UpdateUserNickAndEmail(userID uint, request UpdateNickAndEmailRequest) error
 	UpdateUserBasics(userID uint, request UpdateUserBasicsRequest) error
+	AddExperience(userID uint, experienceAmount uint, awardTitleToUserFunc func(userID uint, titleID uint) error) error
 }

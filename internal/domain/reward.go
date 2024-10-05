@@ -6,6 +6,10 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	RewardableTypeTitles = "titles"
+)
+
 type Reward struct {
 	gorm.Model
 	ID             uint   `gorm:"primaryKey"`

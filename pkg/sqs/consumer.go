@@ -13,9 +13,11 @@ import (
 )
 
 type SQSConsumer struct {
-	client          *sqs.Client
-	queueUrl        string
-	purchaseHandler *messages.PurchaseMessageHandler
+	client                             *sqs.Client
+	queueUrl                           string
+	purchaseHandler                    *messages.PurchaseMessageHandler
+	trackProgressProfilePictureHandler *messages.TrackProgressProfilePictureHandler
+	missionCompleteHandler             *messages.MissionCompleteMessageHandler
 }
 
 func NewSQSConsumer(
@@ -24,6 +26,9 @@ func NewSQSConsumer(
 	userService *usecases.UserService,
 	transactionService *usecases.TransactionService,
 	notificationService *usecases.NotificationService,
+	taskService *usecases.TaskService,
+	missionService *usecases.MissionService,
+	walletService *usecases.WalletService,
 ) *SQSConsumer {
 	purchaseHandler := messages.NewPurchaseMessageHandler(
 		userService,
@@ -31,10 +36,25 @@ func NewSQSConsumer(
 		notificationService,
 	)
 
+	trackProgressProfilePictureHandler := messages.NewTrackProgressProfilePictureHandler(
+		taskService,
+	)
+
+	missionCompleteHandler := messages.NewMissionCompleteMessageHandler(
+		walletService,
+		userService,
+		taskService,
+		missionService,
+		transactionService,
+		notificationService,
+	)
+
 	return &SQSConsumer{
-		client:          client,
-		queueUrl:        queueUrl,
-		purchaseHandler: purchaseHandler,
+		client:                             client,
+		queueUrl:                           queueUrl,
+		purchaseHandler:                    purchaseHandler,
+		trackProgressProfilePictureHandler: trackProgressProfilePictureHandler,
+		missionCompleteHandler:             missionCompleteHandler,
 	}
 }
 
@@ -81,6 +101,10 @@ func (c *SQSConsumer) processMessage(ctx context.Context, message types.Message)
 	switch messageType.Type {
 	case "PurchaseTitle":
 		c.purchaseHandler.HandlePurchaseMessage(ctx, message)
+	case "TrackProgressProfilePicture":
+		c.trackProgressProfilePictureHandler.HandleTrackProgressProfilePictureMessage(ctx, message)
+	case "CompleteMission":
+		c.missionCompleteHandler.HandleCompleteMissionMessage(ctx, message)
 	default:
 		log.Printf("Unknown message type: %s", messageType.Type)
 	}
