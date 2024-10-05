@@ -93,5 +93,6 @@
   - [ ] Method should return 9 hot games
   - [ ] Method should return 9 most liked games
   - [ ] Method should return 9 upcoming games
+- [ ] Coupons for coins purchase
 - [ ] Admin system
   - [ ] ...

@@ -94,5 +94,9 @@
   - [x] Add posibility to purchase some titles by coins
   - [x] Some titles could be earned by doing missions/quests
   - [x] Some titles could be earned just getting some level
+- [x] Create categories table
+- [x] Create tags table
+- [x] Create genres table
+- [x] Create platforms table
 
 ### Post MVP
