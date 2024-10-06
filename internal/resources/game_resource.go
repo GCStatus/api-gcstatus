@@ -50,11 +50,11 @@ type ProtectionFormat struct {
 }
 
 type CrackFormat struct {
-	ID         uint             `json:"id"`
-	Status     string           `json:"status"`
-	CrackedAt  *string          `json:"cracked_at"`
-	By         CrackByFormat    `json:"by"`
-	Protection ProtectionFormat `json:"protection"`
+	ID         uint              `json:"id"`
+	Status     string            `json:"status"`
+	CrackedAt  *string           `json:"cracked_at"`
+	By         *CrackByFormat    `json:"by"`
+	Protection *ProtectionFormat `json:"protection"`
 }
 
 type GameResource struct {
@@ -200,24 +200,28 @@ func TransformGame(game domain.Game) GameResource {
 			Status: game.Crack.Status,
 		}
 
-		if game.Crack.Cracker.ID != 0 {
-			crack.By = CrackByFormat{
-				ID:     game.Crack.Cracker.ID,
-				Name:   game.Crack.Cracker.Name,
-				Acting: game.Crack.Cracker.Acting,
-			}
-		}
-
 		if game.Crack.CrackedAt != nil {
 			formattedTime := utils.FormatTimestamp(*game.Crack.CrackedAt)
 			crack.CrackedAt = &formattedTime
 		}
 
+		if game.Crack.Cracker.ID != 0 {
+			crack.By = &CrackByFormat{
+				ID:     game.Crack.Cracker.ID,
+				Name:   game.Crack.Cracker.Name,
+				Acting: game.Crack.Cracker.Acting,
+			}
+		} else {
+			crack.By = nil
+		}
+
 		if game.Crack.Protection.ID != 0 {
-			crack.Protection = ProtectionFormat{
+			crack.Protection = &ProtectionFormat{
 				ID:   game.Crack.Protection.ID,
 				Name: game.Crack.Protection.Name,
 			}
+		} else {
+			crack.Protection = nil
 		}
 
 		resource.Crack = &crack
