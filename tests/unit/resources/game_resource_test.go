@@ -59,6 +59,8 @@ func TestTransformGame(t *testing.T) {
 				Platforms:        []resources.MorphsFormat{},
 				Genres:           []resources.MorphsFormat{},
 				Tags:             []resources.MorphsFormat{},
+				Languages:        []resources.LanguageFormat{},
+				Requirements:     []resources.RequirementFormat{},
 			},
 		},
 		"With One Category": {
@@ -108,9 +110,11 @@ func TestTransformGame(t *testing.T) {
 				Categories: []resources.MorphsFormat{
 					{ID: 1, Name: "FPS"},
 				},
-				Platforms: []resources.MorphsFormat{},
-				Genres:    []resources.MorphsFormat{},
-				Tags:      []resources.MorphsFormat{},
+				Platforms:    []resources.MorphsFormat{},
+				Genres:       []resources.MorphsFormat{},
+				Tags:         []resources.MorphsFormat{},
+				Languages:    []resources.LanguageFormat{},
+				Requirements: []resources.RequirementFormat{},
 			},
 		},
 	}
@@ -177,6 +181,8 @@ func TestTransformGames(t *testing.T) {
 					Platforms:        []resources.MorphsFormat{},
 					Genres:           []resources.MorphsFormat{},
 					Tags:             []resources.MorphsFormat{},
+					Languages:        []resources.LanguageFormat{},
+					Requirements:     []resources.RequirementFormat{},
 				},
 			},
 		},
@@ -267,8 +273,10 @@ func TestTransformGames(t *testing.T) {
 					Platforms: []resources.MorphsFormat{
 						{ID: 1, Name: "PC"},
 					},
-					Genres: []resources.MorphsFormat{},
-					Tags:   []resources.MorphsFormat{},
+					Genres:       []resources.MorphsFormat{},
+					Tags:         []resources.MorphsFormat{},
+					Languages:    []resources.LanguageFormat{},
+					Requirements: []resources.RequirementFormat{},
 				},
 				{
 					ID:          3,
@@ -291,6 +299,8 @@ func TestTransformGames(t *testing.T) {
 					Tags: []resources.MorphsFormat{
 						{ID: 1, Name: "Adventure"},
 					},
+					Languages:    []resources.LanguageFormat{},
+					Requirements: []resources.RequirementFormat{},
 				},
 			},
 		},

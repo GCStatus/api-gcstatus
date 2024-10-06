@@ -236,10 +236,10 @@ func TestValidateGameLanguageLanguageValidData(t *testing.T) {
 	fixedTime := time.Now()
 
 	testCases := map[string]struct {
-		game domain.GameLanguage
+		gameLanguage domain.GameLanguage
 	}{
 		"Can empty validations errors": {
-			game: domain.GameLanguage{
+			gameLanguage: domain.GameLanguage{
 				Menu:       false,
 				Dubs:       true,
 				Subtitles:  false,
@@ -274,7 +274,7 @@ func TestValidateGameLanguageLanguageValidData(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			err := tc.game.ValidateGameLanguage()
+			err := tc.gameLanguage.ValidateGameLanguage()
 			assert.NoError(t, err)
 		})
 	}
@@ -282,11 +282,11 @@ func TestValidateGameLanguageLanguageValidData(t *testing.T) {
 
 func TestCreateGameLanguageWithMissingFields(t *testing.T) {
 	testCases := map[string]struct {
-		game    domain.GameLanguage
-		wantErr string
+		gameLanguage domain.GameLanguage
+		wantErr      string
 	}{
 		"Missing required fields": {
-			game: domain.GameLanguage{},
+			gameLanguage: domain.GameLanguage{},
 			wantErr: `
 				Name is a required field,
 				ISO is a required field,
@@ -305,7 +305,7 @@ func TestCreateGameLanguageWithMissingFields(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			err := tc.game.ValidateGameLanguage()
+			err := tc.gameLanguage.ValidateGameLanguage()
 
 			assert.Error(t, err)
 			assert.Contains(t, err.Error(), utils.NormalizeWhitespace(tc.wantErr))

@@ -98,10 +98,12 @@
 - [x] Create tags table
 - [x] Create genres table
 - [x] Create platforms table
+- [x] Create languages table
 - [x] Adding outline for games
   - [x] Associating games with platforms
   - [x] Associating games with categories
   - [x] Associating games with tags
   - [x] Associating games with genres
+  - [x] Associating games with languages
 
 ### Post MVP

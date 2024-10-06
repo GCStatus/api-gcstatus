@@ -19,27 +19,47 @@ type LanguageFormat struct {
 	Subtitles bool   `json:"subtitles"`
 }
 
+type RequirementTypeFormat struct {
+	ID        uint   `json:"id"`
+	OS        string `json:"os"`
+	Potential string `json:"potential"`
+}
+
+type RequirementFormat struct {
+	ID              uint                  `json:"id"`
+	OS              string                `json:"os"`
+	DX              string                `json:"dx"`
+	CPU             string                `json:"cpu"`
+	RAM             string                `json:"ram"`
+	GPU             string                `json:"gpu"`
+	ROM             string                `json:"rom"`
+	OBS             *string               `json:"obs,omitempty"`
+	Network         string                `json:"network"`
+	RequirementType RequirementTypeFormat `json:"requirement_type"`
+}
+
 type GameResource struct {
-	ID               uint             `json:"id"`
-	Age              uint             `json:"age"`
-	Slug             string           `json:"slug"`
-	Title            string           `json:"title"`
-	Condition        string           `json:"condition"`
-	Cover            string           `json:"cover"`
-	About            string           `json:"about"`
-	Description      string           `json:"description"`
-	ShortDescription string           `json:"short_description"`
-	Free             bool             `json:"is_free"`
-	Legal            *string          `json:"legal"`
-	Website          *string          `json:"website"`
-	ReleaseDate      string           `json:"release_date"`
-	CreatedAt        string           `json:"created_at"`
-	UpdatedAt        string           `json:"updated_at"`
-	Categories       []MorphsFormat   `json:"categories"`
-	Platforms        []MorphsFormat   `json:"platforms"`
-	Genres           []MorphsFormat   `json:"genres"`
-	Tags             []MorphsFormat   `json:"tags"`
-	Languages        []LanguageFormat `json:"languages"`
+	ID               uint                `json:"id"`
+	Age              uint                `json:"age"`
+	Slug             string              `json:"slug"`
+	Title            string              `json:"title"`
+	Condition        string              `json:"condition"`
+	Cover            string              `json:"cover"`
+	About            string              `json:"about"`
+	Description      string              `json:"description"`
+	ShortDescription string              `json:"short_description"`
+	Free             bool                `json:"is_free"`
+	Legal            *string             `json:"legal"`
+	Website          *string             `json:"website"`
+	ReleaseDate      string              `json:"release_date"`
+	CreatedAt        string              `json:"created_at"`
+	UpdatedAt        string              `json:"updated_at"`
+	Categories       []MorphsFormat      `json:"categories"`
+	Platforms        []MorphsFormat      `json:"platforms"`
+	Genres           []MorphsFormat      `json:"genres"`
+	Tags             []MorphsFormat      `json:"tags"`
+	Languages        []LanguageFormat    `json:"languages"`
+	Requirements     []RequirementFormat `json:"requirements"`
 }
 
 func TransformGame(game domain.Game) GameResource {
@@ -63,6 +83,8 @@ func TransformGame(game domain.Game) GameResource {
 		Platforms:        []MorphsFormat{},
 		Genres:           []MorphsFormat{},
 		Tags:             []MorphsFormat{},
+		Languages:        []LanguageFormat{},
+		Requirements:     []RequirementFormat{},
 	}
 
 	for _, categoriable := range game.Categories {
@@ -121,6 +143,33 @@ func TransformGame(game domain.Game) GameResource {
 			}
 
 			resource.Languages = append(resource.Languages, language)
+		}
+	}
+
+	for _, gameRequirement := range game.Requirements {
+		if gameRequirement.ID != 0 {
+			requirement := RequirementFormat{
+				ID:              gameRequirement.ID,
+				OS:              gameRequirement.OS,
+				DX:              gameRequirement.DX,
+				CPU:             gameRequirement.CPU,
+				RAM:             gameRequirement.RAM,
+				GPU:             gameRequirement.GPU,
+				ROM:             gameRequirement.ROM,
+				OBS:             gameRequirement.OBS,
+				Network:         gameRequirement.Network,
+				RequirementType: RequirementTypeFormat{},
+			}
+
+			if gameRequirement.RequirementType.ID != 0 {
+				requirement.RequirementType = RequirementTypeFormat{
+					ID:        gameRequirement.RequirementType.ID,
+					OS:        gameRequirement.RequirementType.OS,
+					Potential: gameRequirement.RequirementType.Potential,
+				}
+			}
+
+			resource.Requirements = append(resource.Requirements, requirement)
 		}
 	}
 

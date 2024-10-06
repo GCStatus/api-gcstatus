@@ -20,6 +20,27 @@
   - [ ] Review the action keys for missions and titles
   - [ ] Planning all missions and titles type
   - [ ] Planning all daily/weekly/monthly missions
+  - [ ] Create association for games or DLCs
+    - [ ] Create torrent websites (such as firgitl, skidrow etc)
+    - [ ] Create the king of protections (such as Denuvo, Steam, GOG etc)
+    - [ ] Create game developers (such as Game Science)
+    - [ ] Create game publishers (such as Game Science)
+    - [ ] Create requirement types
+      - [ ] A requirement type should have a potential column, that should be enum, with minimum, maximum or recommended
+      - [ ] A requirement type should have a type column, that should be enum, with windows, mac or linux
+    - [ ] Create requirements and associate with requirement types
+- [ ] Create game outline system
+  - [ ] Add game DLCs
+  - [ ] Add game critics
+  - [ ] Add game torrents
+  - [ ] Add game crack
+  - [ ] Add game reviews
+  - [ ] Add game galleries
+  - [ ] Add game publishers
+  - [ ] Add game developers
+  - [ ] Add game requirements
+  - [ ] Add game messages (for torrents section)
+  - [ ] Add game support
 
 ### Post-MVP
 
