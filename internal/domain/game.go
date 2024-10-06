@@ -38,6 +38,7 @@ type Game struct {
 	Requirements     []Requirement   `gorm:"foreignKey:GameID"`
 	Torrents         []Torrent       `gorm:"foreignKey:GameID"`
 	Publishers       []GamePublisher `gorm:"foreignKey:GameID"`
+	Developers       []GameDeveloper `gorm:"foreignKey:GameID"`
 	Crack            *Crack          `gorm:"foreignKey:GameID"`
 }
 

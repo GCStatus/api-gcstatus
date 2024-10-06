@@ -27,6 +27,7 @@ func (h *GameRepositoryMySQL) FindBySlug(slug string) (domain.Game, error) {
 		Preload("Crack.Protection").
 		Preload("Torrents.TorrentProvider").
 		Preload("Publishers.Publisher").
+		Preload("Developers.Developer").
 		Where("slug = ?", slug).
 		First(&game).
 		Error

@@ -105,5 +105,14 @@
   - [x] Associating games with tags
   - [x] Associating games with genres
   - [x] Associating games with languages
+- [x] Create association for games or DLCs
+  - [x] Create torrent websites (such as firgitl, skidrow etc)
+  - [x] Create the kind of protections (such as Denuvo, Steam, GOG etc)
+  - [x] Create game developers (such as Game Science)
+  - [x] Create game publishers (such as Game Science)
+  - [x] Create requirement types
+    - [x] A requirement type should have a potential column, that should be enum, with minimum, maximum or recommended
+    - [x] A requirement type should have a type column, that should be enum, with windows, mac or linux
+  - [x] Create requirements and associate with requirement types
 
 ### Post MVP

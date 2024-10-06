@@ -29,6 +29,7 @@ type GameResource struct {
 	Requirements     []RequirementResource  `json:"requirements"`
 	Torrents         []TorrentResource      `json:"torrents"`
 	Publishers       []PublisherResource    `json:"publishers"`
+	Developers       []DeveloperResource    `json:"developers"`
 	Crack            *CrackResource         `json:"crack"`
 }
 
@@ -57,6 +58,7 @@ func TransformGame(game domain.Game) GameResource {
 		Requirements:     []RequirementResource{},
 		Torrents:         []TorrentResource{},
 		Publishers:       []PublisherResource{},
+		Developers:       []DeveloperResource{},
 		Crack:            nil,
 	}
 
@@ -105,6 +107,12 @@ func TransformGame(game domain.Game) GameResource {
 	for _, gamePublisher := range game.Publishers {
 		if gamePublisher.ID != 0 {
 			resource.Publishers = append(resource.Publishers, TransformPublisher(gamePublisher.Publisher))
+		}
+	}
+
+	for _, gameDeveloper := range game.Developers {
+		if gameDeveloper.ID != 0 {
+			resource.Developers = append(resource.Developers, TransformDeveloper(gameDeveloper.Developer))
 		}
 	}
 
