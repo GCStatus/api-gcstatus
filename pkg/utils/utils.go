@@ -268,6 +268,14 @@ func StringPtr(s string) *string {
 	return &s
 }
 
+func UintPtr(u uint) *uint {
+	return &u
+}
+
+func TimePtr(t time.Time) *time.Time {
+	return &t
+}
+
 func FormatTimestamp(t time.Time) string {
 	return t.Format("2006-01-02T15:04:05")
 }

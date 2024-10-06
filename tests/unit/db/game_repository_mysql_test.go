@@ -62,6 +62,24 @@ func TestGameRepositoryMySQL_FindBySlug(t *testing.T) {
 					WithArgs(1).
 					WillReturnRows(categoriesRows)
 
+				crackRows := mock.NewRows([]string{"id", "status", "cracked_at", "cracker_id", "protection_id", "game_id"}).
+					AddRow(1, "uncracked", fixedTime, 1, 1, 1)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `cracks` WHERE `cracks`.`game_id` = ? AND `cracks`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(crackRows)
+
+				crackerRows := mock.NewRows([]string{"id", "name", "acting"}).
+					AddRow(1, "GOLDBERG", true)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `crackers` WHERE `crackers`.`id` = ? AND `crackers`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(crackerRows)
+
+				protectionRows := mock.NewRows([]string{"id", "name"}).
+					AddRow(1, "Denuvo")
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `protections` WHERE `protections`.`id` = ? AND `protections`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(protectionRows)
+
 				genreableRows := mock.NewRows([]string{"id", "genreable_id", "genreable_type", "genre_id"}).
 					AddRow(1, 1, "games", 1)
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `genreables` WHERE `genreable_type` = ? AND `genreables`.`genreable_id` = ? AND `genreables`.`deleted_at` IS NULL")).

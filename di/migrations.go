@@ -39,6 +39,9 @@ func MigrateModels(dbConn *gorm.DB) {
 		&domain.GameLanguage{},
 		&domain.RequirementType{},
 		&domain.Requirement{},
+		&domain.Protection{},
+		&domain.Cracker{},
+		&domain.Crack{},
 		&domain.Game{},
 	}
 

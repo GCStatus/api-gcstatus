@@ -38,6 +38,25 @@ type RequirementFormat struct {
 	RequirementType RequirementTypeFormat `json:"requirement_type"`
 }
 
+type CrackByFormat struct {
+	ID     uint   `json:"id"`
+	Name   string `json:"name"`
+	Acting bool   `json:"acting"`
+}
+
+type ProtectionFormat struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+}
+
+type CrackFormat struct {
+	ID         uint             `json:"id"`
+	Status     string           `json:"status"`
+	CrackedAt  *string          `json:"cracked_at"`
+	By         CrackByFormat    `json:"by"`
+	Protection ProtectionFormat `json:"protection"`
+}
+
 type GameResource struct {
 	ID               uint                `json:"id"`
 	Age              uint                `json:"age"`
@@ -60,6 +79,7 @@ type GameResource struct {
 	Tags             []MorphsFormat      `json:"tags"`
 	Languages        []LanguageFormat    `json:"languages"`
 	Requirements     []RequirementFormat `json:"requirements"`
+	Crack            *CrackFormat        `json:"crack"`
 }
 
 func TransformGame(game domain.Game) GameResource {
@@ -85,6 +105,7 @@ func TransformGame(game domain.Game) GameResource {
 		Tags:             []MorphsFormat{},
 		Languages:        []LanguageFormat{},
 		Requirements:     []RequirementFormat{},
+		Crack:            nil,
 	}
 
 	for _, categoriable := range game.Categories {
@@ -171,6 +192,35 @@ func TransformGame(game domain.Game) GameResource {
 
 			resource.Requirements = append(resource.Requirements, requirement)
 		}
+	}
+
+	if game.Crack != nil && game.Crack.ID != 0 {
+		crack := CrackFormat{
+			ID:     game.Crack.ID,
+			Status: game.Crack.Status,
+		}
+
+		if game.Crack.Cracker.ID != 0 {
+			crack.By = CrackByFormat{
+				ID:     game.Crack.Cracker.ID,
+				Name:   game.Crack.Cracker.Name,
+				Acting: game.Crack.Cracker.Acting,
+			}
+		}
+
+		if game.Crack.CrackedAt != nil {
+			formattedTime := utils.FormatTimestamp(*game.Crack.CrackedAt)
+			crack.CrackedAt = &formattedTime
+		}
+
+		if game.Crack.Protection.ID != 0 {
+			crack.Protection = ProtectionFormat{
+				ID:   game.Crack.Protection.ID,
+				Name: game.Crack.Protection.Name,
+			}
+		}
+
+		resource.Crack = &crack
 	}
 
 	return resource

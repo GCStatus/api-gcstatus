@@ -36,6 +36,7 @@ type Game struct {
 	Platforms        []Platformable `gorm:"polymorphic:Platformable;"`
 	Languages        []GameLanguage `gorm:"foreignKey:GameID"`
 	Requirements     []Requirement  `gorm:"foreignKey:GameID"`
+	Crack            *Crack         `gorm:"foreignKey:GameID"`
 }
 
 func (g *Game) ValidateGame() error {
