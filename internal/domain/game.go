@@ -34,6 +34,7 @@ type Game struct {
 	Tags             []Taggable     `gorm:"polymorphic:Taggable;"`
 	Genres           []Genreable    `gorm:"polymorphic:Genreable;"`
 	Platforms        []Platformable `gorm:"polymorphic:Platformable;"`
+	Languages        []GameLanguage `gorm:"foreignKey:GameID"`
 }
 
 func (g *Game) ValidateGame() error {

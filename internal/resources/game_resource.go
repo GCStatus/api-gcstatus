@@ -10,26 +10,36 @@ type MorphsFormat struct {
 	Name string `json:"name"`
 }
 
+type LanguageFormat struct {
+	ID        uint   `json:"id"`
+	Name      string `json:"name"`
+	ISO       string `json:"iso"`
+	Menu      bool   `json:"menu"`
+	Dubs      bool   `json:"dubs"`
+	Subtitles bool   `json:"subtitles"`
+}
+
 type GameResource struct {
-	ID               uint           `json:"id"`
-	Age              uint           `json:"age"`
-	Slug             string         `json:"slug"`
-	Title            string         `json:"title"`
-	Condition        string         `json:"condition"`
-	Cover            string         `json:"cover"`
-	About            string         `json:"about"`
-	Description      string         `json:"description"`
-	ShortDescription string         `json:"short_description"`
-	Free             bool           `json:"is_free"`
-	Legal            *string        `json:"legal"`
-	Website          *string        `json:"website"`
-	ReleaseDate      string         `json:"release_date"`
-	CreatedAt        string         `json:"created_at"`
-	UpdatedAt        string         `json:"updated_at"`
-	Categories       []MorphsFormat `json:"categories"`
-	Platforms        []MorphsFormat `json:"platforms"`
-	Genres           []MorphsFormat `json:"genres"`
-	Tags             []MorphsFormat `json:"tags"`
+	ID               uint             `json:"id"`
+	Age              uint             `json:"age"`
+	Slug             string           `json:"slug"`
+	Title            string           `json:"title"`
+	Condition        string           `json:"condition"`
+	Cover            string           `json:"cover"`
+	About            string           `json:"about"`
+	Description      string           `json:"description"`
+	ShortDescription string           `json:"short_description"`
+	Free             bool             `json:"is_free"`
+	Legal            *string          `json:"legal"`
+	Website          *string          `json:"website"`
+	ReleaseDate      string           `json:"release_date"`
+	CreatedAt        string           `json:"created_at"`
+	UpdatedAt        string           `json:"updated_at"`
+	Categories       []MorphsFormat   `json:"categories"`
+	Platforms        []MorphsFormat   `json:"platforms"`
+	Genres           []MorphsFormat   `json:"genres"`
+	Tags             []MorphsFormat   `json:"tags"`
+	Languages        []LanguageFormat `json:"languages"`
 }
 
 func TransformGame(game domain.Game) GameResource {
@@ -96,6 +106,21 @@ func TransformGame(game domain.Game) GameResource {
 			}
 
 			resource.Tags = append(resource.Tags, tag)
+		}
+	}
+
+	for _, gameLanguage := range game.Languages {
+		if gameLanguage.Language.ID != 0 {
+			language := LanguageFormat{
+				ID:        gameLanguage.Language.ID,
+				Name:      gameLanguage.Language.Name,
+				ISO:       gameLanguage.Language.ISO,
+				Menu:      gameLanguage.Menu,
+				Dubs:      gameLanguage.Dubs,
+				Subtitles: gameLanguage.Subtitles,
+			}
+
+			resource.Languages = append(resource.Languages, language)
 		}
 	}
 

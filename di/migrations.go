@@ -35,6 +35,8 @@ func MigrateModels(dbConn *gorm.DB) {
 		&domain.Genreable{},
 		&domain.Taggable{},
 		&domain.Platformable{},
+		&domain.Language{},
+		&domain.GameLanguage{},
 		&domain.Game{},
 	}
 
