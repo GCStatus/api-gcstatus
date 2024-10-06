@@ -1,6 +1,7 @@
 package api
 
 import (
+	"gcstatus/internal/resources"
 	"gcstatus/internal/usecases"
 	"net/http"
 
@@ -27,5 +28,11 @@ func (h *GameHandler) FindBySlug(c *gin.Context) {
 		RespondWithError(c, http.StatusInternalServerError, "Failed to fetch game: "+err.Error())
 	}
 
-	c.JSON(http.StatusOK, game)
+	transformedGame := resources.TransformGame(game)
+
+	response := resources.Response{
+		Data: transformedGame,
+	}
+
+	c.JSON(http.StatusOK, response)
 }
