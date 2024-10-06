@@ -31,6 +31,11 @@ func MigrateModels(dbConn *gorm.DB) {
 		&domain.Tag{},
 		&domain.Platform{},
 		&domain.Category{},
+		&domain.Categoriable{},
+		&domain.Genreable{},
+		&domain.Taggable{},
+		&domain.Platformable{},
+		&domain.Game{},
 	}
 
 	for _, model := range models {

@@ -24,6 +24,7 @@ func main() {
 		transactionService,
 		notificationService,
 		missionService,
+		gameService,
 		db := di.InitDependencies()
 
 	// Setup routes with dependency injection
@@ -39,6 +40,7 @@ func main() {
 		transactionService,
 		notificationService,
 		missionService,
+		gameService,
 	)
 
 	c := cron.New()

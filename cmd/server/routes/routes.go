@@ -23,6 +23,7 @@ func SetupRouter(
 	transactionService *usecases.TransactionService,
 	notificationService *usecases.NotificationService,
 	missionService *usecases.MissionService,
+	gameService *usecases.GameService,
 ) *gin.Engine {
 	r := gin.Default()
 	env := config.LoadConfig()
@@ -51,7 +52,8 @@ func SetupRouter(
 		titleHandler,
 		transactionHandler,
 		notificationHandler,
-		missionHandler := InitHandlers(
+		missionHandler,
+		gameHandler := InitHandlers(
 		authService,
 		userService,
 		passwordResetService,
@@ -63,6 +65,7 @@ func SetupRouter(
 		transactionService,
 		notificationService,
 		missionService,
+		gameService,
 	)
 
 	// Define the middlewares
@@ -108,6 +111,8 @@ func SetupRouter(
 
 		protected.GET("/missions", missionHandler.GetAllForUser)
 		protected.POST("/missions/:id/complete", missionHandler.CompleteMission)
+
+		protected.GET("/games/:slug", gameHandler.FindBySlug)
 	}
 
 	// Common routes
