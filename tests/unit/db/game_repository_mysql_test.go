@@ -139,6 +139,18 @@ func TestGameRepositoryMySQL_FindBySlug(t *testing.T) {
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `tags` WHERE `tags`.`id` = ? AND `tags`.`deleted_at` IS NULL")).
 					WithArgs(1).
 					WillReturnRows(tagsRows)
+
+				torrentsRows := mock.NewRows([]string{"id", "url", "posted_at", "torrent_provider_id", "game_id"}).
+					AddRow(1, "https://google.com", fixedTime, 1, 1)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `torrents` WHERE `torrents`.`game_id` = ? AND `torrents`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(torrentsRows)
+
+				torrentProvidersRows := mock.NewRows([]string{"id", "url", "name"}).
+					AddRow(1, "https://google.com", "Google")
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `torrent_providers` WHERE `torrent_providers`.`id` = ? AND `torrent_providers`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(torrentProvidersRows)
 			},
 		},
 		"game not found": {

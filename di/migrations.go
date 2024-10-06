@@ -8,7 +8,7 @@ import (
 )
 
 func MigrateModels(dbConn *gorm.DB) {
-	models := []interface{}{
+	models := []any{
 		&domain.Reward{},
 		&domain.Level{},
 		&domain.Wallet{},
@@ -42,6 +42,8 @@ func MigrateModels(dbConn *gorm.DB) {
 		&domain.Protection{},
 		&domain.Cracker{},
 		&domain.Crack{},
+		&domain.TorrentProvider{},
+		&domain.Torrent{},
 		&domain.Game{},
 	}
 
