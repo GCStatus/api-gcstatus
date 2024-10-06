@@ -44,6 +44,8 @@ func MigrateModels(dbConn *gorm.DB) {
 		&domain.Crack{},
 		&domain.TorrentProvider{},
 		&domain.Torrent{},
+		&domain.Publisher{},
+		&domain.GamePublisher{},
 		&domain.Game{},
 	}
 

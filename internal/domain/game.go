@@ -30,14 +30,15 @@ type Game struct {
 	ReleaseDate      time.Time `gorm:"size:255" validate:"required"`
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
-	Categories       []Categoriable `gorm:"polymorphic:Categoriable;"`
-	Tags             []Taggable     `gorm:"polymorphic:Taggable;"`
-	Genres           []Genreable    `gorm:"polymorphic:Genreable;"`
-	Platforms        []Platformable `gorm:"polymorphic:Platformable;"`
-	Languages        []GameLanguage `gorm:"foreignKey:GameID"`
-	Requirements     []Requirement  `gorm:"foreignKey:GameID"`
-	Torrents         []Torrent      `gorm:"foreignKey:GameID"`
-	Crack            *Crack         `gorm:"foreignKey:GameID"`
+	Categories       []Categoriable  `gorm:"polymorphic:Categoriable;"`
+	Tags             []Taggable      `gorm:"polymorphic:Taggable;"`
+	Genres           []Genreable     `gorm:"polymorphic:Genreable;"`
+	Platforms        []Platformable  `gorm:"polymorphic:Platformable;"`
+	Languages        []GameLanguage  `gorm:"foreignKey:GameID"`
+	Requirements     []Requirement   `gorm:"foreignKey:GameID"`
+	Torrents         []Torrent       `gorm:"foreignKey:GameID"`
+	Publishers       []GamePublisher `gorm:"foreignKey:GameID"`
+	Crack            *Crack          `gorm:"foreignKey:GameID"`
 }
 
 func (g *Game) ValidateGame() error {

@@ -7,20 +7,20 @@ import (
 	"testing"
 )
 
-func TestTransformCracker(t *testing.T) {
+func TestTransformPublisher(t *testing.T) {
 	testCases := map[string]struct {
-		input    domain.Cracker
-		expected *resources.CrackerResource
+		input    domain.Publisher
+		expected resources.PublisherResource
 	}{
-		"single Cracker": {
-			input: domain.Cracker{
+		"single Publisher": {
+			input: domain.Publisher{
 				ID:     1,
-				Name:   "Cracker 1",
+				Name:   "Publisher 1",
 				Acting: false,
 			},
-			expected: &resources.CrackerResource{
+			expected: resources.PublisherResource{
 				ID:     1,
-				Name:   "Cracker 1",
+				Name:   "Publisher 1",
 				Acting: false,
 			},
 		},
@@ -28,7 +28,7 @@ func TestTransformCracker(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			result := resources.TransformCracker(tc.input)
+			result := resources.TransformPublisher(tc.input)
 			if !reflect.DeepEqual(result, tc.expected) {
 				t.Errorf("Expected %+v, got %+v", tc.expected, result)
 			}
@@ -36,37 +36,37 @@ func TestTransformCracker(t *testing.T) {
 	}
 }
 
-func TestTransformCrackers(t *testing.T) {
+func TestTransformPublishers(t *testing.T) {
 	testCases := map[string]struct {
-		input    []domain.Cracker
-		expected []*resources.CrackerResource
+		input    []domain.Publisher
+		expected []resources.PublisherResource
 	}{
 		"empty slice": {
-			input:    []domain.Cracker{},
-			expected: []*resources.CrackerResource{},
+			input:    []domain.Publisher{},
+			expected: []resources.PublisherResource{},
 		},
-		"multiple Crackers": {
-			input: []domain.Cracker{
+		"multiple Publishers": {
+			input: []domain.Publisher{
 				{
 					ID:     1,
-					Name:   "Cracker 1",
+					Name:   "Publisher 1",
 					Acting: true,
 				},
 				{
 					ID:     2,
-					Name:   "Cracker 2",
+					Name:   "Publisher 2",
 					Acting: false,
 				},
 			},
-			expected: []*resources.CrackerResource{
+			expected: []resources.PublisherResource{
 				{
 					ID:     1,
-					Name:   "Cracker 1",
+					Name:   "Publisher 1",
 					Acting: true,
 				},
 				{
 					ID:     2,
-					Name:   "Cracker 2",
+					Name:   "Publisher 2",
 					Acting: false,
 				},
 			},
@@ -75,10 +75,10 @@ func TestTransformCrackers(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			result := resources.TransformCrackers(tc.input)
+			result := resources.TransformPublishers(tc.input)
 
 			if result == nil {
-				result = []*resources.CrackerResource{}
+				result = []resources.PublisherResource{}
 			}
 
 			if !reflect.DeepEqual(result, tc.expected) {

@@ -32,7 +32,7 @@
 - [ ] Create game outline system
   - [ ] Add game DLCs
   - [ ] Add game critics
-  - [ ] Add game torrents
+  - [x] Add game torrents
   - [x] Add game crack
   - [ ] Add game reviews
   - [ ] Add game galleries

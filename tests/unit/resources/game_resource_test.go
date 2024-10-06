@@ -62,6 +62,7 @@ func TestTransformGame(t *testing.T) {
 				Languages:        []resources.GameLanguageResource{},
 				Requirements:     []resources.RequirementResource{},
 				Torrents:         []resources.TorrentResource{},
+				Publishers:       []resources.PublisherResource{},
 			},
 		},
 		"With One Category": {
@@ -117,6 +118,7 @@ func TestTransformGame(t *testing.T) {
 				Languages:    []resources.GameLanguageResource{},
 				Requirements: []resources.RequirementResource{},
 				Torrents:     []resources.TorrentResource{},
+				Publishers:   []resources.PublisherResource{},
 			},
 		},
 	}
@@ -186,6 +188,7 @@ func TestTransformGames(t *testing.T) {
 					Languages:        []resources.GameLanguageResource{},
 					Requirements:     []resources.RequirementResource{},
 					Torrents:         []resources.TorrentResource{},
+					Publishers:       []resources.PublisherResource{},
 				},
 			},
 		},
@@ -281,6 +284,7 @@ func TestTransformGames(t *testing.T) {
 					Languages:    []resources.GameLanguageResource{},
 					Requirements: []resources.RequirementResource{},
 					Torrents:     []resources.TorrentResource{},
+					Publishers:   []resources.PublisherResource{},
 				},
 				{
 					ID:          3,
@@ -306,6 +310,7 @@ func TestTransformGames(t *testing.T) {
 					Languages:    []resources.GameLanguageResource{},
 					Requirements: []resources.RequirementResource{},
 					Torrents:     []resources.TorrentResource{},
+					Publishers:   []resources.PublisherResource{},
 				},
 			},
 		},

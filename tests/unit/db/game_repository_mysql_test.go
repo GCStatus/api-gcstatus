@@ -116,6 +116,18 @@ func TestGameRepositoryMySQL_FindBySlug(t *testing.T) {
 					WithArgs(1).
 					WillReturnRows(platformsRows)
 
+				gamePublishersRows := mock.NewRows([]string{"id", "publisher_id", "game_id"}).
+					AddRow(1, 1, 1)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `game_publishers` WHERE `game_publishers`.`game_id` = ? AND `game_publishers`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(gamePublishersRows)
+
+				publishersRows := mock.NewRows([]string{"id", "name", "acting"}).
+					AddRow(1, "Game Science", true)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `publishers` WHERE `publishers`.`id` = ? AND `publishers`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(publishersRows)
+
 				requirementRows := mock.NewRows([]string{"id", "os", "dx", "cpu", "ram", "gpu", "rom", "obs", "network", "requirement_type_id", "game_id"}).
 					AddRow(1, "Windows 11 64-bit", "DirectX 12", "Ryzen 5 3600", "16GB", "GeForce RTX 3090 Ti", "90GB", "Test", "Non necessary", 1, 1)
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `requirements` WHERE `requirements`.`game_id` = ? AND `requirements`.`deleted_at` IS NULL")).
