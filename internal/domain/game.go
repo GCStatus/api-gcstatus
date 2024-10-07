@@ -40,6 +40,7 @@ type Game struct {
 	Publishers       []GamePublisher `gorm:"foreignKey:GameID"`
 	Developers       []GameDeveloper `gorm:"foreignKey:GameID"`
 	Crack            *Crack          `gorm:"foreignKey:GameID"`
+	Support          *GameSupport    `gorm:"foreignKey:GameID"`
 }
 
 func (g *Game) ValidateGame() error {

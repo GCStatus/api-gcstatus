@@ -31,6 +31,7 @@ type GameResource struct {
 	Publishers       []PublisherResource    `json:"publishers"`
 	Developers       []DeveloperResource    `json:"developers"`
 	Crack            *CrackResource         `json:"crack"`
+	Support          *SupportResource       `json:"support"`
 }
 
 func TransformGame(game domain.Game) GameResource {
@@ -60,6 +61,7 @@ func TransformGame(game domain.Game) GameResource {
 		Publishers:       []PublisherResource{},
 		Developers:       []DeveloperResource{},
 		Crack:            nil,
+		Support:          nil,
 	}
 
 	for _, categoriable := range game.Categories {
@@ -118,6 +120,10 @@ func TransformGame(game domain.Game) GameResource {
 
 	if game.Crack != nil && game.Crack.ID != 0 {
 		resource.Crack = TransformCrack(game.Crack)
+	}
+
+	if game.Support != nil && game.Support.ID != 0 {
+		resource.Support = TransformSupport(game.Support)
 	}
 
 	return resource

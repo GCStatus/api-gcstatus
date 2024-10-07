@@ -31,7 +31,7 @@
   - [x] Add game developers
   - [x] Add game requirements
   - [ ] Add game messages (for torrents section)
-  - [ ] Add game support
+  - [x] Add game support
 
 ### Post-MVP
 
