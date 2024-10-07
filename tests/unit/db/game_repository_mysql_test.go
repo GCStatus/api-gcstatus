@@ -152,6 +152,24 @@ func TestGameRepositoryMySQL_FindBySlug(t *testing.T) {
 					WithArgs(1).
 					WillReturnRows(requirementTypeRows)
 
+				reviewablesRows := mock.NewRows([]string{"id", "rate", "review", "reviewable_id", "reviewable_type", "user_id"}).
+					AddRow(1, 5, "Good game!", 1, "games", 1)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `reviewables` WHERE `reviewable_type` = ? AND `reviewables`.`reviewable_id` = ? AND `reviewables`.`deleted_at` IS NULL")).
+					WithArgs("games", 1).
+					WillReturnRows(reviewablesRows)
+
+				usersRows := mock.NewRows([]string{"id", "name", "email", "nickname", "created_at", "updated_at"}).
+					AddRow(1, "Fake", "fake@gmail.com", "fake", fixedTime, fixedTime)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ? AND `users`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(usersRows)
+
+				profilesRows := mock.NewRows([]string{"id", "share", "photo", "user_id"}).
+					AddRow(1, true, "https://photo.co", 1)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `profiles` WHERE `profiles`.`user_id` = ? AND `profiles`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(profilesRows)
+
 				supportsRows := mock.NewRows([]string{"id", "url", "email", "contact", "game_id"}).
 					AddRow(1, "https://google.com", "email@example.com", "fakeContact", 1)
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `game_supports` WHERE `game_supports`.`game_id` = ? AND `game_supports`.`deleted_at` IS NULL")).

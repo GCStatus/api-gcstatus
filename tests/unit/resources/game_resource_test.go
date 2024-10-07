@@ -64,6 +64,7 @@ func TestTransformGame(t *testing.T) {
 				Torrents:         []resources.TorrentResource{},
 				Publishers:       []resources.PublisherResource{},
 				Developers:       []resources.DeveloperResource{},
+				Reviews:          []resources.ReviewResource{},
 			},
 		},
 		"With One Category": {
@@ -121,13 +122,15 @@ func TestTransformGame(t *testing.T) {
 				Torrents:     []resources.TorrentResource{},
 				Publishers:   []resources.PublisherResource{},
 				Developers:   []resources.DeveloperResource{},
+				Reviews:      []resources.ReviewResource{},
 			},
 		},
 	}
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			result := resources.TransformGame(tc.input)
+			mockS3Client := &MockS3Client{}
+			result := resources.TransformGame(tc.input, mockS3Client)
 			assert.Equal(t, tc.expected, result)
 		})
 	}
@@ -192,6 +195,7 @@ func TestTransformGames(t *testing.T) {
 					Torrents:         []resources.TorrentResource{},
 					Publishers:       []resources.PublisherResource{},
 					Developers:       []resources.DeveloperResource{},
+					Reviews:          []resources.ReviewResource{},
 				},
 			},
 		},
@@ -289,6 +293,7 @@ func TestTransformGames(t *testing.T) {
 					Torrents:     []resources.TorrentResource{},
 					Publishers:   []resources.PublisherResource{},
 					Developers:   []resources.DeveloperResource{},
+					Reviews:      []resources.ReviewResource{},
 				},
 				{
 					ID:          3,
@@ -316,6 +321,7 @@ func TestTransformGames(t *testing.T) {
 					Torrents:     []resources.TorrentResource{},
 					Publishers:   []resources.PublisherResource{},
 					Developers:   []resources.DeveloperResource{},
+					Reviews:      []resources.ReviewResource{},
 				},
 			},
 		},
@@ -323,7 +329,8 @@ func TestTransformGames(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			result := resources.TransformGames(tc.input)
+			mockS3Client := &MockS3Client{}
+			result := resources.TransformGames(tc.input, mockS3Client)
 			assert.Equal(t, tc.expected, result)
 		})
 	}

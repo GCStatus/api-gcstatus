@@ -3,6 +3,7 @@ package api
 import (
 	"gcstatus/internal/resources"
 	"gcstatus/internal/usecases"
+	"gcstatus/pkg/s3"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -28,7 +29,7 @@ func (h *GameHandler) FindBySlug(c *gin.Context) {
 		RespondWithError(c, http.StatusInternalServerError, "Failed to fetch game: "+err.Error())
 	}
 
-	transformedGame := resources.TransformGame(game)
+	transformedGame := resources.TransformGame(game, s3.GlobalS3Client)
 
 	response := resources.Response{
 		Data: transformedGame,

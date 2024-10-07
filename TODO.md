@@ -25,13 +25,15 @@
   - [ ] Add game critics
   - [x] Add game torrents
   - [x] Add game crack
-  - [ ] Add game reviews
+  - [x] Add game reviews
   - [ ] Add game galleries
   - [x] Add game publishers
   - [x] Add game developers
   - [x] Add game requirements
   - [ ] Add game messages (for torrents section)
   - [x] Add game support
+  - [ ] Add game hearts
+  - [ ] Add game views
 
 ### Post-MVP
 

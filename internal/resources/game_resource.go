@@ -2,6 +2,7 @@ package resources
 
 import (
 	"gcstatus/internal/domain"
+	"gcstatus/pkg/s3"
 	"gcstatus/pkg/utils"
 )
 
@@ -30,11 +31,12 @@ type GameResource struct {
 	Torrents         []TorrentResource      `json:"torrents"`
 	Publishers       []PublisherResource    `json:"publishers"`
 	Developers       []DeveloperResource    `json:"developers"`
+	Reviews          []ReviewResource       `json:"reviews"`
 	Crack            *CrackResource         `json:"crack"`
 	Support          *SupportResource       `json:"support"`
 }
 
-func TransformGame(game domain.Game) GameResource {
+func TransformGame(game domain.Game, s3Client s3.S3ClientInterface) GameResource {
 	resource := GameResource{
 		ID:               game.ID,
 		Age:              uint(game.Age),
@@ -60,6 +62,7 @@ func TransformGame(game domain.Game) GameResource {
 		Torrents:         []TorrentResource{},
 		Publishers:       []PublisherResource{},
 		Developers:       []DeveloperResource{},
+		Reviews:          []ReviewResource{},
 		Crack:            nil,
 		Support:          nil,
 	}
@@ -118,6 +121,12 @@ func TransformGame(game domain.Game) GameResource {
 		}
 	}
 
+	for _, review := range game.Reviews {
+		if review.ID != 0 {
+			resource.Reviews = append(resource.Reviews, TransformReview(review, s3Client))
+		}
+	}
+
 	if game.Crack != nil && game.Crack.ID != 0 {
 		resource.Crack = TransformCrack(game.Crack)
 	}
@@ -129,13 +138,13 @@ func TransformGame(game domain.Game) GameResource {
 	return resource
 }
 
-func TransformGames(games []domain.Game) []GameResource {
+func TransformGames(games []domain.Game, s3Client s3.S3ClientInterface) []GameResource {
 	var resources []GameResource
 
 	resources = make([]GameResource, 0, len(games))
 
 	for _, game := range games {
-		resources = append(resources, TransformGame(game))
+		resources = append(resources, TransformGame(game, s3Client))
 	}
 
 	return resources

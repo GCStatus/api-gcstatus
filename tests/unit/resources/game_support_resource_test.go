@@ -38,16 +38,16 @@ func TestTransformSupport(t *testing.T) {
 			result := resources.TransformSupport(tc.input)
 
 			if result.ID != tc.expected.ID ||
-				!compareStringPtr(result.URL, tc.expected.URL) ||
-				!compareStringPtr(result.Email, tc.expected.Email) ||
-				!compareStringPtr(result.Contact, tc.expected.Contact) {
+				!CompareStringPtr(result.URL, tc.expected.URL) ||
+				!CompareStringPtr(result.Email, tc.expected.Email) ||
+				!CompareStringPtr(result.Contact, tc.expected.Contact) {
 				t.Errorf("Expected %+v, got %+v", tc.expected, result)
 			}
 		})
 	}
 }
 
-func compareStringPtr(a, b *string) bool {
+func CompareStringPtr(a, b *string) bool {
 	if a == nil && b == nil {
 		return true
 	}
