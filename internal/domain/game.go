@@ -30,6 +30,7 @@ type Game struct {
 	ReleaseDate      time.Time `gorm:"size:255" validate:"required"`
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
+	View             Viewable        `gorm:"polymorphic:Viewable"`
 	Categories       []Categoriable  `gorm:"polymorphic:Categoriable;"`
 	Tags             []Taggable      `gorm:"polymorphic:Taggable;"`
 	Genres           []Genreable     `gorm:"polymorphic:Genreable;"`

@@ -235,6 +235,11 @@ func TestValidateGameDeveloper(t *testing.T) {
 					ReleaseDate:      fixedTime,
 					CreatedAt:        fixedTime,
 					UpdatedAt:        fixedTime,
+					View: domain.Viewable{
+						Count:        10,
+						ViewableID:   1,
+						ViewableType: "games",
+					},
 				},
 			},
 		},

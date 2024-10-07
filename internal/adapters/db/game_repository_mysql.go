@@ -30,9 +30,31 @@ func (h *GameRepositoryMySQL) FindBySlug(slug string) (domain.Game, error) {
 		Preload("Developers.Developer").
 		Preload("Reviews.User.Profile").
 		Preload("Support").
+		Preload("View").
 		Where("slug = ?", slug).
 		First(&game).
 		Error
 
-	return game, err
+	if err != nil {
+		return game, err
+	}
+
+	if game.View.ID == 0 {
+		view := domain.Viewable{
+			Count:        1,
+			ViewableID:   game.ID,
+			ViewableType: "games",
+		}
+		if err := h.db.Create(&view).Error; err != nil {
+			return game, err
+		}
+		game.View = view
+	} else {
+		game.View.Count += 1
+		if err := h.db.Save(&game.View).Error; err != nil {
+			return game, err
+		}
+	}
+
+	return game, nil
 }

@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 )
@@ -199,6 +200,18 @@ func TestGameRepositoryMySQL_FindBySlug(t *testing.T) {
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `torrent_providers` WHERE `torrent_providers`.`id` = ? AND `torrent_providers`.`deleted_at` IS NULL")).
 					WithArgs(1).
 					WillReturnRows(torrentProvidersRows)
+
+				viewRows := mock.NewRows([]string{"id", "viewable_id", "viewable_type", "count"}).
+					AddRow(1, 1, "games", 10)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `viewables` WHERE `viewable_type` = ? AND `viewables`.`viewable_id` = ? AND `viewables`.`deleted_at` IS NULL")).
+					WithArgs("games", 1).
+					WillReturnRows(viewRows)
+
+				mock.ExpectBegin()
+				mock.ExpectExec(regexp.QuoteMeta("UPDATE `viewables` SET `created_at`=?,`updated_at`=?,`deleted_at`=?,`count`=?,`viewable_id`=?,`viewable_type`=? WHERE `viewables`.`deleted_at` IS NULL AND `id` = ?")).
+					WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), 11, 1, "games", 1).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectCommit()
 			},
 		},
 		"game not found": {
