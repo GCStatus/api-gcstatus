@@ -51,6 +51,7 @@ func MigrateModels(dbConn *gorm.DB) {
 		&domain.GameSupport{},
 		&domain.Reviewable{},
 		&domain.Viewable{},
+		&domain.Heartable{},
 		&domain.Game{},
 	}
 

@@ -21,7 +21,7 @@ func TestCreateViewable(t *testing.T) {
 			viewable: domain.Viewable{
 				ViewableID:   1,
 				ViewableType: "games",
-				Count:        1,
+				UserID:       1,
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, viewable domain.Viewable) {
 				mock.ExpectBegin()
@@ -30,9 +30,9 @@ func TestCreateViewable(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
-						viewable.Count,
 						viewable.ViewableID,
 						viewable.ViewableType,
+						viewable.UserID,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -43,7 +43,7 @@ func TestCreateViewable(t *testing.T) {
 			viewable: domain.Viewable{
 				ViewableID:   1,
 				ViewableType: "games",
-				Count:        1,
+				UserID:       1,
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, viewable domain.Viewable) {
 				mock.ExpectBegin()
@@ -52,9 +52,9 @@ func TestCreateViewable(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
-						viewable.Count,
 						viewable.ViewableID,
 						viewable.ViewableType,
+						viewable.UserID,
 					).
 					WillReturnError(fmt.Errorf("some error"))
 				mock.ExpectRollback()
@@ -97,7 +97,7 @@ func TestUpdateViewable(t *testing.T) {
 				ID:           1,
 				ViewableID:   1,
 				ViewableType: "games",
-				Count:        1,
+				UserID:       1,
 				CreatedAt:    fixedTime,
 				UpdatedAt:    fixedTime,
 			},
@@ -108,9 +108,9 @@ func TestUpdateViewable(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
-						viewable.Count,
 						viewable.ViewableID,
 						viewable.ViewableType,
+						viewable.UserID,
 						viewable.ID,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
@@ -123,7 +123,7 @@ func TestUpdateViewable(t *testing.T) {
 				ID:           1,
 				ViewableID:   1,
 				ViewableType: "games",
-				Count:        1,
+				UserID:       1,
 				CreatedAt:    fixedTime,
 				UpdatedAt:    fixedTime,
 			},
@@ -134,9 +134,9 @@ func TestUpdateViewable(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
-						viewable.Count,
 						viewable.ViewableID,
 						viewable.ViewableType,
+						viewable.UserID,
 						viewable.ID,
 					).
 					WillReturnError(fmt.Errorf("some error"))
@@ -224,11 +224,30 @@ func TestValidateViewableValidData(t *testing.T) {
 		"Valid Viewable with zero amount": {
 			viewable: domain.Viewable{
 				ID:           1,
-				Count:        10,
 				CreatedAt:    fixedTime,
 				UpdatedAt:    fixedTime,
 				ViewableID:   1,
 				ViewableType: "games",
+				User: domain.User{
+					Name:       "John Doe",
+					Email:      "johndoe@example.com",
+					Nickname:   "johnny",
+					Blocked:    false,
+					Experience: 500,
+					Birthdate:  fixedTime,
+					Password:   "supersecretpassword",
+					Profile: domain.Profile{
+						Share: true,
+					},
+					Wallet: domain.Wallet{
+						Amount: 10,
+					},
+					Level: domain.Level{
+						Level:      1,
+						Experience: 500,
+						Coins:      10,
+					},
+				},
 			},
 		},
 	}
@@ -237,27 +256,6 @@ func TestValidateViewableValidData(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			err := tc.viewable.ValidateViewable()
 			assert.NoError(t, err)
-		})
-	}
-}
-
-func TestCreateViewableWithMissingFields(t *testing.T) {
-	testCases := map[string]struct {
-		viewable domain.Viewable
-		wantErr  string
-	}{
-		"Missing required fields": {
-			viewable: domain.Viewable{},
-			wantErr:  "Count is a required field",
-		},
-	}
-
-	for name, tc := range testCases {
-		t.Run(name, func(t *testing.T) {
-			err := tc.viewable.ValidateViewable()
-
-			assert.Error(t, err)
-			assert.Contains(t, err.Error(), tc.wantErr)
 		})
 	}
 }

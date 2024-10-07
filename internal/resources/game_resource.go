@@ -21,6 +21,7 @@ type GameResource struct {
 	Website          *string                `json:"website"`
 	ReleaseDate      string                 `json:"release_date"`
 	ViewsCount       uint                   `json:"views_count"`
+	HeartsCount      uint                   `json:"hearts_count"`
 	CreatedAt        string                 `json:"created_at"`
 	UpdatedAt        string                 `json:"updated_at"`
 	Categories       []CategoryResource     `json:"categories"`
@@ -51,6 +52,8 @@ func TransformGame(game domain.Game, s3Client s3.S3ClientInterface) GameResource
 		Free:             game.Free,
 		Legal:            game.Legal,
 		Website:          game.Website,
+		ViewsCount:       uint(len(game.Views)),
+		HeartsCount:      uint(len(game.Hearts)),
 		ReleaseDate:      utils.FormatTimestamp(game.ReleaseDate),
 		CreatedAt:        utils.FormatTimestamp(game.CreatedAt),
 		UpdatedAt:        utils.FormatTimestamp(game.UpdatedAt),
@@ -134,10 +137,6 @@ func TransformGame(game domain.Game, s3Client s3.S3ClientInterface) GameResource
 
 	if game.Support != nil && game.Support.ID != 0 {
 		resource.Support = TransformSupport(game.Support)
-	}
-
-	if game.View.ID != 0 {
-		resource.ViewsCount = game.View.Count
 	}
 
 	return resource

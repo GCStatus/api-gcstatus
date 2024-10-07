@@ -13,6 +13,6 @@ func NewGameService(repo ports.GameRepository) *GameService {
 	return &GameService{repo: repo}
 }
 
-func (h *GameService) FindBySlug(slug string) (domain.Game, error) {
-	return h.repo.FindBySlug(slug)
+func (h *GameService) FindBySlug(slug string, userID uint) (domain.Game, error) {
+	return h.repo.FindBySlug(slug, userID)
 }

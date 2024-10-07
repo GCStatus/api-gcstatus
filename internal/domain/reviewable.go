@@ -18,3 +18,14 @@ type Reviewable struct {
 	UserID         uint   `gorm:"constraint:OnDelete:SET NULL,OnUpdate:CASCADE;"`
 	User           User   `gorm:"foreignKey:UserID"`
 }
+
+func (r *Reviewable) ValidateReviewable() error {
+	Init()
+
+	err := validate.Struct(r)
+	if err != nil {
+		return FormatValidationError(err)
+	}
+
+	return nil
+}

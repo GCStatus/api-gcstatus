@@ -20,6 +20,7 @@ func TestGameRepositoryMySQL_FindBySlug(t *testing.T) {
 	mockRepo := db.NewGameRepositoryMySQL(gormDB)
 
 	testCases := map[string]struct {
+		userID       uint
 		slug         string
 		wantErr      bool
 		expectedErr  error
@@ -27,6 +28,7 @@ func TestGameRepositoryMySQL_FindBySlug(t *testing.T) {
 		mockBehavior func(slug string)
 	}{
 		"game found": {
+			userID:  1,
 			slug:    "valid",
 			wantErr: false,
 			wantGame: domain.Game{
@@ -104,6 +106,12 @@ func TestGameRepositoryMySQL_FindBySlug(t *testing.T) {
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `genres` WHERE `genres`.`id` = ? AND `genres`.`deleted_at` IS NULL")).
 					WithArgs(1).
 					WillReturnRows(genresRows)
+
+				heartsRows := mock.NewRows([]string{"id", "heartable_id", "heartable_type", "user_id"}).
+					AddRow(1, 1, "games", 1)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `heartables` WHERE `heartable_type` = ? AND `heartables`.`heartable_id` = ? AND `heartables`.`deleted_at` IS NULL")).
+					WithArgs("games", 1).
+					WillReturnRows(heartsRows)
 
 				gameLanguageRows := mock.NewRows([]string{"id", "menu", "dubs", "subtitles", "game_id", "language_id"}).
 					AddRow(1, false, true, false, 1, 1)
@@ -201,20 +209,25 @@ func TestGameRepositoryMySQL_FindBySlug(t *testing.T) {
 					WithArgs(1).
 					WillReturnRows(torrentProvidersRows)
 
-				viewRows := mock.NewRows([]string{"id", "viewable_id", "viewable_type", "count"}).
-					AddRow(1, 1, "games", 10)
+				viewRows := mock.NewRows([]string{"id", "viewable_id", "viewable_type", "user_id"}).
+					AddRow(1, 1, "games", 1)
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `viewables` WHERE `viewable_type` = ? AND `viewables`.`viewable_id` = ? AND `viewables`.`deleted_at` IS NULL")).
 					WithArgs("games", 1).
 					WillReturnRows(viewRows)
 
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `viewables` WHERE (viewable_id = ? AND viewable_type = ? AND user_id = ?) AND `viewables`.`deleted_at` IS NULL ORDER BY `viewables`.`id` LIMIT ?")).
+					WithArgs(1, "games", 1, 1).
+					WillReturnRows(viewRows)
+
 				mock.ExpectBegin()
-				mock.ExpectExec(regexp.QuoteMeta("UPDATE `viewables` SET `created_at`=?,`updated_at`=?,`deleted_at`=?,`count`=?,`viewable_id`=?,`viewable_type`=? WHERE `viewables`.`deleted_at` IS NULL AND `id` = ?")).
-					WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), 11, 1, "games", 1).
+				mock.ExpectExec(regexp.QuoteMeta("INSERT INTO `viewables` (`created_at`,`updated_at`,`deleted_at`,`viewable_id`,`viewable_type`,`user_id`) VALUES (?,?,?,?,?,?)")).
+					WithArgs(sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), 1, "games", 1).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
 			},
 		},
 		"game not found": {
+			userID:      1,
 			slug:        "invalid",
 			wantErr:     true,
 			expectedErr: errors.New("record not found"),
@@ -227,6 +240,7 @@ func TestGameRepositoryMySQL_FindBySlug(t *testing.T) {
 			},
 		},
 		"db error": {
+			userID:      1,
 			slug:        "valid",
 			wantErr:     true,
 			expectedErr: errors.New("db error"),
@@ -243,7 +257,7 @@ func TestGameRepositoryMySQL_FindBySlug(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			tc.mockBehavior(tc.slug)
 
-			game, err := mockRepo.FindBySlug(tc.slug)
+			game, err := mockRepo.FindBySlug(tc.slug, tc.userID)
 
 			assert.Equal(t, tc.expectedErr, err)
 			if err == gorm.ErrRecordNotFound {

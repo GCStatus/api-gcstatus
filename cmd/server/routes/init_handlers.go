@@ -39,7 +39,7 @@ func InitHandlers(
 	transactionHandler = api.NewTransactionHandler(transactionService, userService)
 	notificationHandler = api.NewNotificationHandler(notificationService, userService)
 	missionHandler = api.NewMissionHandler(missionService, userService)
-	gameHandler = api.NewGameHandler(gameService)
+	gameHandler = api.NewGameHandler(gameService, userService)
 
 	return authHandler,
 		passwordResetHandler,

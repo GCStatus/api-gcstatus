@@ -260,10 +260,12 @@ func TestValidateCrack(t *testing.T) {
 					ReleaseDate:      fixedTime,
 					CreatedAt:        fixedTime,
 					UpdatedAt:        fixedTime,
-					View: domain.Viewable{
-						Count:        10,
-						ViewableID:   1,
-						ViewableType: "games",
+					Views: []domain.Viewable{
+						{
+							UserID:       10,
+							ViewableID:   1,
+							ViewableType: "games",
+						},
 					},
 				},
 			},
@@ -297,8 +299,7 @@ func TestCreateCrackWithMissingFields(t *testing.T) {
 				About is a required field,
 				Description is a required field,
 				ShortDescription is a required field,
-				ReleaseDate is a required field,
-				Count is a required field
+				ReleaseDate is a required field
 			`,
 		},
 	}
