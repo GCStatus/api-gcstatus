@@ -67,6 +67,7 @@ func TestTransformGame(t *testing.T) {
 				Reviews:          []resources.ReviewResource{},
 				Critics:          []resources.CriticableResource{},
 				Stores:           []resources.GameStoreResource{},
+				Comments:         []resources.CommentableResource{},
 			},
 		},
 		"With One Category": {
@@ -127,6 +128,7 @@ func TestTransformGame(t *testing.T) {
 				Reviews:      []resources.ReviewResource{},
 				Critics:      []resources.CriticableResource{},
 				Stores:       []resources.GameStoreResource{},
+				Comments:     []resources.CommentableResource{},
 			},
 		},
 	}
@@ -202,6 +204,7 @@ func TestTransformGames(t *testing.T) {
 					Reviews:          []resources.ReviewResource{},
 					Critics:          []resources.CriticableResource{},
 					Stores:           []resources.GameStoreResource{},
+					Comments:         []resources.CommentableResource{},
 				},
 			},
 		},
@@ -302,6 +305,7 @@ func TestTransformGames(t *testing.T) {
 					Reviews:      []resources.ReviewResource{},
 					Critics:      []resources.CriticableResource{},
 					Stores:       []resources.GameStoreResource{},
+					Comments:     []resources.CommentableResource{},
 				},
 				{
 					ID:          3,
@@ -332,6 +336,7 @@ func TestTransformGames(t *testing.T) {
 					Reviews:      []resources.ReviewResource{},
 					Critics:      []resources.CriticableResource{},
 					Stores:       []resources.GameStoreResource{},
+					Comments:     []resources.CommentableResource{},
 				},
 			},
 		},

@@ -92,13 +92,13 @@ func TransformMinimalUser(user domain.User, s3Client s3.S3ClientInterface) Minim
 		CreatedAt: utils.FormatTimestamp(user.CreatedAt),
 	}
 
-	if user.Profile.ID != 0 {
+	if user.Profile.Photo != "" {
 		url, err := s3Client.GetPresignedURL(context.TODO(), user.Profile.Photo, time.Hour*3)
 		if err != nil {
 			log.Printf("Error generating presigned URL: %v", err)
+		} else {
+			userResource.Photo = &url
 		}
-
-		userResource.Photo = &url
 	}
 
 	return userResource

@@ -65,6 +65,22 @@ func TestGameRepositoryMySQL_FindBySlug(t *testing.T) {
 					WithArgs(1).
 					WillReturnRows(categoriesRows)
 
+				commentablesRows := mock.NewRows([]string{"id", "comment", "user_id", "commentable_id", "commentable_type"}).
+					AddRow(1, "Fake comment", 1, 1, "games")
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `commentables` WHERE `commentable_type` = ? AND `commentables`.`commentable_id` = ? AND parent_id IS NULL AND `commentables`.`deleted_at` IS NULL")).
+					WithArgs("games", 1).
+					WillReturnRows(commentablesRows)
+
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `commentables` WHERE `commentables`.`parent_id` = ? AND `commentables`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(commentablesRows)
+
+				userCommentablessRows := mock.NewRows([]string{"id", "name", "email", "nickname", "created_at", "updated_at"}).
+					AddRow(1, "Fake", "fake@gmail.com", "fake", fixedTime, fixedTime)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ? AND `users`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(userCommentablessRows)
+
 				crackRows := mock.NewRows([]string{"id", "status", "cracked_at", "cracker_id", "protection_id", "game_id"}).
 					AddRow(1, "uncracked", fixedTime, 1, 1, 1)
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `cracks` WHERE `cracks`.`game_id` = ? AND `cracks`.`deleted_at` IS NULL")).

@@ -37,7 +37,7 @@
   - [x] Add game publishers
   - [x] Add game developers
   - [x] Add game requirements
-  - [ ] Add game messages (for torrents section)
+  - [x] Add game comments (for torrents section)
   - [x] Add game support
   - [x] Add game hearts
   - [x] Add game views
@@ -94,6 +94,7 @@
 - [ ] AWS
   - [ ] SNS
   - [ ] Lambda
+- [ ] Make user friend requests
 - [ ] Create a chat between users
   - [ ] User can be able to chat another users
   - [ ] User can be able to create a group and chat them
@@ -101,6 +102,7 @@
   - [ ] User can be able to add and remove members (creator or admin)
   - [ ] User can be able to add admins on groups (owner only)
   - [ ] Chat should use realtime
+  - [ ] User can chat only friends - check if possibility will be only to that ones that accepts the friend request
 - [ ] Create quizz that could reward with some coins and experience, maybe titles
 - [ ] Award with coins and experience on comment, heart a game, or something else
   - [ ] Heart a game;

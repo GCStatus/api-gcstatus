@@ -38,6 +38,7 @@ type Game struct {
 	Platforms        []Platformable  `gorm:"polymorphic:Platformable;"`
 	Reviews          []Reviewable    `gorm:"polymorphic:Reviewable"`
 	Critics          []Criticable    `gorm:"polymorphic:Criticable"`
+	Comments         []Commentable   `gorm:"polymorphic:Commentable"`
 	Languages        []GameLanguage  `gorm:"foreignKey:GameID"`
 	Requirements     []Requirement   `gorm:"foreignKey:GameID"`
 	Torrents         []Torrent       `gorm:"foreignKey:GameID"`

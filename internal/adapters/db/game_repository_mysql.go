@@ -18,7 +18,7 @@ func NewGameRepositoryMySQL(db *gorm.DB) ports.GameRepository {
 
 func (h *GameRepositoryMySQL) FindBySlug(slug string, userID uint) (domain.Game, error) {
 	var game domain.Game
-	err := h.db.Preload("Categories.Category").
+	if err := h.db.Preload("Categories.Category").
 		Preload("Genres.Genre").
 		Preload("Tags.Tag").
 		Preload("Platforms.Platform").
@@ -32,31 +32,32 @@ func (h *GameRepositoryMySQL) FindBySlug(slug string, userID uint) (domain.Game,
 		Preload("Reviews.User.Profile").
 		Preload("Critics.Critic").
 		Preload("Stores.Store").
+		Preload("Comments", "parent_id IS NULL").
+		Preload("Comments.User").
+		Preload("Comments.Replies.User").
 		Preload("Support").
 		Preload("Views").
 		Preload("Hearts").
 		Where("slug = ?", slug).
 		First(&game).
-		Error
-
-	if err != nil {
+		Error; err != nil {
 		return game, err
 	}
 
 	var view domain.Viewable
-	err = h.db.Where("viewable_id = ? AND viewable_type = ? AND user_id = ?", game.ID, "games", userID).First(&view).Error
-
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		view = domain.Viewable{
-			ViewableID:   game.ID,
-			ViewableType: "games",
-			UserID:       userID,
-		}
-		if err := h.db.Create(&view).Error; err != nil {
+	if err := h.db.Where("viewable_id = ? AND viewable_type = ? AND user_id = ?", game.ID, "games", userID).First(&view).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			view = domain.Viewable{
+				ViewableID:   game.ID,
+				ViewableType: "games",
+				UserID:       userID,
+			}
+			if err := h.db.Create(&view).Error; err != nil {
+				return game, err
+			}
+		} else {
 			return game, err
 		}
-	} else if err != nil {
-		return game, err
 	}
 
 	return game, nil
