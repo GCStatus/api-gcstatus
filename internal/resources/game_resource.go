@@ -37,6 +37,7 @@ type GameResource struct {
 	Critics          []CriticableResource   `json:"critics"`
 	Stores           []GameStoreResource    `json:"stores"`
 	Comments         []CommentableResource  `json:"comments"`
+	Galleries        []GalleriableResource  `json:"galleries"`
 	Crack            *CrackResource         `json:"crack"`
 	Support          *SupportResource       `json:"support"`
 }
@@ -73,6 +74,7 @@ func TransformGame(game domain.Game, s3Client s3.S3ClientInterface) GameResource
 		Critics:          []CriticableResource{},
 		Stores:           []GameStoreResource{},
 		Comments:         []CommentableResource{},
+		Galleries:        []GalleriableResource{},
 		Crack:            nil,
 		Support:          nil,
 	}
@@ -152,6 +154,12 @@ func TransformGame(game domain.Game, s3Client s3.S3ClientInterface) GameResource
 	for _, commentable := range game.Comments {
 		if commentable.ID != 0 {
 			resource.Comments = append(resource.Comments, TransformCommentable(commentable, s3Client))
+		}
+	}
+
+	for _, galleriable := range game.Galleries {
+		if galleriable.ID != 0 {
+			resource.Galleries = append(resource.Galleries, TransformGalleriable(galleriable, s3Client))
 		}
 	}
 

@@ -33,7 +33,7 @@
   - [x] Add game torrents
   - [x] Add game crack
   - [x] Add game reviews
-  - [ ] Add game galleries
+  - [x] Add game galleries
   - [x] Add game publishers
   - [x] Add game developers
   - [x] Add game requirements
