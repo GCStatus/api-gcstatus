@@ -41,6 +41,7 @@
   - [x] Add game support
   - [x] Add game hearts
   - [x] Add game views
+  - [x] Add game stores
 
 ### Post-MVP
 

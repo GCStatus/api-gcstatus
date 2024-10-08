@@ -191,6 +191,18 @@ func TestGameRepositoryMySQL_FindBySlug(t *testing.T) {
 					WithArgs(1).
 					WillReturnRows(profilesRows)
 
+				gameStoresRows := mock.NewRows([]string{"id", "price", "url", "game_id", "store_id"}).
+					AddRow(1, 22999, "https://photo.co", 1, 1)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `game_stores` WHERE `game_stores`.`game_id` = ? AND `game_stores`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(gameStoresRows)
+
+				storesRows := mock.NewRows([]string{"id", "name", "url", "slug", "logo"}).
+					AddRow(1, "Store 1", "https://photo.co", "store-1", "https://photo.co")
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `stores` WHERE `stores`.`id` = ? AND `stores`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(storesRows)
+
 				supportsRows := mock.NewRows([]string{"id", "url", "email", "contact", "game_id"}).
 					AddRow(1, "https://google.com", "email@example.com", "fakeContact", 1)
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `game_supports` WHERE `game_supports`.`game_id` = ? AND `game_supports`.`deleted_at` IS NULL")).
