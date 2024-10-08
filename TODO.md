@@ -25,11 +25,11 @@
   - [ ] Add post views count
 - [ ] Create heartable structure
   - [ ] Add game hearts count
-  - [ ] Add post hearts count
+  - [x] Add post hearts count
   - [ ] Add comment hearts count
 - [ ] Create game outline system
   - [ ] Add game DLCs
-  - [ ] Add game critics
+  - [x] Add game critics
   - [x] Add game torrents
   - [x] Add game crack
   - [x] Add game reviews
@@ -39,7 +39,7 @@
   - [x] Add game requirements
   - [ ] Add game messages (for torrents section)
   - [x] Add game support
-  - [ ] Add game hearts
+  - [x] Add game hearts
   - [x] Add game views
 
 ### Post-MVP
