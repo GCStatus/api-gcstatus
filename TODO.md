@@ -103,5 +103,6 @@
   - [ ] Method should return 9 most liked games
   - [ ] Method should return 9 upcoming games
 - [ ] Coupons for coins purchase
+- [ ] Create method to store game sales automatically integrating with external stores
 - [ ] Admin system
   - [ ] ...
