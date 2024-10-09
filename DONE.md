@@ -98,5 +98,36 @@
 - [x] Create tags table
 - [x] Create genres table
 - [x] Create platforms table
+- [x] Create languages table
+- [x] Adding outline for games
+  - [x] Associating games with platforms
+  - [x] Associating games with categories
+  - [x] Associating games with tags
+  - [x] Associating games with genres
+  - [x] Associating games with languages
+- [x] Create association for games or DLCs
+  - [x] Create torrent websites (such as firgitl, skidrow etc)
+  - [x] Create the kind of protections (such as Denuvo, Steam, GOG etc)
+  - [x] Create game developers (such as Game Science)
+  - [x] Create game publishers (such as Game Science)
+  - [x] Create requirement types
+    - [x] A requirement type should have a potential column, that should be enum, with minimum, maximum or recommended
+    - [x] A requirement type should have a type column, that should be enum, with windows, mac or linux
+  - [x] Create requirements and associate with requirement types
+- [x] Create game outline system
+  - [x] Add game DLCs
+  - [x] Add game critics
+  - [x] Add game torrents
+  - [x] Add game crack
+  - [x] Add game reviews
+  - [x] Add game galleries
+  - [x] Add game publishers
+  - [x] Add game developers
+  - [x] Add game requirements
+  - [x] Add game comments (for torrents section)
+  - [x] Add game support
+  - [x] Add game hearts
+  - [x] Add game views
+  - [x] Add game stores
 
 ### Post MVP

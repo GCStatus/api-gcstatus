@@ -29,6 +29,7 @@ type User struct {
 	Notifications     []Notification          `json:"notifications" gorm:"foreignKey:UserID"`
 	Missions          []UserMission           `gorm:"foreignKey:UserID"`
 	MyMissions        []UserMissionAssignment `gorm:"foreignKey:UserID"`
+	Reviews           []Reviewable            `gorm:"foreignKey:UserID"`
 }
 
 func (u *User) ValidateUser() error {

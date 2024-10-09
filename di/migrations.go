@@ -8,7 +8,7 @@ import (
 )
 
 func MigrateModels(dbConn *gorm.DB) {
-	models := []interface{}{
+	models := []any{
 		&domain.Reward{},
 		&domain.Level{},
 		&domain.Wallet{},
@@ -31,6 +31,36 @@ func MigrateModels(dbConn *gorm.DB) {
 		&domain.Tag{},
 		&domain.Platform{},
 		&domain.Category{},
+		&domain.Categoriable{},
+		&domain.Genreable{},
+		&domain.Taggable{},
+		&domain.Platformable{},
+		&domain.Language{},
+		&domain.GameLanguage{},
+		&domain.RequirementType{},
+		&domain.Requirement{},
+		&domain.Protection{},
+		&domain.Cracker{},
+		&domain.Crack{},
+		&domain.TorrentProvider{},
+		&domain.Torrent{},
+		&domain.Publisher{},
+		&domain.GamePublisher{},
+		&domain.Developer{},
+		&domain.GameDeveloper{},
+		&domain.GameSupport{},
+		&domain.Reviewable{},
+		&domain.Viewable{},
+		&domain.Heartable{},
+		&domain.Critic{},
+		&domain.Criticable{},
+		&domain.Store{},
+		&domain.GameStore{},
+		&domain.Commentable{},
+		&domain.Galleriable{},
+		&domain.DLC{},
+		&domain.DLCStore{},
+		&domain.Game{},
 	}
 
 	for _, model := range models {

@@ -17,6 +17,7 @@ func InitHandlers(
 	transactionService *usecases.TransactionService,
 	notificationService *usecases.NotificationService,
 	missionService *usecases.MissionService,
+	gameService *usecases.GameService,
 ) (
 	authHandler *api.AuthHandler,
 	passwordResetHandler *api.PasswordResetHandler,
@@ -27,6 +28,7 @@ func InitHandlers(
 	transactionHandler *api.TransactionHandler,
 	notificationHandler *api.NotificationHandler,
 	missionHandler *api.MissionHandler,
+	gameHandler *api.GameHandler,
 ) {
 	userHandler = api.NewUserHandler(userService)
 	authHandler = api.NewAuthHandler(authService, userService)
@@ -37,6 +39,7 @@ func InitHandlers(
 	transactionHandler = api.NewTransactionHandler(transactionService, userService)
 	notificationHandler = api.NewNotificationHandler(notificationService, userService)
 	missionHandler = api.NewMissionHandler(missionService, userService)
+	gameHandler = api.NewGameHandler(gameService, userService)
 
 	return authHandler,
 		passwordResetHandler,
@@ -46,5 +49,6 @@ func InitHandlers(
 		titleHandler,
 		transactionHandler,
 		notificationHandler,
-		missionHandler
+		missionHandler,
+		gameHandler
 }

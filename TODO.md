@@ -20,6 +20,13 @@
   - [ ] Review the action keys for missions and titles
   - [ ] Planning all missions and titles type
   - [ ] Planning all daily/weekly/monthly missions
+- [x] Create viewable structure
+  - [x] Add game views count
+  - [ ] Add post views count
+- [ ] Create heartable structure
+  - [x] Add game hearts count
+  - [ ] Add post hearts count
+  - [x] Add comment hearts count
 
 ### Post-MVP
 
@@ -72,6 +79,7 @@
 - [ ] AWS
   - [ ] SNS
   - [ ] Lambda
+- [ ] Make user friend requests
 - [ ] Create a chat between users
   - [ ] User can be able to chat another users
   - [ ] User can be able to create a group and chat them
@@ -79,6 +87,7 @@
   - [ ] User can be able to add and remove members (creator or admin)
   - [ ] User can be able to add admins on groups (owner only)
   - [ ] Chat should use realtime
+  - [ ] User can chat only friends - check if possibility will be only to that ones that accepts the friend request
 - [ ] Create quizz that could reward with some coins and experience, maybe titles
 - [ ] Award with coins and experience on comment, heart a game, or something else
   - [ ] Heart a game;

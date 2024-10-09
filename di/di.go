@@ -25,6 +25,7 @@ func InitDependencies() (
 	*usecases.TransactionService,
 	*usecases.NotificationService,
 	*usecases.MissionService,
+	*usecases.GameService,
 	*gorm.DB,
 ) {
 	cfg := config.LoadConfig()
@@ -50,7 +51,8 @@ func InitDependencies() (
 		walletService,
 		transactionService,
 		notificationService,
-		missionService := Setup(dbConn)
+		missionService,
+		gameService := Setup(dbConn)
 
 	// Setup clients for non-test environment
 	if cfg.ENV != "testing" {
@@ -84,5 +86,6 @@ func InitDependencies() (
 		transactionService,
 		notificationService,
 		missionService,
+		gameService,
 		dbConn
 }
