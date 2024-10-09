@@ -24,9 +24,9 @@
   - [x] Add game views count
   - [ ] Add post views count
 - [ ] Create heartable structure
-  - [ ] Add game hearts count
-  - [x] Add post hearts count
-  - [ ] Add comment hearts count
+  - [x] Add game hearts count
+  - [ ] Add post hearts count
+  - [x] Add comment hearts count
 
 ### Post-MVP
 

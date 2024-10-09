@@ -18,6 +18,7 @@ type Commentable struct {
 	CommentableType string        `gorm:"index"`
 	ParentID        *uint         `gorm:"index"`
 	Replies         []Commentable `gorm:"foreignKey:ParentID;constraint:OnDelete:CASCADE"`
+	Hearts          []Heartable   `gorm:"polymorphic:Heartable"`
 }
 
 func (c *Commentable) ValidateCommentable() error {

@@ -71,6 +71,12 @@ func TestGameRepositoryMySQL_FindBySlug(t *testing.T) {
 					WithArgs("games", 1).
 					WillReturnRows(commentablesRows)
 
+				commentableHeartsRows := mock.NewRows([]string{"id", "heartable_id", "heartable_type", "user_id"}).
+					AddRow(1, 1, "commentables", 1)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `heartables` WHERE `heartable_type` = ? AND `heartables`.`heartable_id` = ? AND `heartables`.`deleted_at` IS NULL")).
+					WithArgs("commentables", 1).
+					WillReturnRows(commentableHeartsRows)
+
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `commentables` WHERE `commentables`.`parent_id` = ? AND `commentables`.`deleted_at` IS NULL")).
 					WithArgs(1).
 					WillReturnRows(commentablesRows)
