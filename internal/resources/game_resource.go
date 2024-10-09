@@ -61,107 +61,22 @@ func TransformGame(game domain.Game, s3Client s3.S3ClientInterface) GameResource
 		ReleaseDate:      utils.FormatTimestamp(game.ReleaseDate),
 		CreatedAt:        utils.FormatTimestamp(game.CreatedAt),
 		UpdatedAt:        utils.FormatTimestamp(game.UpdatedAt),
-		Categories:       []CategoryResource{},
-		Platforms:        []PlatformResource{},
-		Genres:           []GenreResource{},
-		Tags:             []TagResource{},
-		Languages:        []GameLanguageResource{},
-		Requirements:     []RequirementResource{},
-		Torrents:         []TorrentResource{},
-		Publishers:       []PublisherResource{},
-		Developers:       []DeveloperResource{},
-		Reviews:          []ReviewResource{},
-		Critics:          []CriticableResource{},
-		Stores:           []GameStoreResource{},
-		Comments:         []CommentableResource{},
-		Galleries:        []GalleriableResource{},
-		Crack:            nil,
-		Support:          nil,
 	}
 
-	for _, categoriable := range game.Categories {
-		if categoriable.Category.ID != 0 {
-			resource.Categories = append(resource.Categories, TransformCategory(categoriable.Category))
-		}
-	}
-
-	for _, platformable := range game.Platforms {
-		if platformable.Platform.ID != 0 {
-			resource.Platforms = append(resource.Platforms, TransformPlatform(platformable.Platform))
-		}
-	}
-
-	for _, genreable := range game.Genres {
-		if genreable.Genre.ID != 0 {
-			resource.Genres = append(resource.Genres, TransformGenre(genreable.Genre))
-		}
-	}
-
-	for _, taggable := range game.Tags {
-		if taggable.Tag.ID != 0 {
-			resource.Tags = append(resource.Tags, TransformTag(taggable.Tag))
-		}
-	}
-
-	for _, gameLanguage := range game.Languages {
-		if gameLanguage.Language.ID != 0 {
-			resource.Languages = append(resource.Languages, TransformGameLanguage(gameLanguage))
-		}
-	}
-
-	for _, gameRequirement := range game.Requirements {
-		if gameRequirement.ID != 0 {
-			resource.Requirements = append(resource.Requirements, TransformRequirement(gameRequirement))
-		}
-	}
-
-	for _, torrent := range game.Torrents {
-		if torrent.ID != 0 {
-			resource.Torrents = append(resource.Torrents, TransformTorrent(torrent))
-		}
-	}
-
-	for _, gamePublisher := range game.Publishers {
-		if gamePublisher.ID != 0 {
-			resource.Publishers = append(resource.Publishers, TransformPublisher(gamePublisher.Publisher))
-		}
-	}
-
-	for _, gameDeveloper := range game.Developers {
-		if gameDeveloper.ID != 0 {
-			resource.Developers = append(resource.Developers, TransformDeveloper(gameDeveloper.Developer))
-		}
-	}
-
-	for _, review := range game.Reviews {
-		if review.ID != 0 {
-			resource.Reviews = append(resource.Reviews, TransformReview(review, s3Client))
-		}
-	}
-
-	for _, criticable := range game.Critics {
-		if criticable.ID != 0 {
-			resource.Critics = append(resource.Critics, TransformCriticable(criticable))
-		}
-	}
-
-	for _, gameStore := range game.Stores {
-		if gameStore.ID != 0 {
-			resource.Stores = append(resource.Stores, TransformGameStore(gameStore))
-		}
-	}
-
-	for _, commentable := range game.Comments {
-		if commentable.ID != 0 {
-			resource.Comments = append(resource.Comments, TransformCommentable(commentable, s3Client))
-		}
-	}
-
-	for _, galleriable := range game.Galleries {
-		if galleriable.ID != 0 {
-			resource.Galleries = append(resource.Galleries, TransformGalleriable(galleriable, s3Client))
-		}
-	}
+	resource.Categories = transformCategories(game.Categories)
+	resource.Platforms = transformPlatforms(game.Platforms)
+	resource.Genres = transformGenres(game.Genres)
+	resource.Tags = transformTags(game.Tags)
+	resource.Languages = transformLanguages(game.Languages)
+	resource.Requirements = transformRequirements(game.Requirements)
+	resource.Torrents = transformTorrents(game.Torrents)
+	resource.Publishers = transformPublishers(game.Publishers)
+	resource.Developers = transformDevelopers(game.Developers)
+	resource.Reviews = transformReviews(game.Reviews, s3Client)
+	resource.Critics = transformCritics(game.Critics)
+	resource.Stores = transformStores(game.Stores)
+	resource.Comments = transformComments(game.Comments, s3Client)
+	resource.Galleries = transformGalleries(game.Galleries, s3Client)
 
 	if game.Crack != nil && game.Crack.ID != 0 {
 		resource.Crack = TransformCrack(game.Crack)
@@ -184,4 +99,158 @@ func TransformGames(games []domain.Game, s3Client s3.S3ClientInterface) []GameRe
 	}
 
 	return resources
+}
+
+func transformCategories(categories []domain.Categoriable) []CategoryResource {
+	categoryResources := make([]CategoryResource, 0)
+	for _, c := range categories {
+		if c.Category.ID != 0 {
+			categoryResources = append(categoryResources, TransformCategory(c.Category))
+		}
+	}
+
+	return categoryResources
+}
+
+func transformPlatforms(platforms []domain.Platformable) []PlatformResource {
+	platformResources := make([]PlatformResource, 0)
+	for _, p := range platforms {
+		if p.Platform.ID != 0 {
+			platformResources = append(platformResources, TransformPlatform(p.Platform))
+		}
+	}
+
+	return platformResources
+}
+
+func transformGenres(genres []domain.Genreable) []GenreResource {
+	genreResources := make([]GenreResource, 0)
+	for _, g := range genres {
+		if g.Genre.ID != 0 {
+			genreResources = append(genreResources, TransformGenre(g.Genre))
+		}
+	}
+
+	return genreResources
+}
+
+func transformTags(tags []domain.Taggable) []TagResource {
+	tagResources := make([]TagResource, 0)
+	for _, t := range tags {
+		if t.Tag.ID != 0 {
+			tagResources = append(tagResources, TransformTag(t.Tag))
+		}
+	}
+
+	return tagResources
+}
+
+func transformLanguages(languages []domain.GameLanguage) []GameLanguageResource {
+	languageResources := make([]GameLanguageResource, 0)
+	for _, l := range languages {
+		if l.Language.ID != 0 {
+			languageResources = append(languageResources, TransformGameLanguage(l))
+		}
+	}
+
+	return languageResources
+}
+
+func transformRequirements(requirements []domain.Requirement) []RequirementResource {
+	requirementResources := make([]RequirementResource, 0)
+	for _, r := range requirements {
+		if r.ID != 0 {
+			requirementResources = append(requirementResources, TransformRequirement(r))
+		}
+	}
+
+	return requirementResources
+}
+
+func transformTorrents(torrents []domain.Torrent) []TorrentResource {
+	torrentResources := make([]TorrentResource, 0)
+	for _, t := range torrents {
+		if t.ID != 0 {
+			torrentResources = append(torrentResources, TransformTorrent(t))
+		}
+	}
+
+	return torrentResources
+}
+
+func transformPublishers(publishers []domain.GamePublisher) []PublisherResource {
+	publisherResources := make([]PublisherResource, 0)
+	for _, p := range publishers {
+		if p.Publisher.ID != 0 {
+			publisherResources = append(publisherResources, TransformPublisher(p.Publisher))
+		}
+	}
+
+	return publisherResources
+}
+
+func transformDevelopers(developers []domain.GameDeveloper) []DeveloperResource {
+	developerResources := make([]DeveloperResource, 0)
+	for _, d := range developers {
+		if d.Developer.ID != 0 {
+			developerResources = append(developerResources, TransformDeveloper(d.Developer))
+		}
+	}
+
+	return developerResources
+}
+
+func transformReviews(reviews []domain.Reviewable, s3Client s3.S3ClientInterface) []ReviewResource {
+	reviewResources := make([]ReviewResource, 0)
+	for _, r := range reviews {
+		if r.ID != 0 {
+			reviewResources = append(reviewResources, TransformReview(r, s3Client))
+		}
+	}
+
+	return reviewResources
+}
+
+func transformCritics(critics []domain.Criticable) []CriticableResource {
+	criticResources := make([]CriticableResource, 0)
+	for _, c := range critics {
+		if c.ID != 0 {
+			criticResources = append(criticResources, TransformCriticable(c))
+		}
+	}
+
+	return criticResources
+}
+
+func transformStores(stores []domain.GameStore) []GameStoreResource {
+	storeResources := make([]GameStoreResource, 0)
+	for _, s := range stores {
+		if s.ID != 0 {
+			storeResources = append(storeResources, TransformGameStore(s))
+		}
+	}
+
+	return storeResources
+}
+
+func transformComments(comments []domain.Commentable, s3Client s3.S3ClientInterface) []CommentableResource {
+	commentResources := make([]CommentableResource, 0)
+	for _, c := range comments {
+		if c.ID != 0 {
+			commentResources = append(commentResources, TransformCommentable(c, s3Client))
+		}
+	}
+
+	return commentResources
+}
+
+func transformGalleries(galleries []domain.Galleriable, s3Client s3.S3ClientInterface) []GalleriableResource {
+	galleryResources := make([]GalleriableResource, 0)
+	for _, g := range galleries {
+		if g.ID != 0 {
+			galleryResources = append(galleryResources, TransformGalleriable(g, s3Client))
+		}
+	}
+
+	return galleryResources
 }
