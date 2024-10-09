@@ -111,6 +111,42 @@ func TestGameRepositoryMySQL_FindBySlug(t *testing.T) {
 					WithArgs(1).
 					WillReturnRows(criticsRows)
 
+				dlcsRows := mock.NewRows([]string{"id", "name", "cover", "release_date", "game_id"}).
+					AddRow(1, "DLC 1", "https://placehold.co/600x400/EEE/31343C", fixedTime, 1)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `dlcs` WHERE `dlcs`.`game_id` = ? AND `dlcs`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(dlcsRows)
+
+				dlcGalleriesRows := mock.NewRows([]string{"id", "path", "s3", "galleriable_id", "galleriable_type"}).
+					AddRow(1, "Game Science", false, 1, "dlcs")
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `galleriables` WHERE `galleriable_type` = ? AND `galleriables`.`galleriable_id` = ? AND `galleriables`.`deleted_at` IS NULL")).
+					WithArgs("dlcs", 1).
+					WillReturnRows(dlcGalleriesRows)
+
+				platformableDlcsRows := mock.NewRows([]string{"id", "platformable_id", "platformable_type", "platform_id"}).
+					AddRow(1, 1, "dlcs", 1)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `platformables` WHERE `platformable_type` = ? AND `platformables`.`platformable_id` = ? AND `platformables`.`deleted_at` IS NULL")).
+					WithArgs("dlcs", 1).
+					WillReturnRows(platformableDlcsRows)
+
+				platformsRows := mock.NewRows([]string{"id", "name"}).
+					AddRow(1, "PC")
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `platforms` WHERE `platforms`.`id` = ? AND `platforms`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(platformsRows)
+
+				dlcStoresRows := mock.NewRows([]string{"id", "price", "url", "dlc_id", "store_id"}).
+					AddRow(1, 2200, "https://google.com", 1, 1)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `dlc_stores` WHERE `dlc_stores`.`dlc_id` = ? AND `dlc_stores`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(dlcStoresRows)
+
+				storesRows := mock.NewRows([]string{"id", "name", "url", "slug", "logo"}).
+					AddRow(1, "Store 1", "https://photo.co", "store-1", "https://photo.co")
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `stores` WHERE `stores`.`id` = ? AND `stores`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(storesRows)
+
 				gameDevelopersRows := mock.NewRows([]string{"id", "developer_id", "game_id"}).
 					AddRow(1, 1, 1)
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `game_developers` WHERE `game_developers`.`game_id` = ? AND `game_developers`.`deleted_at` IS NULL")).
@@ -165,8 +201,6 @@ func TestGameRepositoryMySQL_FindBySlug(t *testing.T) {
 					WithArgs("games", 1).
 					WillReturnRows(platformableRows)
 
-				platformsRows := mock.NewRows([]string{"id", "name"}).
-					AddRow(1, "PC")
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `platforms` WHERE `platforms`.`id` = ? AND `platforms`.`deleted_at` IS NULL")).
 					WithArgs(1).
 					WillReturnRows(platformsRows)
@@ -219,8 +253,6 @@ func TestGameRepositoryMySQL_FindBySlug(t *testing.T) {
 					WithArgs(1).
 					WillReturnRows(gameStoresRows)
 
-				storesRows := mock.NewRows([]string{"id", "name", "url", "slug", "logo"}).
-					AddRow(1, "Store 1", "https://photo.co", "store-1", "https://photo.co")
 				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `stores` WHERE `stores`.`id` = ? AND `stores`.`deleted_at` IS NULL")).
 					WithArgs(1).
 					WillReturnRows(storesRows)

@@ -33,6 +33,9 @@ func (h *GameRepositoryMySQL) FindBySlug(slug string, userID uint) (domain.Game,
 		Preload("Critics.Critic").
 		Preload("Stores.Store").
 		Preload("Galleries").
+		Preload("DLCs.Galleries").
+		Preload("DLCs.Platforms.Platform").
+		Preload("DLCs.Stores.Store").
 		Preload("Comments", "parent_id IS NULL").
 		Preload("Comments.User").
 		Preload("Comments.Replies.User").

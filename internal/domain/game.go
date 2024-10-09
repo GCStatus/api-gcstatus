@@ -46,6 +46,7 @@ type Game struct {
 	Publishers       []GamePublisher `gorm:"foreignKey:GameID"`
 	Developers       []GameDeveloper `gorm:"foreignKey:GameID"`
 	Stores           []GameStore     `gorm:"foreignKey:GameID"`
+	DLCs             []DLC           `gorm:"foreignKey:GameID"`
 	Crack            *Crack          `gorm:"foreignKey:GameID"`
 	Support          *GameSupport    `gorm:"foreignKey:GameID"`
 }

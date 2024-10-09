@@ -38,6 +38,7 @@ type GameResource struct {
 	Stores           []GameStoreResource    `json:"stores"`
 	Comments         []CommentableResource  `json:"comments"`
 	Galleries        []GalleriableResource  `json:"galleries"`
+	DLCs             []DLCResource          `json:"dlcs"`
 	Crack            *CrackResource         `json:"crack"`
 	Support          *SupportResource       `json:"support"`
 }
@@ -77,6 +78,7 @@ func TransformGame(game domain.Game, s3Client s3.S3ClientInterface) GameResource
 	resource.Stores = transformStores(game.Stores)
 	resource.Comments = transformComments(game.Comments, s3Client)
 	resource.Galleries = transformGalleries(game.Galleries, s3Client)
+	resource.DLCs = transformDLCs(game.DLCs, s3Client)
 
 	if game.Crack != nil && game.Crack.ID != 0 {
 		resource.Crack = TransformCrack(game.Crack)
@@ -253,4 +255,15 @@ func transformGalleries(galleries []domain.Galleriable, s3Client s3.S3ClientInte
 	}
 
 	return galleryResources
+}
+
+func transformDLCs(DLCs []domain.DLC, s3Client s3.S3ClientInterface) []DLCResource {
+	DLCResources := make([]DLCResource, 0)
+	for _, d := range DLCs {
+		if d.ID != 0 {
+			DLCResources = append(DLCResources, TransformDLC(d, s3Client))
+		}
+	}
+
+	return DLCResources
 }
