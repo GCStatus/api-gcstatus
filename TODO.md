@@ -27,6 +27,7 @@
   - [x] Add game hearts count
   - [ ] Add post hearts count
   - [x] Add comment hearts count
+- [ ] Create method to receive comments, with parent id if reply
 
 ### Post-MVP
 
