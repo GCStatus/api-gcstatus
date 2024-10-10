@@ -129,5 +129,7 @@
   - [x] Add game hearts
   - [x] Add game views
   - [x] Add game stores
+- [x] User heart on games
+- [x] User heart on comments or replies
 
 ### Post MVP
