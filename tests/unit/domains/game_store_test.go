@@ -20,10 +20,11 @@ func TestCreateGameStore(t *testing.T) {
 	}{
 		"Success": {
 			gameStore: domain.GameStore{
-				Price:   22999,
-				URL:     "https://google.com",
-				GameID:  1,
-				StoreID: 1,
+				Price:       22999,
+				URL:         "https://google.com",
+				GameID:      1,
+				StoreID:     1,
+				StoreGameID: "1",
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, gameStore domain.GameStore) {
 				mock.ExpectBegin()
@@ -36,6 +37,7 @@ func TestCreateGameStore(t *testing.T) {
 						gameStore.URL,
 						gameStore.GameID,
 						gameStore.StoreID,
+						gameStore.StoreGameID,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -44,10 +46,11 @@ func TestCreateGameStore(t *testing.T) {
 		},
 		"Failure - Insert Error": {
 			gameStore: domain.GameStore{
-				Price:   22999,
-				URL:     "https://google.com",
-				GameID:  1,
-				StoreID: 1,
+				Price:       22999,
+				URL:         "https://google.com",
+				GameID:      1,
+				StoreID:     1,
+				StoreGameID: "1",
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, gameStore domain.GameStore) {
 				mock.ExpectBegin()
@@ -60,6 +63,7 @@ func TestCreateGameStore(t *testing.T) {
 						gameStore.URL,
 						gameStore.GameID,
 						gameStore.StoreID,
+						gameStore.StoreGameID,
 					).
 					WillReturnError(fmt.Errorf("some error"))
 				mock.ExpectRollback()
@@ -99,13 +103,14 @@ func TestUpdateGameStore(t *testing.T) {
 	}{
 		"Success": {
 			gameStore: domain.GameStore{
-				ID:        1,
-				Price:     22999,
-				URL:       "https://google.com",
-				GameID:    1,
-				StoreID:   1,
-				CreatedAt: fixedTime,
-				UpdatedAt: fixedTime,
+				ID:          1,
+				Price:       22999,
+				URL:         "https://google.com",
+				GameID:      1,
+				StoreID:     1,
+				StoreGameID: "1",
+				CreatedAt:   fixedTime,
+				UpdatedAt:   fixedTime,
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, gameStore domain.GameStore) {
 				mock.ExpectBegin()
@@ -118,6 +123,7 @@ func TestUpdateGameStore(t *testing.T) {
 						gameStore.URL,
 						gameStore.GameID,
 						gameStore.StoreID,
+						gameStore.StoreGameID,
 						gameStore.ID,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
@@ -127,13 +133,14 @@ func TestUpdateGameStore(t *testing.T) {
 		},
 		"Failure - Update Error": {
 			gameStore: domain.GameStore{
-				ID:        1,
-				Price:     22999,
-				URL:       "https://google.com",
-				GameID:    1,
-				StoreID:   1,
-				CreatedAt: fixedTime,
-				UpdatedAt: fixedTime,
+				ID:          1,
+				Price:       22999,
+				URL:         "https://google.com",
+				GameID:      1,
+				StoreID:     1,
+				StoreGameID: "1",
+				CreatedAt:   fixedTime,
+				UpdatedAt:   fixedTime,
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, gameStore domain.GameStore) {
 				mock.ExpectBegin()
@@ -146,6 +153,7 @@ func TestUpdateGameStore(t *testing.T) {
 						gameStore.URL,
 						gameStore.GameID,
 						gameStore.StoreID,
+						gameStore.StoreGameID,
 						gameStore.ID,
 					).
 					WillReturnError(fmt.Errorf("some error"))
@@ -232,8 +240,9 @@ func TestValidateGameStoreValidData(t *testing.T) {
 	}{
 		"Can empty validations errors": {
 			gameStore: domain.GameStore{
-				Price: 22999,
-				URL:   "https://google.com",
+				Price:       22999,
+				URL:         "https://google.com",
+				StoreGameID: "1",
 				Game: domain.Game{
 					Slug:             "valid",
 					Age:              18,
@@ -293,7 +302,8 @@ func TestCreateGameStoreWithMissingFields(t *testing.T) {
 				Name is a required field,
 				URL is a required field,
 				Slug is a required field,
-				Logo is a required field	
+				Logo is a required field,
+				StoreGameID is a required field
 			`,
 		},
 	}

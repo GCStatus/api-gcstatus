@@ -23,12 +23,14 @@ func TestTransformTag(t *testing.T) {
 			input: domain.Tag{
 				ID:        1,
 				Name:      "Tag 1",
+				Slug:      "tag-1",
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
 			},
 			expected: resources.TagResource{
 				ID:   1,
 				Name: "Tag 1",
+				Slug: "tag-1",
 			},
 		},
 	}
@@ -62,12 +64,14 @@ func TestTransformTags(t *testing.T) {
 				{
 					ID:        1,
 					Name:      "Tag 1",
+					Slug:      "tag-1",
 					CreatedAt: fixedTime,
 					UpdatedAt: fixedTime,
 				},
 				{
 					ID:        2,
 					Name:      "Tag 2",
+					Slug:      "tag-2",
 					CreatedAt: fixedTime,
 					UpdatedAt: fixedTime,
 				},
@@ -76,10 +80,12 @@ func TestTransformTags(t *testing.T) {
 				{
 					ID:   1,
 					Name: "Tag 1",
+					Slug: "tag-1",
 				},
 				{
 					ID:   2,
 					Name: "Tag 2",
+					Slug: "tag-2",
 				},
 			},
 		},

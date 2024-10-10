@@ -10,6 +10,7 @@ type Platform struct {
 	gorm.Model
 	ID        uint   `gorm:"primaryKey"`
 	Name      string `gorm:"size:255;not null;unique" validate:"required"`
+	Slug      string `gorm:"size:255;not null;unique" validate:"required"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

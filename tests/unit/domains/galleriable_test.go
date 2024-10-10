@@ -25,6 +25,7 @@ func TestCreateGalleriable(t *testing.T) {
 				Path:            "https://google.com",
 				GalleriableID:   1,
 				GalleriableType: "games",
+				MediaTypeID:     1,
 				CreatedAt:       fixedTime,
 				UpdatedAt:       fixedTime,
 			},
@@ -39,6 +40,7 @@ func TestCreateGalleriable(t *testing.T) {
 						galleriable.Path,
 						galleriable.GalleriableID,
 						galleriable.GalleriableType,
+						galleriable.MediaTypeID,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -51,6 +53,7 @@ func TestCreateGalleriable(t *testing.T) {
 				Path:            "https://google.com",
 				GalleriableID:   1,
 				GalleriableType: "games",
+				MediaTypeID:     1,
 				CreatedAt:       fixedTime,
 				UpdatedAt:       fixedTime,
 			},
@@ -65,6 +68,7 @@ func TestCreateGalleriable(t *testing.T) {
 						galleriable.Path,
 						galleriable.GalleriableID,
 						galleriable.GalleriableType,
+						galleriable.MediaTypeID,
 					).
 					WillReturnError(fmt.Errorf("some error"))
 				mock.ExpectRollback()
@@ -109,6 +113,7 @@ func TestUpdateGalleriable(t *testing.T) {
 				Path:            "https://google.com",
 				GalleriableID:   1,
 				GalleriableType: "games",
+				MediaTypeID:     1,
 				CreatedAt:       fixedTime,
 				UpdatedAt:       fixedTime,
 			},
@@ -123,6 +128,7 @@ func TestUpdateGalleriable(t *testing.T) {
 						galleriable.Path,
 						galleriable.GalleriableID,
 						galleriable.GalleriableType,
+						galleriable.MediaTypeID,
 						galleriable.ID,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
@@ -137,6 +143,7 @@ func TestUpdateGalleriable(t *testing.T) {
 				Path:            "https://google.com",
 				GalleriableID:   1,
 				GalleriableType: "games",
+				MediaTypeID:     1,
 				CreatedAt:       fixedTime,
 				UpdatedAt:       fixedTime,
 			},
@@ -151,6 +158,7 @@ func TestUpdateGalleriable(t *testing.T) {
 						galleriable.Path,
 						galleriable.GalleriableID,
 						galleriable.GalleriableType,
+						galleriable.MediaTypeID,
 						galleriable.ID,
 					).
 					WillReturnError(fmt.Errorf("some error"))
@@ -243,6 +251,10 @@ func TestValidateGalleriableValidData(t *testing.T) {
 				GalleriableType: "games",
 				CreatedAt:       fixedTime,
 				UpdatedAt:       fixedTime,
+				MediaType: domain.MediaType{
+					ID:   1,
+					Name: "photo",
+				},
 			},
 		},
 	}

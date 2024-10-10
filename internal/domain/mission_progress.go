@@ -19,10 +19,10 @@ type MissionProgress struct {
 	MissionRequirement   *MissionRequirement `gorm:"foreignKey:MissionRequirementID;references:ID"`
 }
 
-func (tp *MissionProgress) ValidateMissionProgress() error {
+func (mp *MissionProgress) ValidateMissionProgress() error {
 	Init()
 
-	err := validate.Struct(tp)
+	err := validate.Struct(mp)
 	if err != nil {
 		return FormatValidationError(err)
 	}

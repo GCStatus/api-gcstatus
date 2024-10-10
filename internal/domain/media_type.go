@@ -6,20 +6,18 @@ import (
 	"gorm.io/gorm"
 )
 
-type Tag struct {
+type MediaType struct {
 	gorm.Model
 	ID        uint   `gorm:"primaryKey"`
 	Name      string `gorm:"size:255;not null;unique" validate:"required"`
-	Slug      string `gorm:"size:255;not null;unique" validate:"required"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
 
-func (t *Tag) ValidateTag() error {
+func (mt *MediaType) ValidateMediaType() error {
 	Init()
 
-	err := validate.Struct(t)
-	if err != nil {
+	if err := validate.Struct(mt); err != nil {
 		return FormatValidationError(err)
 	}
 

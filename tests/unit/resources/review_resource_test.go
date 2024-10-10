@@ -21,6 +21,7 @@ func TestTransformReview(t *testing.T) {
 				ID:             1,
 				Rate:           5,
 				Review:         "Good game!",
+				Played:         true,
 				CreatedAt:      fixedTime,
 				UpdatedAt:      fixedTime,
 				ReviewableID:   1,
@@ -42,6 +43,7 @@ func TestTransformReview(t *testing.T) {
 				ID:        1,
 				Rate:      5,
 				Review:    "Good game!",
+				Played:    true,
 				CreatedAt: utils.FormatTimestamp(fixedTime),
 				UpdatedAt: utils.FormatTimestamp(fixedTime),
 				User: resources.MinimalUserResource{
@@ -85,6 +87,7 @@ func TestTransformReviews(t *testing.T) {
 					ID:             1,
 					Rate:           1,
 					Review:         "Bad game!",
+					Played:         true,
 					CreatedAt:      fixedTime,
 					UpdatedAt:      fixedTime,
 					ReviewableID:   1,
@@ -111,6 +114,7 @@ func TestTransformReviews(t *testing.T) {
 					ID:             2,
 					Rate:           5,
 					Review:         "Good game!",
+					Played:         false,
 					CreatedAt:      fixedTime,
 					UpdatedAt:      fixedTime,
 					ReviewableID:   1,
@@ -139,6 +143,7 @@ func TestTransformReviews(t *testing.T) {
 					ID:        1,
 					Rate:      1,
 					Review:    "Bad game!",
+					Played:    true,
 					CreatedAt: utils.FormatTimestamp(fixedTime),
 					UpdatedAt: utils.FormatTimestamp(fixedTime),
 					User: resources.MinimalUserResource{
@@ -154,6 +159,7 @@ func TestTransformReviews(t *testing.T) {
 					ID:        2,
 					Rate:      5,
 					Review:    "Good game!",
+					Played:    false,
 					CreatedAt: utils.FormatTimestamp(fixedTime),
 					UpdatedAt: utils.FormatTimestamp(fixedTime),
 					User: resources.MinimalUserResource{

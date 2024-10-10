@@ -11,6 +11,7 @@ type Reviewable struct {
 	ID             uint   `gorm:"primaryKey"`
 	Rate           uint   `gorm:"not nul;" validate:"required,numeric"`
 	Review         string `gorm:"size:255;not null" validate:"required"`
+	Played         bool   `gorm:"not null;default:false" validate:"boolean"`
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 	ReviewableID   uint   `gorm:"index"`
@@ -22,8 +23,7 @@ type Reviewable struct {
 func (r *Reviewable) ValidateReviewable() error {
 	Init()
 
-	err := validate.Struct(r)
-	if err != nil {
+	if err := validate.Struct(r); err != nil {
 		return FormatValidationError(err)
 	}
 

@@ -20,10 +20,11 @@ func TestCreateDLCStore(t *testing.T) {
 	}{
 		"Success": {
 			DLCStore: domain.DLCStore{
-				Price:   2200,
-				URL:     "https://google.com",
-				DLCID:   1,
-				StoreID: 1,
+				Price:     2200,
+				URL:       "https://google.com",
+				DLCID:     1,
+				StoreID:   1,
+				StorDLCID: "1",
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, DLCStore domain.DLCStore) {
 				mock.ExpectBegin()
@@ -36,6 +37,7 @@ func TestCreateDLCStore(t *testing.T) {
 						DLCStore.URL,
 						DLCStore.DLCID,
 						DLCStore.StoreID,
+						DLCStore.StorDLCID,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -44,10 +46,11 @@ func TestCreateDLCStore(t *testing.T) {
 		},
 		"Failure - Insert Error": {
 			DLCStore: domain.DLCStore{
-				Price:   2200,
-				URL:     "https://google.com",
-				DLCID:   1,
-				StoreID: 1,
+				Price:     2200,
+				URL:       "https://google.com",
+				DLCID:     1,
+				StoreID:   1,
+				StorDLCID: "1",
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, DLCStore domain.DLCStore) {
 				mock.ExpectBegin()
@@ -60,6 +63,7 @@ func TestCreateDLCStore(t *testing.T) {
 						DLCStore.URL,
 						DLCStore.DLCID,
 						DLCStore.StoreID,
+						DLCStore.StorDLCID,
 					).
 					WillReturnError(fmt.Errorf("some error"))
 				mock.ExpectRollback()
@@ -104,6 +108,7 @@ func TestUpdateDLCStore(t *testing.T) {
 				URL:       "https://google.com",
 				DLCID:     1,
 				StoreID:   1,
+				StorDLCID: "1",
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
 			},
@@ -118,6 +123,7 @@ func TestUpdateDLCStore(t *testing.T) {
 						DLCStore.URL,
 						DLCStore.DLCID,
 						DLCStore.StoreID,
+						DLCStore.StorDLCID,
 						DLCStore.ID,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
@@ -132,6 +138,7 @@ func TestUpdateDLCStore(t *testing.T) {
 				URL:       "https://google.com",
 				DLCID:     1,
 				StoreID:   1,
+				StorDLCID: "1",
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
 			},
@@ -146,6 +153,7 @@ func TestUpdateDLCStore(t *testing.T) {
 						DLCStore.URL,
 						DLCStore.DLCID,
 						DLCStore.StoreID,
+						DLCStore.StorDLCID,
 						DLCStore.ID,
 					).
 					WillReturnError(fmt.Errorf("some error"))
@@ -232,8 +240,9 @@ func TestValidateDLCStore(t *testing.T) {
 	}{
 		"Can empty validations errors": {
 			DLCStore: domain.DLCStore{
-				Price: 2200,
-				URL:   "https://google.com",
+				Price:     2200,
+				URL:       "https://google.com",
+				StorDLCID: "1",
 				DLC: domain.DLC{
 					Name:        "Game Science",
 					Cover:       "https://google.com",
@@ -286,6 +295,8 @@ func TestCreateDLCStoreWithMissingFields(t *testing.T) {
 		"Missing required fields": {
 			DLCStore: domain.DLCStore{},
 			wantErr: `
+				Price is a required field,
+				URL is a required field,
 				Name is a required field,
 				Cover is a required field,
 				Age is a required field,
@@ -296,7 +307,12 @@ func TestCreateDLCStoreWithMissingFields(t *testing.T) {
 				About is a required field,
 				Description is a required field,
 				ShortDescription is a required field,
-				ReleaseDate is a required field
+				ReleaseDate is a required field,
+				Name is a required field,
+				URL is a required field,
+				Slug is a required field,
+				Logo is a required field,
+				StorDLCID is a required field
 			`,
 		},
 	}

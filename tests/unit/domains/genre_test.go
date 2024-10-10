@@ -21,6 +21,7 @@ func TestCreateGenre(t *testing.T) {
 		"Success": {
 			genre: domain.Genre{
 				Name: "Genre 1",
+				Slug: "genre-1",
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, genre domain.Genre) {
 				mock.ExpectBegin()
@@ -30,6 +31,7 @@ func TestCreateGenre(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						genre.Name,
+						genre.Slug,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -39,6 +41,7 @@ func TestCreateGenre(t *testing.T) {
 		"Failure - Insert Error": {
 			genre: domain.Genre{
 				Name: "Failure",
+				Slug: "failure",
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, genre domain.Genre) {
 				mock.ExpectBegin()
@@ -48,6 +51,7 @@ func TestCreateGenre(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						genre.Name,
+						genre.Slug,
 					).
 					WillReturnError(fmt.Errorf("some error"))
 				mock.ExpectRollback()
@@ -89,6 +93,7 @@ func TestUpdateGenre(t *testing.T) {
 			genre: domain.Genre{
 				ID:        1,
 				Name:      "Genre 1",
+				Slug:      "genre-1",
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
 			},
@@ -100,6 +105,7 @@ func TestUpdateGenre(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						genre.Name,
+						genre.Slug,
 						genre.ID,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
@@ -111,6 +117,7 @@ func TestUpdateGenre(t *testing.T) {
 			genre: domain.Genre{
 				ID:        1,
 				Name:      "Genre 1",
+				Slug:      "genre-1",
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
 			},
@@ -122,6 +129,7 @@ func TestUpdateGenre(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						genre.Name,
+						genre.Slug,
 						genre.ID,
 					).
 					WillReturnError(fmt.Errorf("some error"))
@@ -262,6 +270,7 @@ func TestValidateGenreValidData(t *testing.T) {
 		"Can empty validations errors": {
 			genre: domain.Genre{
 				Name: "Genre 1",
+				Slug: "genre-1",
 			},
 		},
 	}
@@ -281,7 +290,7 @@ func TestCreateGenreWithMissingFields(t *testing.T) {
 	}{
 		"Missing required fields": {
 			genre:   domain.Genre{},
-			wantErr: "Name is a required field",
+			wantErr: "Name is a required field, Slug is a required field",
 		},
 	}
 

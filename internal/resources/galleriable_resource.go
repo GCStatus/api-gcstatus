@@ -9,13 +9,15 @@ import (
 )
 
 type GalleriableResource struct {
-	ID   uint   `json:"id"`
-	Path string `json:"path"`
+	ID        uint              `json:"id"`
+	Path      string            `json:"path"`
+	MediaType MediaTypeResource `json:"media_type"`
 }
 
 func TransformGalleriable(galleriable domain.Galleriable, s3Client s3.S3ClientInterface) GalleriableResource {
 	resource := GalleriableResource{
-		ID: galleriable.ID,
+		ID:        galleriable.ID,
+		MediaType: TransformMediaType(galleriable.MediaType),
 	}
 
 	if galleriable.S3 {

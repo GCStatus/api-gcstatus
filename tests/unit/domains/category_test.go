@@ -21,6 +21,7 @@ func TestCreateCategory(t *testing.T) {
 		"Success": {
 			category: domain.Category{
 				Name: "Category 1",
+				Slug: "category-1",
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, category domain.Category) {
 				mock.ExpectBegin()
@@ -30,6 +31,7 @@ func TestCreateCategory(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						category.Name,
+						category.Slug,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -39,6 +41,7 @@ func TestCreateCategory(t *testing.T) {
 		"Failure - Insert Error": {
 			category: domain.Category{
 				Name: "Failure",
+				Slug: "failure",
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, category domain.Category) {
 				mock.ExpectBegin()
@@ -48,6 +51,7 @@ func TestCreateCategory(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						category.Name,
+						category.Slug,
 					).
 					WillReturnError(fmt.Errorf("some error"))
 				mock.ExpectRollback()
@@ -89,6 +93,7 @@ func TestUpdateCategory(t *testing.T) {
 			category: domain.Category{
 				ID:        1,
 				Name:      "Category 1",
+				Slug:      "category-1",
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
 			},
@@ -100,6 +105,7 @@ func TestUpdateCategory(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						category.Name,
+						category.Slug,
 						category.ID,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
@@ -111,6 +117,7 @@ func TestUpdateCategory(t *testing.T) {
 			category: domain.Category{
 				ID:        1,
 				Name:      "Category 1",
+				Slug:      "category-1",
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
 			},
@@ -122,6 +129,7 @@ func TestUpdateCategory(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						category.Name,
+						category.Slug,
 						category.ID,
 					).
 					WillReturnError(fmt.Errorf("some error"))
@@ -262,6 +270,7 @@ func TestValidateCategoryValidData(t *testing.T) {
 		"Can empty validations errors": {
 			category: domain.Category{
 				Name: "Category 1",
+				Slug: "category-1",
 			},
 		},
 	}
@@ -281,7 +290,7 @@ func TestCreateCategoryWithMissingFields(t *testing.T) {
 	}{
 		"Missing required fields": {
 			category: domain.Category{},
-			wantErr:  "Name is a required field",
+			wantErr:  "Name is a required field, Slug is a required field",
 		},
 	}
 

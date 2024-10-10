@@ -21,6 +21,7 @@ func TestCreateTag(t *testing.T) {
 		"Success": {
 			tag: domain.Tag{
 				Name: "Tag 1",
+				Slug: "tag-1",
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, tag domain.Tag) {
 				mock.ExpectBegin()
@@ -30,6 +31,7 @@ func TestCreateTag(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						tag.Name,
+						tag.Slug,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -39,6 +41,7 @@ func TestCreateTag(t *testing.T) {
 		"Failure - Insert Error": {
 			tag: domain.Tag{
 				Name: "Failure",
+				Slug: "failure",
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, tag domain.Tag) {
 				mock.ExpectBegin()
@@ -48,6 +51,7 @@ func TestCreateTag(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						tag.Name,
+						tag.Slug,
 					).
 					WillReturnError(fmt.Errorf("some error"))
 				mock.ExpectRollback()
@@ -89,6 +93,7 @@ func TestUpdateTag(t *testing.T) {
 			tag: domain.Tag{
 				ID:        1,
 				Name:      "Tag 1",
+				Slug:      "tag-1",
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
 			},
@@ -100,6 +105,7 @@ func TestUpdateTag(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						tag.Name,
+						tag.Slug,
 						tag.ID,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
@@ -111,6 +117,7 @@ func TestUpdateTag(t *testing.T) {
 			tag: domain.Tag{
 				ID:        1,
 				Name:      "Tag 1",
+				Slug:      "tag-1",
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
 			},
@@ -122,6 +129,7 @@ func TestUpdateTag(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						tag.Name,
+						tag.Slug,
 						tag.ID,
 					).
 					WillReturnError(fmt.Errorf("some error"))
@@ -262,6 +270,7 @@ func TestValidateTagValidData(t *testing.T) {
 		"Can empty validations errors": {
 			tag: domain.Tag{
 				Name: "Tag 1",
+				Slug: "tag-1",
 			},
 		},
 	}
@@ -281,7 +290,7 @@ func TestCreateTagWithMissingFields(t *testing.T) {
 	}{
 		"Missing required fields": {
 			tag:     domain.Tag{},
-			wantErr: "Name is a required field",
+			wantErr: "Name is a required field, Slug is a required field",
 		},
 	}
 

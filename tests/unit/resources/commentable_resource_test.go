@@ -13,9 +13,178 @@ func TestTransformCommentable(t *testing.T) {
 	formattedTime := utils.FormatTimestamp(fixedTime)
 
 	testCases := map[string]struct {
+		userID   uint
 		input    domain.Commentable
 		expected resources.CommentableResource
 	}{
+		"liked reply": {
+			input: domain.Commentable{
+				ID:        1,
+				Comment:   "Fake comment",
+				CreatedAt: fixedTime,
+				UpdatedAt: fixedTime,
+				User: domain.User{
+					ID:        1,
+					Name:      "John Doe",
+					Email:     "johndoe@example.com",
+					Nickname:  "johnny",
+					CreatedAt: fixedTime,
+					Profile: domain.Profile{
+						Share: true,
+						Photo: "photo-key-1",
+					},
+				},
+				Replies: []domain.Commentable{
+					{
+						ID:        1,
+						Comment:   "Fake comment",
+						CreatedAt: fixedTime,
+						UpdatedAt: fixedTime,
+						User: domain.User{
+							ID:        1,
+							Name:      "John Doe",
+							Email:     "johndoe@example.com",
+							Nickname:  "johnny",
+							CreatedAt: fixedTime,
+							Profile: domain.Profile{
+								Share: true,
+								Photo: "photo-key-1",
+							},
+						},
+						Hearts: []domain.Heartable{
+							{
+								ID:            1,
+								HeartableID:   1,
+								HeartableType: "commentables",
+								UserID:        1,
+							},
+						},
+					},
+				},
+			},
+			expected: resources.CommentableResource{
+				ID:          1,
+				Comment:     "Fake comment",
+				CreatedAt:   formattedTime,
+				HeartsCount: 0,
+				IsHearted:   false,
+				UpdatedAt:   formattedTime,
+				By: resources.MinimalUserResource{
+					ID:        1,
+					Name:      "John Doe",
+					Photo:     utils.StringPtr("https://mock-presigned-url.com/photo-key-1"),
+					Email:     "johndoe@example.com",
+					Nickname:  "johnny",
+					CreatedAt: formattedTime,
+				},
+				Replies: []resources.CommentableResource{
+					{
+						ID:          1,
+						Comment:     "Fake comment",
+						CreatedAt:   formattedTime,
+						HeartsCount: 1,
+						IsHearted:   true,
+						UpdatedAt:   formattedTime,
+						By: resources.MinimalUserResource{
+							ID:        1,
+							Name:      "John Doe",
+							Photo:     utils.StringPtr("https://mock-presigned-url.com/photo-key-1"),
+							Email:     "johndoe@example.com",
+							Nickname:  "johnny",
+							CreatedAt: formattedTime,
+						},
+					},
+				},
+			},
+		},
+		"not liked comment": {
+			input: domain.Commentable{
+				ID:        1,
+				Comment:   "Fake comment",
+				CreatedAt: fixedTime,
+				UpdatedAt: fixedTime,
+				User: domain.User{
+					ID:        1,
+					Name:      "John Doe",
+					Email:     "johndoe@example.com",
+					Nickname:  "johnny",
+					CreatedAt: fixedTime,
+					Profile: domain.Profile{
+						Share: true,
+						Photo: "photo-key-1",
+					},
+				},
+				Hearts: []domain.Heartable{
+					{
+						ID:            1,
+						HeartableID:   1,
+						HeartableType: "commentables",
+						UserID:        2,
+					},
+				},
+			},
+			expected: resources.CommentableResource{
+				ID:          1,
+				Comment:     "Fake comment",
+				CreatedAt:   formattedTime,
+				HeartsCount: 1,
+				IsHearted:   false,
+				UpdatedAt:   formattedTime,
+				By: resources.MinimalUserResource{
+					ID:        1,
+					Name:      "John Doe",
+					Photo:     utils.StringPtr("https://mock-presigned-url.com/photo-key-1"),
+					Email:     "johndoe@example.com",
+					Nickname:  "johnny",
+					CreatedAt: formattedTime,
+				},
+				Replies: []resources.CommentableResource{},
+			},
+		},
+		"liked comment": {
+			input: domain.Commentable{
+				ID:        1,
+				Comment:   "Fake comment",
+				CreatedAt: fixedTime,
+				UpdatedAt: fixedTime,
+				User: domain.User{
+					ID:        1,
+					Name:      "John Doe",
+					Email:     "johndoe@example.com",
+					Nickname:  "johnny",
+					CreatedAt: fixedTime,
+					Profile: domain.Profile{
+						Share: true,
+						Photo: "photo-key-1",
+					},
+				},
+				Hearts: []domain.Heartable{
+					{
+						ID:            1,
+						HeartableID:   1,
+						HeartableType: "commentables",
+						UserID:        1,
+					},
+				},
+			},
+			expected: resources.CommentableResource{
+				ID:          1,
+				Comment:     "Fake comment",
+				CreatedAt:   formattedTime,
+				HeartsCount: 1,
+				IsHearted:   true,
+				UpdatedAt:   formattedTime,
+				By: resources.MinimalUserResource{
+					ID:        1,
+					Name:      "John Doe",
+					Photo:     utils.StringPtr("https://mock-presigned-url.com/photo-key-1"),
+					Email:     "johndoe@example.com",
+					Nickname:  "johnny",
+					CreatedAt: formattedTime,
+				},
+				Replies: []resources.CommentableResource{},
+			},
+		},
 		"without replies": {
 			input: domain.Commentable{
 				ID:        1,
@@ -118,7 +287,7 @@ func TestTransformCommentable(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			mockS3Client := &MockS3Client{}
-			result := resources.TransformCommentable(tc.input, mockS3Client)
+			result := resources.TransformCommentable(tc.input, mockS3Client, tc.userID)
 
 			if !compareCommentableResources(tc.expected, result) {
 				t.Errorf("Expected %+v, got %+v", tc.expected, result)

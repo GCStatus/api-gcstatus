@@ -39,7 +39,7 @@ func (h *GameHandler) FindBySlug(c *gin.Context) {
 		return
 	}
 
-	transformedGame := resources.TransformGame(game, s3.GlobalS3Client)
+	transformedGame := resources.TransformGame(game, s3.GlobalS3Client, user.ID)
 
 	response := resources.Response{
 		Data: transformedGame,

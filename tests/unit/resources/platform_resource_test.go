@@ -23,12 +23,14 @@ func TestTransformPlatform(t *testing.T) {
 			input: domain.Platform{
 				ID:        1,
 				Name:      "Platform 1",
+				Slug:      "platform-1",
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
 			},
 			expected: resources.PlatformResource{
 				ID:   1,
 				Name: "Platform 1",
+				Slug: "platform-1",
 			},
 		},
 	}
@@ -62,12 +64,14 @@ func TestTransformPlatforms(t *testing.T) {
 				{
 					ID:        1,
 					Name:      "Platform 1",
+					Slug:      "platform-1",
 					CreatedAt: fixedTime,
 					UpdatedAt: fixedTime,
 				},
 				{
 					ID:        2,
 					Name:      "Platform 2",
+					Slug:      "platform-2",
 					CreatedAt: fixedTime,
 					UpdatedAt: fixedTime,
 				},
@@ -76,10 +80,12 @@ func TestTransformPlatforms(t *testing.T) {
 				{
 					ID:   1,
 					Name: "Platform 1",
+					Slug: "platform-1",
 				},
 				{
 					ID:   2,
 					Name: "Platform 2",
+					Slug: "platform-2",
 				},
 			},
 		},

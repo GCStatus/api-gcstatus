@@ -21,6 +21,7 @@ func TestCreatePlatform(t *testing.T) {
 		"Success": {
 			platform: domain.Platform{
 				Name: "Platform 1",
+				Slug: "platform-1",
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, platform domain.Platform) {
 				mock.ExpectBegin()
@@ -30,6 +31,7 @@ func TestCreatePlatform(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						platform.Name,
+						platform.Slug,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -39,6 +41,7 @@ func TestCreatePlatform(t *testing.T) {
 		"Failure - Insert Error": {
 			platform: domain.Platform{
 				Name: "Failure",
+				Slug: "failure",
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, platform domain.Platform) {
 				mock.ExpectBegin()
@@ -48,6 +51,7 @@ func TestCreatePlatform(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						platform.Name,
+						platform.Slug,
 					).
 					WillReturnError(fmt.Errorf("some error"))
 				mock.ExpectRollback()
@@ -89,6 +93,7 @@ func TestUpdatePlatform(t *testing.T) {
 			platform: domain.Platform{
 				ID:        1,
 				Name:      "Platform 1",
+				Slug:      "platform-1",
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
 			},
@@ -100,6 +105,7 @@ func TestUpdatePlatform(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						platform.Name,
+						platform.Slug,
 						platform.ID,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
@@ -111,6 +117,7 @@ func TestUpdatePlatform(t *testing.T) {
 			platform: domain.Platform{
 				ID:        1,
 				Name:      "Platform 1",
+				Slug:      "platform-1",
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
 			},
@@ -122,6 +129,7 @@ func TestUpdatePlatform(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						platform.Name,
+						platform.Slug,
 						platform.ID,
 					).
 					WillReturnError(fmt.Errorf("some error"))
@@ -262,6 +270,7 @@ func TestValidatePlatformValidData(t *testing.T) {
 		"Can empty validations errors": {
 			platform: domain.Platform{
 				Name: "Platform 1",
+				Slug: "platform-1",
 			},
 		},
 	}
@@ -281,7 +290,7 @@ func TestCreatePlatformWithMissingFields(t *testing.T) {
 	}{
 		"Missing required fields": {
 			platform: domain.Platform{},
-			wantErr:  "Name is a required field",
+			wantErr:  "Name is a required field, Slug is a required field",
 		},
 	}
 

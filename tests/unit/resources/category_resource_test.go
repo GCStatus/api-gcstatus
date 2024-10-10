@@ -23,12 +23,14 @@ func TestTransformCategory(t *testing.T) {
 			input: domain.Category{
 				ID:        1,
 				Name:      "Category 1",
+				Slug:      "category-1",
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
 			},
 			expected: resources.CategoryResource{
 				ID:   1,
 				Name: "Category 1",
+				Slug: "category-1",
 			},
 		},
 	}
@@ -62,12 +64,14 @@ func TestTransformCategories(t *testing.T) {
 				{
 					ID:        1,
 					Name:      "Category 1",
+					Slug:      "category-1",
 					CreatedAt: fixedTime,
 					UpdatedAt: fixedTime,
 				},
 				{
 					ID:        2,
 					Name:      "Category 2",
+					Slug:      "category-2",
 					CreatedAt: fixedTime,
 					UpdatedAt: fixedTime,
 				},
@@ -76,10 +80,12 @@ func TestTransformCategories(t *testing.T) {
 				{
 					ID:   1,
 					Name: "Category 1",
+					Slug: "category-1",
 				},
 				{
 					ID:   2,
 					Name: "Category 2",
+					Slug: "category-2",
 				},
 			},
 		},

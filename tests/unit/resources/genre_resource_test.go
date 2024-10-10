@@ -23,12 +23,14 @@ func TestTransformGenre(t *testing.T) {
 			input: domain.Genre{
 				ID:        1,
 				Name:      "Genre 1",
+				Slug:      "genre-1",
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
 			},
 			expected: resources.GenreResource{
 				ID:   1,
 				Name: "Genre 1",
+				Slug: "genre-1",
 			},
 		},
 	}
@@ -62,12 +64,14 @@ func TestTransformGenres(t *testing.T) {
 				{
 					ID:        1,
 					Name:      "Genre 1",
+					Slug:      "genre-1",
 					CreatedAt: fixedTime,
 					UpdatedAt: fixedTime,
 				},
 				{
 					ID:        2,
 					Name:      "Genre 2",
+					Slug:      "genre-2",
 					CreatedAt: fixedTime,
 					UpdatedAt: fixedTime,
 				},
@@ -76,10 +80,12 @@ func TestTransformGenres(t *testing.T) {
 				{
 					ID:   1,
 					Name: "Genre 1",
+					Slug: "genre-1",
 				},
 				{
 					ID:   2,
 					Name: "Genre 2",
+					Slug: "genre-2",
 				},
 			},
 		},

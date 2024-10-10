@@ -5,12 +5,14 @@ import "gcstatus/internal/domain"
 type GenreResource struct {
 	ID   uint   `json:"id"`
 	Name string `json:"name"`
+	Slug string `json:"slug"`
 }
 
 func TransformGenre(genre domain.Genre) GenreResource {
 	return GenreResource{
 		ID:   genre.ID,
 		Name: genre.Name,
+		Slug: genre.Slug,
 	}
 }
 

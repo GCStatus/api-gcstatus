@@ -10,6 +10,7 @@ type ReviewResource struct {
 	ID        uint                `json:"id"`
 	Rate      uint                `json:"rate"`
 	Review    string              `json:"review"`
+	Played    bool                `json:"played"`
 	CreatedAt string              `json:"created_at"`
 	UpdatedAt string              `json:"updated_at"`
 	User      MinimalUserResource `json:"user"`
@@ -20,6 +21,7 @@ func TransformReview(review domain.Reviewable, s3Client s3.S3ClientInterface) Re
 		ID:        review.ID,
 		Rate:      review.Rate,
 		Review:    review.Review,
+		Played:    review.Played,
 		CreatedAt: utils.FormatTimestamp(review.CreatedAt),
 		UpdatedAt: utils.FormatTimestamp(review.UpdatedAt),
 	}

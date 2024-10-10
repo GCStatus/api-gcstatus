@@ -22,6 +22,7 @@ type GameResource struct {
 	ReleaseDate      string                 `json:"release_date"`
 	ViewsCount       uint                   `json:"views_count"`
 	HeartsCount      uint                   `json:"hearts_count"`
+	IsHearted        bool                   `json:"is_hearted"`
 	CreatedAt        string                 `json:"created_at"`
 	UpdatedAt        string                 `json:"updated_at"`
 	Categories       []CategoryResource     `json:"categories"`
@@ -43,7 +44,7 @@ type GameResource struct {
 	Support          *SupportResource       `json:"support"`
 }
 
-func TransformGame(game domain.Game, s3Client s3.S3ClientInterface) GameResource {
+func TransformGame(game domain.Game, s3Client s3.S3ClientInterface, userID uint) GameResource {
 	resource := GameResource{
 		ID:               game.ID,
 		Age:              uint(game.Age),
@@ -53,6 +54,7 @@ func TransformGame(game domain.Game, s3Client s3.S3ClientInterface) GameResource
 		Cover:            game.Cover,
 		About:            game.About,
 		Description:      game.Description,
+		IsHearted:        false,
 		ShortDescription: game.ShortDescription,
 		Free:             game.Free,
 		Legal:            game.Legal,
@@ -76,7 +78,7 @@ func TransformGame(game domain.Game, s3Client s3.S3ClientInterface) GameResource
 	resource.Reviews = transformReviews(game.Reviews, s3Client)
 	resource.Critics = transformCritics(game.Critics)
 	resource.Stores = transformStores(game.Stores)
-	resource.Comments = transformComments(game.Comments, s3Client)
+	resource.Comments = transformComments(game.Comments, s3Client, userID)
 	resource.Galleries = transformGalleries(game.Galleries, s3Client)
 	resource.DLCs = transformDLCs(game.DLCs, s3Client)
 
@@ -88,16 +90,23 @@ func TransformGame(game domain.Game, s3Client s3.S3ClientInterface) GameResource
 		resource.Support = TransformSupport(game.Support)
 	}
 
+	heartsMap := make(map[uint]bool)
+	for _, heart := range game.Hearts {
+		heartsMap[heart.UserID] = true
+	}
+
+	resource.IsHearted = heartsMap[userID]
+
 	return resource
 }
 
-func TransformGames(games []domain.Game, s3Client s3.S3ClientInterface) []GameResource {
+func TransformGames(games []domain.Game, s3Client s3.S3ClientInterface, userID uint) []GameResource {
 	var resources []GameResource
 
 	resources = make([]GameResource, 0, len(games))
 
 	for _, game := range games {
-		resources = append(resources, TransformGame(game, s3Client))
+		resources = append(resources, TransformGame(game, s3Client, userID))
 	}
 
 	return resources
@@ -235,11 +244,11 @@ func transformStores(stores []domain.GameStore) []GameStoreResource {
 	return storeResources
 }
 
-func transformComments(comments []domain.Commentable, s3Client s3.S3ClientInterface) []CommentableResource {
+func transformComments(comments []domain.Commentable, s3Client s3.S3ClientInterface, userID uint) []CommentableResource {
 	commentResources := make([]CommentableResource, 0)
 	for _, c := range comments {
 		if c.ID != 0 {
-			commentResources = append(commentResources, TransformCommentable(c, s3Client))
+			commentResources = append(commentResources, TransformCommentable(c, s3Client, userID))
 		}
 	}
 

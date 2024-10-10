@@ -8,11 +8,13 @@ import (
 
 type Galleriable struct {
 	gorm.Model
-	ID              uint   `gorm:"primaryKey"`
-	S3              bool   `gorm:"not null;default:false" validate:"boolean"`
-	Path            string `gorm:"size:255;not null" validate:"required"`
-	GalleriableID   uint   `gorm:"index"`
-	GalleriableType string `gorm:"index"`
+	ID              uint      `gorm:"primaryKey"`
+	S3              bool      `gorm:"not null;default:false" validate:"boolean"`
+	Path            string    `gorm:"size:255;not null" validate:"required"`
+	GalleriableID   uint      `gorm:"index"`
+	GalleriableType string    `gorm:"index"`
+	MediaTypeID     uint      `gorm:"constraint:OnDelete:SET NULL,OnUpdate:CASCADE;"`
+	MediaType       MediaType `gorm:"foreignKey:MediaTypeID;references:ID"`
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 }

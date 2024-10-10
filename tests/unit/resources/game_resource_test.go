@@ -14,10 +14,144 @@ func TestTransformGame(t *testing.T) {
 	fixedTime := time.Now()
 
 	testCases := map[string]struct {
+		userID   uint
 		input    domain.Game
 		expected resources.GameResource
 	}{
+		"not liked game": {
+			userID: 1,
+			input: domain.Game{
+				ID:               1,
+				Age:              16,
+				Slug:             "test-game",
+				Title:            "Test Game",
+				Condition:        "New",
+				Cover:            "test-cover.jpg",
+				About:            "About Test Game",
+				Description:      "Detailed description of Test Game",
+				ShortDescription: "Short description",
+				Free:             true,
+				Legal:            utils.StringPtr("Some legal info"),
+				Website:          utils.StringPtr("http://testgame.com"),
+				ReleaseDate:      fixedTime,
+				CreatedAt:        fixedTime,
+				UpdatedAt:        fixedTime,
+				Categories:       []domain.Categoriable{},
+				Platforms:        []domain.Platformable{},
+				Genres:           []domain.Genreable{},
+				Tags:             []domain.Taggable{},
+				Hearts: []domain.Heartable{
+					{
+						ID:            1,
+						HeartableID:   1,
+						HeartableType: "games",
+						UserID:        2,
+					},
+				},
+			},
+			expected: resources.GameResource{
+				ID:               1,
+				Age:              16,
+				Slug:             "test-game",
+				Title:            "Test Game",
+				Condition:        "New",
+				Cover:            "test-cover.jpg",
+				About:            "About Test Game",
+				Description:      "Detailed description of Test Game",
+				ShortDescription: "Short description",
+				Free:             true,
+				HeartsCount:      1,
+				Legal:            utils.StringPtr("Some legal info"),
+				Website:          utils.StringPtr("http://testgame.com"),
+				IsHearted:        false,
+				ReleaseDate:      utils.FormatTimestamp(fixedTime),
+				CreatedAt:        utils.FormatTimestamp(fixedTime),
+				UpdatedAt:        utils.FormatTimestamp(fixedTime),
+				Categories:       []resources.CategoryResource{},
+				Platforms:        []resources.PlatformResource{},
+				Genres:           []resources.GenreResource{},
+				Tags:             []resources.TagResource{},
+				Languages:        []resources.GameLanguageResource{},
+				Requirements:     []resources.RequirementResource{},
+				Torrents:         []resources.TorrentResource{},
+				Publishers:       []resources.PublisherResource{},
+				Developers:       []resources.DeveloperResource{},
+				Reviews:          []resources.ReviewResource{},
+				Critics:          []resources.CriticableResource{},
+				Stores:           []resources.GameStoreResource{},
+				Comments:         []resources.CommentableResource{},
+				Galleries:        []resources.GalleriableResource{},
+				DLCs:             []resources.DLCResource{},
+			},
+		},
+		"liked game": {
+			userID: 1,
+			input: domain.Game{
+				ID:               1,
+				Age:              16,
+				Slug:             "test-game",
+				Title:            "Test Game",
+				Condition:        "New",
+				Cover:            "test-cover.jpg",
+				About:            "About Test Game",
+				Description:      "Detailed description of Test Game",
+				ShortDescription: "Short description",
+				Free:             true,
+				Legal:            utils.StringPtr("Some legal info"),
+				Website:          utils.StringPtr("http://testgame.com"),
+				ReleaseDate:      fixedTime,
+				CreatedAt:        fixedTime,
+				UpdatedAt:        fixedTime,
+				Categories:       []domain.Categoriable{},
+				Platforms:        []domain.Platformable{},
+				Genres:           []domain.Genreable{},
+				Tags:             []domain.Taggable{},
+				Hearts: []domain.Heartable{
+					{
+						ID:            1,
+						HeartableID:   1,
+						HeartableType: "games",
+						UserID:        1,
+					},
+				},
+			},
+			expected: resources.GameResource{
+				ID:               1,
+				Age:              16,
+				Slug:             "test-game",
+				Title:            "Test Game",
+				Condition:        "New",
+				Cover:            "test-cover.jpg",
+				About:            "About Test Game",
+				Description:      "Detailed description of Test Game",
+				ShortDescription: "Short description",
+				Free:             true,
+				HeartsCount:      1,
+				Legal:            utils.StringPtr("Some legal info"),
+				Website:          utils.StringPtr("http://testgame.com"),
+				IsHearted:        true,
+				ReleaseDate:      utils.FormatTimestamp(fixedTime),
+				CreatedAt:        utils.FormatTimestamp(fixedTime),
+				UpdatedAt:        utils.FormatTimestamp(fixedTime),
+				Categories:       []resources.CategoryResource{},
+				Platforms:        []resources.PlatformResource{},
+				Genres:           []resources.GenreResource{},
+				Tags:             []resources.TagResource{},
+				Languages:        []resources.GameLanguageResource{},
+				Requirements:     []resources.RequirementResource{},
+				Torrents:         []resources.TorrentResource{},
+				Publishers:       []resources.PublisherResource{},
+				Developers:       []resources.DeveloperResource{},
+				Reviews:          []resources.ReviewResource{},
+				Critics:          []resources.CriticableResource{},
+				Stores:           []resources.GameStoreResource{},
+				Comments:         []resources.CommentableResource{},
+				Galleries:        []resources.GalleriableResource{},
+				DLCs:             []resources.DLCResource{},
+			},
+		},
 		"No Morph Relations": {
+			userID: 1,
 			input: domain.Game{
 				ID:               1,
 				Age:              16,
@@ -47,9 +181,11 @@ func TestTransformGame(t *testing.T) {
 				Condition:        "New",
 				Cover:            "test-cover.jpg",
 				About:            "About Test Game",
+				HeartsCount:      0,
 				Description:      "Detailed description of Test Game",
 				ShortDescription: "Short description",
 				Free:             true,
+				IsHearted:        false,
 				Legal:            utils.StringPtr("Some legal info"),
 				Website:          utils.StringPtr("http://testgame.com"),
 				ReleaseDate:      utils.FormatTimestamp(fixedTime),
@@ -73,6 +209,7 @@ func TestTransformGame(t *testing.T) {
 			},
 		},
 		"With One Category": {
+			userID: 1,
 			input: domain.Game{
 				ID:          2,
 				Age:         18,
@@ -140,7 +277,7 @@ func TestTransformGame(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			mockS3Client := &MockS3Client{}
-			result := resources.TransformGame(tc.input, mockS3Client)
+			result := resources.TransformGame(tc.input, mockS3Client, tc.userID)
 			assert.Equal(t, tc.expected, result)
 		})
 	}
@@ -148,14 +285,17 @@ func TestTransformGame(t *testing.T) {
 
 func TestTransformGames(t *testing.T) {
 	testCases := map[string]struct {
+		userID   uint
 		input    []domain.Game
 		expected []resources.GameResource
 	}{
 		"Empty Game List": {
+			userID:   1,
 			input:    []domain.Game{},
 			expected: []resources.GameResource{},
 		},
 		"Single Game With No Morph Relations": {
+			userID: 1,
 			input: []domain.Game{
 				{
 					ID:               1,
@@ -215,6 +355,7 @@ func TestTransformGames(t *testing.T) {
 			},
 		},
 		"Multiple Games With Mixed Morph Relations": {
+			userID: 1,
 			input: []domain.Game{
 				{
 					ID:          2,
@@ -355,7 +496,7 @@ func TestTransformGames(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			mockS3Client := &MockS3Client{}
-			result := resources.TransformGames(tc.input, mockS3Client)
+			result := resources.TransformGames(tc.input, mockS3Client, tc.userID)
 			assert.Equal(t, tc.expected, result)
 		})
 	}

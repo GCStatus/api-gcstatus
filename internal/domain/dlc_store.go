@@ -15,6 +15,7 @@ type DLCStore struct {
 	DLC       DLC    `gorm:"foreignKey:DLCID;references:ID"`
 	StoreID   uint   `gorm:"constraint:OnDelete:SET NULL,OnUpdate:CASCADE;"`
 	Store     Store  `gorm:"foreignKey:StoreID;references:ID"`
+	StorDLCID string `gorm:"not null;" validate:"required"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
