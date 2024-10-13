@@ -3,7 +3,7 @@ package tests
 import (
 	"fmt"
 	"gcstatus/internal/domain"
-	"gcstatus/pkg/utils"
+	"gcstatus/internal/utils"
 	"gcstatus/tests"
 	"testing"
 	"time"
@@ -22,10 +22,14 @@ func TestCreateDLC(t *testing.T) {
 	}{
 		"Success": {
 			DLC: domain.DLC{
-				Name:        "Game Science",
-				Cover:       "https://google.com",
-				ReleaseDate: fixedTime,
-				GameID:      1,
+				Name:             "Game Science",
+				About:            "About DLC",
+				Description:      "DLC Description",
+				Free:             false,
+				ShortDescription: "Short DLC Description",
+				Cover:            "https://google.com",
+				ReleaseDate:      fixedTime,
+				GameID:           1,
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, DLC domain.DLC) {
 				mock.ExpectBegin()
@@ -36,6 +40,11 @@ func TestCreateDLC(t *testing.T) {
 						sqlmock.AnyArg(),
 						DLC.Name,
 						DLC.Cover,
+						DLC.About,
+						DLC.Description,
+						DLC.Free,
+						DLC.ShortDescription,
+						DLC.Legal,
 						DLC.ReleaseDate,
 						DLC.GameID,
 					).
@@ -46,10 +55,14 @@ func TestCreateDLC(t *testing.T) {
 		},
 		"Failure - Insert Error": {
 			DLC: domain.DLC{
-				Name:        "Game Science",
-				Cover:       "https://google.com",
-				ReleaseDate: fixedTime,
-				GameID:      1,
+				Name:             "Game Science",
+				About:            "About DLC",
+				Description:      "DLC Description",
+				ShortDescription: "Short DLC Description",
+				Free:             false,
+				Cover:            "https://google.com",
+				ReleaseDate:      fixedTime,
+				GameID:           1,
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, DLC domain.DLC) {
 				mock.ExpectBegin()
@@ -60,6 +73,11 @@ func TestCreateDLC(t *testing.T) {
 						sqlmock.AnyArg(),
 						DLC.Name,
 						DLC.Cover,
+						DLC.About,
+						DLC.Description,
+						DLC.Free,
+						DLC.ShortDescription,
+						DLC.Legal,
 						DLC.ReleaseDate,
 						DLC.GameID,
 					).
@@ -101,13 +119,17 @@ func TestUpdateDLC(t *testing.T) {
 	}{
 		"Success": {
 			DLC: domain.DLC{
-				ID:          1,
-				Name:        "Game Science",
-				Cover:       "https://google.com",
-				ReleaseDate: fixedTime,
-				GameID:      1,
-				CreatedAt:   fixedTime,
-				UpdatedAt:   fixedTime,
+				ID:               1,
+				Name:             "Game Science",
+				About:            "About DLC",
+				Description:      "DLC Description",
+				Free:             false,
+				ShortDescription: "Short DLC Description",
+				Cover:            "https://google.com",
+				ReleaseDate:      fixedTime,
+				GameID:           1,
+				CreatedAt:        fixedTime,
+				UpdatedAt:        fixedTime,
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, DLC domain.DLC) {
 				mock.ExpectBegin()
@@ -118,6 +140,11 @@ func TestUpdateDLC(t *testing.T) {
 						sqlmock.AnyArg(),
 						DLC.Name,
 						DLC.Cover,
+						DLC.About,
+						DLC.Description,
+						DLC.Free,
+						DLC.ShortDescription,
+						DLC.Legal,
 						DLC.ReleaseDate,
 						DLC.GameID,
 						DLC.ID,
@@ -129,13 +156,17 @@ func TestUpdateDLC(t *testing.T) {
 		},
 		"Failure - Update Error": {
 			DLC: domain.DLC{
-				ID:          1,
-				Name:        "Game Science",
-				Cover:       "https://google.com",
-				ReleaseDate: fixedTime,
-				GameID:      1,
-				CreatedAt:   fixedTime,
-				UpdatedAt:   fixedTime,
+				ID:               1,
+				Name:             "Game Science",
+				About:            "About DLC",
+				Free:             false,
+				Description:      "DLC Description",
+				ShortDescription: "Short DLC Description",
+				Cover:            "https://google.com",
+				ReleaseDate:      fixedTime,
+				GameID:           1,
+				CreatedAt:        fixedTime,
+				UpdatedAt:        fixedTime,
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, DLC domain.DLC) {
 				mock.ExpectBegin()
@@ -146,6 +177,11 @@ func TestUpdateDLC(t *testing.T) {
 						sqlmock.AnyArg(),
 						DLC.Name,
 						DLC.Cover,
+						DLC.About,
+						DLC.Description,
+						DLC.Free,
+						DLC.ShortDescription,
+						DLC.Legal,
 						DLC.ReleaseDate,
 						DLC.GameID,
 						DLC.ID,
@@ -234,9 +270,12 @@ func TestValidateDLC(t *testing.T) {
 	}{
 		"Can empty validations errors": {
 			DLC: domain.DLC{
-				Name:        "Game Science",
-				Cover:       "https://google.com",
-				ReleaseDate: fixedTime,
+				Name:             "Game Science",
+				About:            "About DLC",
+				Description:      "DLC Description",
+				ShortDescription: "Short DLC Description",
+				Cover:            "https://google.com",
+				ReleaseDate:      fixedTime,
 				Game: domain.Game{
 					Slug:             "valid",
 					Age:              18,
@@ -280,6 +319,9 @@ func TestCreateDLCWithMissingFields(t *testing.T) {
 			wantErr: `
 				Name is a required field,
 				Cover is a required field,
+				About is a required field,
+				Description is a required field,
+				ShortDescription is a required field,
 				Age is a required field,
 				Slug is a required field,
 				Title is a required field,

@@ -3,7 +3,7 @@ package usecases
 import (
 	"gcstatus/config"
 	"gcstatus/internal/ports"
-	"gcstatus/pkg/utils"
+	"gcstatus/internal/utils"
 	"strconv"
 	"time"
 

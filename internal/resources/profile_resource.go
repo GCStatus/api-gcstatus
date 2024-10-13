@@ -3,8 +3,8 @@ package resources
 import (
 	"context"
 	"gcstatus/internal/domain"
+	"gcstatus/internal/utils"
 	"gcstatus/pkg/s3"
-	"gcstatus/pkg/utils"
 	"log"
 	"time"
 )

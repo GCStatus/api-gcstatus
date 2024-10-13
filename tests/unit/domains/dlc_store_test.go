@@ -3,7 +3,7 @@ package tests
 import (
 	"fmt"
 	"gcstatus/internal/domain"
-	"gcstatus/pkg/utils"
+	"gcstatus/internal/utils"
 	"gcstatus/tests"
 	"testing"
 	"time"
@@ -244,9 +244,12 @@ func TestValidateDLCStore(t *testing.T) {
 				URL:       "https://google.com",
 				StorDLCID: "1",
 				DLC: domain.DLC{
-					Name:        "Game Science",
-					Cover:       "https://google.com",
-					ReleaseDate: fixedTime,
+					Name:             "Game Science",
+					About:            "About DLC",
+					Description:      "DLC Description",
+					ShortDescription: "Short DLC Description",
+					Cover:            "https://google.com",
+					ReleaseDate:      fixedTime,
 					Game: domain.Game{
 						Slug:             "valid",
 						Age:              18,
@@ -299,6 +302,9 @@ func TestCreateDLCStoreWithMissingFields(t *testing.T) {
 				URL is a required field,
 				Name is a required field,
 				Cover is a required field,
+				About is a required field,
+				Description is a required field,
+				ShortDescription is a required field,
 				Age is a required field,
 				Slug is a required field,
 				Title is a required field,

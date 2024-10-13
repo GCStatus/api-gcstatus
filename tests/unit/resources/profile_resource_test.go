@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/resources"
-	"gcstatus/pkg/utils"
+	"gcstatus/internal/utils"
 	"testing"
 	"time"
 

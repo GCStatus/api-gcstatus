@@ -6,6 +6,11 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	PhotoTypeID = 1
+	VideoTypeID = 2
+)
+
 type MediaType struct {
 	gorm.Model
 	ID        uint   `gorm:"primaryKey"`

@@ -3,7 +3,7 @@ package ses
 import (
 	"bytes"
 	"fmt"
-	"gcstatus/pkg/utils"
+	"gcstatus/internal/utils"
 	"html/template"
 )
 

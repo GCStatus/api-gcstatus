@@ -3,7 +3,7 @@ package tests
 import (
 	"gcstatus/internal/domain"
 	"gcstatus/internal/resources"
-	"gcstatus/pkg/utils"
+	"gcstatus/internal/utils"
 	"reflect"
 	"testing"
 	"time"
@@ -29,7 +29,7 @@ func TestTransformDLC(t *testing.T) {
 			expected: resources.DLCResource{
 				ID:          1,
 				Name:        "DLC 1",
-				Cover:       "https://mock-presigned-url.com/photo-key-1",
+				Cover:       "photo-key-1",
 				ReleaseDate: utils.FormatTimestamp(fixedTime),
 				Galleries:   []resources.GalleriableResource{},
 				Platforms:   []resources.PlatformResource{},
@@ -83,7 +83,7 @@ func TestTransformDLC(t *testing.T) {
 			expected: resources.DLCResource{
 				ID:          1,
 				Name:        "DLC 1",
-				Cover:       "https://mock-presigned-url.com/photo-key-1",
+				Cover:       "photo-key-1",
 				ReleaseDate: utils.FormatTimestamp(fixedTime),
 				Galleries: []resources.GalleriableResource{
 					{

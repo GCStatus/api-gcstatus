@@ -1,37 +1,35 @@
 package resources
 
 import (
-	"context"
 	"gcstatus/internal/domain"
+	"gcstatus/internal/utils"
 	"gcstatus/pkg/s3"
-	"gcstatus/pkg/utils"
-	"log"
-	"time"
 )
 
 type DLCResource struct {
-	ID          uint                  `json:"id"`
-	Name        string                `json:"name"`
-	Cover       string                `json:"cover"`
-	ReleaseDate string                `json:"release_date"`
-	Galleries   []GalleriableResource `json:"galleries"`
-	Platforms   []PlatformResource    `json:"platforms"`
-	Stores      []DLCStoreResource    `json:"stores"`
+	ID               uint                  `json:"id"`
+	Name             string                `json:"name"`
+	Cover            string                `json:"cover"`
+	About            string                `json:"about"`
+	Description      string                `json:"description"`
+	ShortDescription string                `json:"short_description"`
+	ReleaseDate      string                `json:"release_date"`
+	Galleries        []GalleriableResource `json:"galleries"`
+	Platforms        []PlatformResource    `json:"platforms"`
+	Stores           []DLCStoreResource    `json:"stores"`
 }
 
 func TransformDLC(DLC domain.DLC, s3Client s3.S3ClientInterface) DLCResource {
 	resource := DLCResource{
-		ID:          DLC.ID,
-		Name:        DLC.Name,
-		ReleaseDate: utils.FormatTimestamp(DLC.ReleaseDate),
+		ID:               DLC.ID,
+		Name:             DLC.Name,
+		Cover:            DLC.Cover,
+		About:            DLC.About,
+		Description:      DLC.Description,
+		ShortDescription: DLC.ShortDescription,
+		ReleaseDate:      utils.FormatTimestamp(DLC.ReleaseDate),
 	}
 
-	url, err := s3Client.GetPresignedURL(context.TODO(), DLC.Cover, time.Hour*3)
-	if err != nil {
-		log.Printf("Error generating presigned URL: %v", err)
-	}
-
-	resource.Cover = url
 	resource.Platforms = transformPlatforms(DLC.Platforms)
 	resource.Galleries = transformGalleries(DLC.Galleries, s3Client)
 	resource.Stores = transformDLCStores(DLC.Stores)

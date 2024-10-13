@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/resources"
-	"gcstatus/pkg/utils"
+	"gcstatus/internal/utils"
 	"log"
 	"testing"
 	"time"

@@ -3,7 +3,7 @@ package tests
 import (
 	"fmt"
 	"gcstatus/internal/domain"
-	"gcstatus/pkg/utils"
+	"gcstatus/internal/utils"
 	"gcstatus/tests"
 	"testing"
 	"time"

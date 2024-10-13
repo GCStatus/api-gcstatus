@@ -4,7 +4,7 @@ import (
 	"errors"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/ports"
-	"gcstatus/pkg/utils"
+	"gcstatus/internal/utils"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"

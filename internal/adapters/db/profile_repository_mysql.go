@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/ports"
-	"gcstatus/pkg/utils"
+	"gcstatus/internal/utils"
 
 	"gorm.io/gorm"
 )

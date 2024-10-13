@@ -7,8 +7,8 @@ import (
 	"gcstatus/internal/domain"
 	"gcstatus/internal/resources"
 	"gcstatus/internal/usecases"
+	"gcstatus/internal/utils"
 	"gcstatus/pkg/s3"
-	"gcstatus/pkg/utils"
 	"net/http"
 	"time"
 
