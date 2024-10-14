@@ -28,6 +28,7 @@ func main() {
 		notificationService,
 		missionService,
 		gameService,
+		bannerService,
 		db := di.InitDependencies()
 
 	// Setup routes with dependency injection
@@ -44,6 +45,7 @@ func main() {
 		notificationService,
 		missionService,
 		gameService,
+		bannerService,
 		db,
 	)
 

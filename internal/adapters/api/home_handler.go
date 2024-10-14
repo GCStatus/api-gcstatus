@@ -11,17 +11,20 @@ import (
 )
 
 type HomeHandler struct {
-	userService *usecases.UserService
-	gameService *usecases.GameService
+	userService   *usecases.UserService
+	gameService   *usecases.GameService
+	bannerService *usecases.BannerService
 }
 
 func NewHomeHandler(
 	userService *usecases.UserService,
 	gameService *usecases.GameService,
+	bannerService *usecases.BannerService,
 ) *HomeHandler {
 	return &HomeHandler{
-		userService: userService,
-		gameService: gameService,
+		userService:   userService,
+		gameService:   gameService,
+		bannerService: bannerService,
 	}
 }
 
@@ -39,6 +42,13 @@ func (h *HomeHandler) Home(c *gin.Context) {
 		return
 	}
 
+	banners, err := h.bannerService.GetBannersForHome()
+	if err != nil {
+		RespondWithError(c, http.StatusInternalServerError, "Failed to fetch banners: "+err.Error())
+		return
+	}
+
+	transformedBanners := resources.TransformBanners(banners, s3.GlobalS3Client, userID)
 	transformedHotGames := resources.TransformGames(hotGames, s3.GlobalS3Client, userID)
 	transformedPopularGames := resources.TransformGames(popularGames, s3.GlobalS3Client, userID)
 	transformedUpcomingGames := resources.TransformGames(upcomingGames, s3.GlobalS3Client, userID)
@@ -47,11 +57,12 @@ func (h *HomeHandler) Home(c *gin.Context) {
 
 	response := resources.Response{
 		Data: map[string]any{
+			"banners":          transformedBanners,
 			"hot":              transformedHotGames,
 			"popular":          transformedPopularGames,
+			"upcoming_games":   transformedUpcomingGames,
 			"most_liked_games": transformedMostLikedGames,
 			"next_release":     transformedNextGreatRelease,
-			"upcoming_games":   transformedUpcomingGames,
 		},
 	}
 

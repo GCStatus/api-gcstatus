@@ -25,6 +25,7 @@ func SetupRouter(
 	notificationService *usecases.NotificationService,
 	missionService *usecases.MissionService,
 	gameService *usecases.GameService,
+	bannerService *usecases.BannerService,
 	db *gorm.DB,
 ) *gin.Engine {
 	r := gin.Default()
@@ -70,6 +71,7 @@ func SetupRouter(
 		notificationService,
 		missionService,
 		gameService,
+		bannerService,
 		db,
 	)
 

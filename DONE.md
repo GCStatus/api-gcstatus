@@ -131,5 +131,12 @@
   - [x] Add game stores
 - [x] User heart on games
 - [x] User heart on comments or replies
+- [x] Create a method to receive all main data from API for HOME
+  - [x] Method should return home banners
+  - [x] Method should return 9 popular games
+  - [x] Method should return the next most awaited release (and should stay for one week as released)
+  - [x] Method should return 9 hot games
+  - [x] Method should return 9 most liked games
+  - [x] Method should return 9 upcoming games
 
 ### Post MVP

@@ -21,6 +21,7 @@ func InitHandlers(
 	notificationService *usecases.NotificationService,
 	missionService *usecases.MissionService,
 	gameService *usecases.GameService,
+	bannerService *usecases.BannerService,
 	db *gorm.DB,
 ) (
 	authHandler *api.AuthHandler,
@@ -46,7 +47,7 @@ func InitHandlers(
 	notificationHandler = api.NewNotificationHandler(notificationService, userService)
 	missionHandler = api.NewMissionHandler(missionService, userService)
 	gameHandler = api.NewGameHandler(gameService, userService)
-	homeHandler = api.NewHomeHandler(userService, gameService)
+	homeHandler = api.NewHomeHandler(userService, gameService, bannerService)
 	steamHandler = admin.NewSteamHandler(gameService, db)
 
 	return authHandler,
