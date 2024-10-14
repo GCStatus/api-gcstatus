@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"gcstatus/internal/usecases"
-	"gcstatus/pkg/utils"
+	"gcstatus/internal/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

@@ -7,7 +7,7 @@ import (
 
 	"gcstatus/internal/adapters/db"
 	"gcstatus/internal/ports"
-	"gcstatus/pkg/utils"
+	"gcstatus/internal/utils"
 	"gcstatus/tests"
 
 	"github.com/DATA-DOG/go-sqlmock"

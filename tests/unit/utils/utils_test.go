@@ -2,7 +2,7 @@ package tests
 
 import (
 	"errors"
-	"gcstatus/pkg/utils"
+	"gcstatus/internal/utils"
 	"testing"
 	"time"
 
@@ -332,6 +332,55 @@ func TestNormalizeWhitespace(t *testing.T) {
 			normalized := utils.NormalizeWhitespace(tc.toNormalize)
 
 			assert.Equal(t, normalized, tc.expectReturn)
+		})
+	}
+}
+
+func TestSlugify(t *testing.T) {
+	tests := map[string]struct {
+		input    string
+		expected string
+	}{
+		"simple string": {
+			input:    "Hello World",
+			expected: "hello-world",
+		},
+		"string with special chars": {
+			input:    "Hello World!",
+			expected: "hello-world",
+		},
+		"string with numbers": {
+			input:    "123 Hello World",
+			expected: "123-hello-world",
+		},
+		"multiple spaces": {
+			input:    "Hello    World",
+			expected: "hello----world",
+		},
+		"leading and trailing spaces": {
+			input:    "  Hello World  ",
+			expected: "hello-world",
+		},
+		"all caps": {
+			input:    "HELLO WORLD",
+			expected: "hello-world",
+		},
+		"empty string": {
+			input:    "",
+			expected: "",
+		},
+		"only special characters": {
+			input:    "@#$%",
+			expected: "",
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			result := utils.Slugify(tc.input)
+			if result != tc.expected {
+				t.Errorf("expected %s, got %s", tc.expected, result)
+			}
 		})
 	}
 }

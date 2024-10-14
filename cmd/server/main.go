@@ -1,14 +1,17 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"gcstatus/cmd/server/routes"
 	"gcstatus/di"
 	"gcstatus/internal/crons"
+	"gcstatus/internal/jobs"
 	"log"
 	"os"
 
 	"github.com/robfig/cron/v3"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -25,6 +28,7 @@ func main() {
 		notificationService,
 		missionService,
 		gameService,
+		bannerService,
 		db := di.InitDependencies()
 
 	// Setup routes with dependency injection
@@ -41,6 +45,8 @@ func main() {
 		notificationService,
 		missionService,
 		gameService,
+		bannerService,
+		db,
 	)
 
 	c := cron.New()
@@ -51,20 +57,42 @@ func main() {
 		log.Fatalf("Failed to start cron: %+v", err)
 	}
 
+	// Register command to populate database
+	populateSteamDBCmd := flag.Bool("populate-steam-db", false, "Populate the database with Steam games data")
+	populateSteamOneDBCmd := flag.Bool("populate-steam-db-one", false, "Populate the database with only one Steam game data")
+	appID := flag.Int("appID", 0, "App ID of the Steam game to populate (required if using populate-steam-db-one)")
+	flag.Parse()
+
 	// Start the cron scheduler
 	c.Start()
 
-	// Get port
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
-	// Log the port before starting the server
 	log.Printf("Starting server on port %s", port)
 
-	// Start the server
-	if err := r.Run(fmt.Sprintf(":%s", port)); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+	if *populateSteamDBCmd || *populateSteamOneDBCmd {
+		if *populateSteamDBCmd {
+			jobs.PopulateSteamDatabaseJob(db)
+			fmt.Println("Database population job executed via command.")
+		} else if *populateSteamOneDBCmd {
+			if *appID == 0 {
+				log.Fatalf("An appID is required when using -populate-steam-db-one")
+			}
+			jobs.FetchSteamOneByOneApp(db, *appID)
+			fmt.Println("Database population for only one app job executed via command.")
+		}
+	} else {
+		if err := r.Run(fmt.Sprintf(":%s", port)); err != nil {
+			log.Fatalf("Failed to start server: %v", err)
+		}
 	}
+}
+
+func BackgroundJobRunner(db *gorm.DB) {
+	go jobs.PopulateSteamDatabaseJob(db)
+
+	fmt.Println("Database population job started asynchronously.")
 }

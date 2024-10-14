@@ -2,7 +2,7 @@ package resources
 
 import (
 	"gcstatus/internal/domain"
-	"gcstatus/pkg/utils"
+	"gcstatus/internal/utils"
 )
 
 type MissionResource struct {

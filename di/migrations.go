@@ -60,7 +60,11 @@ func MigrateModels(dbConn *gorm.DB) {
 		&domain.Galleriable{},
 		&domain.DLC{},
 		&domain.DLCStore{},
+		&domain.DLCPublisher{},
+		&domain.DLCDeveloper{},
+		&domain.DLCLanguage{},
 		&domain.Game{},
+		&domain.Banner{},
 	}
 
 	for _, model := range models {

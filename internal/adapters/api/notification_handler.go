@@ -4,7 +4,7 @@ import (
 	"gcstatus/internal/errors"
 	"gcstatus/internal/resources"
 	"gcstatus/internal/usecases"
-	"gcstatus/pkg/utils"
+	"gcstatus/internal/utils"
 	"log"
 	"net/http"
 	"strconv"

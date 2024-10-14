@@ -22,32 +22,26 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Encrypts using AES encryption
 func Encrypt(encryptable string, key string) (string, error) {
-	// Create a new AES cipher using the secret key
 	block, err := aes.NewCipher([]byte(key))
 	if err != nil {
 		return "", err
 	}
 
-	// Create a GCM mode instance with the block cipher
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
 		return "", err
 	}
 
-	// Generate a nonce for AES-GCM encryption
 	nonce := make([]byte, gcm.NonceSize())
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
 		return "", err
 	}
 
-	// Encrypt the encryptable
 	ciphertext := gcm.Seal(nonce, nonce, []byte(encryptable), nil)
 	return hex.EncodeToString(ciphertext), nil
 }
 
-// Decrypts using AES encryption
 func Decrypt(decryptable string, key string) (string, error) {
 	block, err := aes.NewCipher([]byte(key))
 	if err != nil {
@@ -93,7 +87,6 @@ func ExtractAuthenticatedUser(c *gin.Context, fetchUser UserFetcher) (any, error
 		return nil, errors.New("failed to decrypt token")
 	}
 
-	// Parse and validate the JWT token
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("unexpected signing method")
@@ -127,6 +120,57 @@ func ExtractAuthenticatedUser(c *gin.Context, fetchUser UserFetcher) (any, error
 	}
 
 	return nil, errors.New("invalid token claims")
+}
+
+func GetAuthenticatedUserID(c *gin.Context, fetchUser UserFetcher) *uint {
+	env := config.LoadConfig()
+
+	encryptedToken, err := c.Cookie(env.AccessTokenKey)
+	if err != nil {
+		return nil
+	}
+
+	tokenString, err := Decrypt(encryptedToken, env.JwtSecret)
+	if err != nil {
+		return nil
+	}
+
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (any, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("unexpected signing method")
+		}
+		return []byte(env.JwtSecret), nil
+	})
+
+	if err != nil {
+		return nil
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		userID, exists := claims["user_id"]
+		if !exists {
+			return nil
+		}
+
+		userIDFloat, ok := userID.(float64)
+		if !ok {
+			return nil
+		}
+		userIDUint := uint(userIDFloat)
+
+		user, err := fetchUser(userIDUint)
+		if err != nil {
+			return nil
+		}
+
+		if user.Blocked {
+			return nil
+		}
+
+		return &userIDUint
+	}
+
+	return nil
 }
 
 func ValidatePassword(password string) bool {
@@ -284,4 +328,17 @@ func NormalizeWhitespace(str string) string {
 	re := regexp.MustCompile(`\s+`)
 
 	return strings.TrimSpace(re.ReplaceAllString(str, " "))
+}
+
+func Slugify(s string) string {
+	s = strings.ToLower(s)
+
+	reg, _ := regexp.Compile(`[^a-z0-9\s]+`)
+	s = reg.ReplaceAllString(s, "")
+
+	s = strings.ReplaceAll(s, " ", "-")
+
+	s = strings.Trim(s, "-")
+
+	return s
 }

@@ -6,6 +6,10 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	SteamStoreID = 1
+)
+
 type Store struct {
 	gorm.Model
 	ID        uint   `gorm:"primaryKey"`

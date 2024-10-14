@@ -3,7 +3,7 @@ package resources
 import (
 	"encoding/json"
 	"gcstatus/internal/domain"
-	"gcstatus/pkg/utils"
+	"gcstatus/internal/utils"
 	"log"
 )
 

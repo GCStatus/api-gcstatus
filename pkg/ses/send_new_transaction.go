@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"gcstatus/internal/domain"
-	"gcstatus/pkg/utils"
+	"gcstatus/internal/utils"
 	"html/template"
 )
 

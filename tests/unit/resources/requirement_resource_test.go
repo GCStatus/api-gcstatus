@@ -3,7 +3,7 @@ package tests
 import (
 	"gcstatus/internal/domain"
 	"gcstatus/internal/resources"
-	"gcstatus/pkg/utils"
+	"gcstatus/internal/utils"
 	"reflect"
 	"testing"
 )

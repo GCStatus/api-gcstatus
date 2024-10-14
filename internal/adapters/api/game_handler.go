@@ -3,8 +3,8 @@ package api
 import (
 	"gcstatus/internal/resources"
 	"gcstatus/internal/usecases"
+	"gcstatus/internal/utils"
 	"gcstatus/pkg/s3"
-	"gcstatus/pkg/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -27,19 +27,20 @@ func NewGameHandler(
 
 func (h *GameHandler) FindBySlug(c *gin.Context) {
 	slug := c.Param("slug")
-	user, err := utils.Auth(c, h.userService.GetUserByID)
-	if err != nil {
-		RespondWithError(c, http.StatusUnauthorized, "Unauthorized: "+err.Error())
-		return
+	authUserID := utils.GetAuthenticatedUserID(c, h.userService.GetUserByID)
+
+	var userID uint
+	if authUserID != nil {
+		userID = *authUserID
 	}
 
-	game, err := h.gameService.FindBySlug(slug, user.ID)
+	game, err := h.gameService.FindBySlug(slug, userID)
 	if err != nil {
 		RespondWithError(c, http.StatusInternalServerError, "Failed to fetch game: "+err.Error())
 		return
 	}
 
-	transformedGame := resources.TransformGame(game, s3.GlobalS3Client, user.ID)
+	transformedGame := resources.TransformGame(game, s3.GlobalS3Client, userID)
 
 	response := resources.Response{
 		Data: transformedGame,

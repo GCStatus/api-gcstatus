@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 // SetupRouter initializes the routes for the API
@@ -24,6 +25,8 @@ func SetupRouter(
 	notificationService *usecases.NotificationService,
 	missionService *usecases.MissionService,
 	gameService *usecases.GameService,
+	bannerService *usecases.BannerService,
+	db *gorm.DB,
 ) *gin.Engine {
 	r := gin.Default()
 	env := config.LoadConfig()
@@ -53,7 +56,9 @@ func SetupRouter(
 		transactionHandler,
 		notificationHandler,
 		missionHandler,
-		gameHandler := InitHandlers(
+		gameHandler,
+		homeHandler,
+		steamHandler := InitHandlers(
 		authService,
 		userService,
 		passwordResetService,
@@ -66,11 +71,14 @@ func SetupRouter(
 		notificationService,
 		missionService,
 		gameService,
+		bannerService,
+		db,
 	)
 
 	// Define the middlewares
 	r.Use(middlewares.LimitThrottleMiddleware())
 	protected := r.Group("/")
+	admin := r.Group("/admin")
 
 	// Define the routes
 	authRoutes := r.Group("/auth")
@@ -111,11 +119,15 @@ func SetupRouter(
 
 		protected.GET("/missions", missionHandler.GetAllForUser)
 		protected.POST("/missions/:id/complete", missionHandler.CompleteMission)
-
-		protected.GET("/games/:slug", gameHandler.FindBySlug)
+	}
+	admin.Use(middlewares.JWTAuthMiddleware(userService)) // TODO: add middleware for admin
+	{
+		admin.POST("/steam/register/:appID", steamHandler.RegisterByAppID)
 	}
 
 	// Common routes
+	r.GET("/home", homeHandler.Home)
+	r.GET("/games/:slug", gameHandler.FindBySlug)
 
 	return r
 }

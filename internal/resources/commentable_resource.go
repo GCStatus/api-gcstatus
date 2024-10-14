@@ -2,8 +2,8 @@ package resources
 
 import (
 	"gcstatus/internal/domain"
+	"gcstatus/internal/utils"
 	"gcstatus/pkg/s3"
-	"gcstatus/pkg/utils"
 )
 
 type CommentableResource struct {

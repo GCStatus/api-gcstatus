@@ -25,6 +25,7 @@ type Game struct {
 	Description      string    `gorm:"type:text" validate:"required"`
 	ShortDescription string    `gorm:"size:255" validate:"required"`
 	Free             bool      `gorm:"not null;default:false" validate:"boolean"`
+	GreatRelease     bool      `gorm:"not null;default:false" validate:"boolean"`
 	Legal            *string   `gorm:"size:255"`
 	Website          *string   `gorm:"size:255"`
 	ReleaseDate      time.Time `gorm:"size:255" validate:"required"`
