@@ -104,8 +104,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: [release]
-    outputs:
-      version: ${{ needs.release.outputs.version }}
+    if: needs.release.outputs.version != null
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -138,9 +140,9 @@ jobs:
           platforms: linux/amd64
 
   deploy-prod:
-    name: Deploy to Production
-    needs: [build]
+    name: Deploy to production environment
+    needs: [release, build]
     uses: ./.github/workflows/deploy-production.yml
     with:
-      container-tag: v${{ needs.build.outputs.version }}
+      container-tag: v${{ needs.release.outputs.version }}
     secrets: inherit
