@@ -45,11 +45,6 @@ jobs:
             docker stop $DOCKER_CONTAINER || true
             docker rm $DOCKER_CONTAINER || true
 
-            if [ $(docker ps --filter "publish=$DOCKER_PORT" --format '{{.ID}}') ]; then
-              echo "Port $DOCKER_PORT is already in use. Stopping the container using this port..."
-              docker stop $(docker ps --filter "publish=$DOCKER_PORT" --format '{{.ID}}')
-            fi
-
             docker run -d --name $DOCKER_CONTAINER -p $DOCKER_PORT:$DOCKER_PORT \
               $DOCKER_HUB_USERNAME/$DOCKER_CONTAINER:$DOCKER_TAG
 
