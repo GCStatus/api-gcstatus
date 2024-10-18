@@ -3,7 +3,7 @@ package tests
 import (
 	"fmt"
 	"gcstatus/internal/domain"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"regexp"
 	"testing"
 	"time"
@@ -62,7 +62,7 @@ func TestCreateCategory(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			db, mock := tests.Setup(t)
+			db, mock := testutils.Setup(t)
 
 			tc.mockBehavior(mock, tc.category)
 
@@ -141,7 +141,7 @@ func TestUpdateCategory(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			db, mock := tests.Setup(t)
+			db, mock := testutils.Setup(t)
 
 			tc.mockBehavior(mock, tc.category)
 
@@ -161,7 +161,7 @@ func TestUpdateCategory(t *testing.T) {
 }
 
 func TestSoftDeleteCategory(t *testing.T) {
-	db, mock := tests.Setup(t)
+	db, mock := testutils.Setup(t)
 
 	testCases := map[string]struct {
 		categoryID   uint
@@ -209,7 +209,7 @@ func TestSoftDeleteCategory(t *testing.T) {
 }
 
 func TestGetCategoryByID(t *testing.T) {
-	db, mock := tests.Setup(t)
+	db, mock := testutils.Setup(t)
 
 	testCases := map[string]struct {
 		categoryID   uint

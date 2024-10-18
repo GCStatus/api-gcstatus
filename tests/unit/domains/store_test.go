@@ -3,7 +3,7 @@ package tests
 import (
 	"fmt"
 	"gcstatus/internal/domain"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"regexp"
 	"testing"
 	"time"
@@ -70,7 +70,7 @@ func TestCreateStore(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			db, mock := tests.Setup(t)
+			db, mock := testutils.Setup(t)
 
 			tc.mockBehavior(mock, tc.store)
 
@@ -157,7 +157,7 @@ func TestUpdateStore(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			db, mock := tests.Setup(t)
+			db, mock := testutils.Setup(t)
 
 			tc.mockBehavior(mock, tc.store)
 
@@ -177,7 +177,7 @@ func TestUpdateStore(t *testing.T) {
 }
 
 func TestSoftDeleteStore(t *testing.T) {
-	db, mock := tests.Setup(t)
+	db, mock := testutils.Setup(t)
 
 	testCases := map[string]struct {
 		storeID      uint
@@ -225,7 +225,7 @@ func TestSoftDeleteStore(t *testing.T) {
 }
 
 func TestGetStoreByID(t *testing.T) {
-	db, mock := tests.Setup(t)
+	db, mock := testutils.Setup(t)
 
 	testCases := map[string]struct {
 		storeID   uint

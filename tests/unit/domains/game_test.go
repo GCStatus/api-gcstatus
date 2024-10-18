@@ -3,7 +3,7 @@ package tests
 import (
 	"fmt"
 	"gcstatus/internal/domain"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"regexp"
 	"testing"
 	"time"
@@ -108,7 +108,7 @@ func TestCreateGame(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			db, mock := tests.Setup(t)
+			db, mock := testutils.Setup(t)
 
 			tc.mockBehavior(mock, tc.game)
 
@@ -227,7 +227,7 @@ func TestUpdateGame(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			db, mock := tests.Setup(t)
+			db, mock := testutils.Setup(t)
 
 			tc.mockBehavior(mock, tc.game)
 
@@ -247,7 +247,7 @@ func TestUpdateGame(t *testing.T) {
 }
 
 func TestSoftDeleteGame(t *testing.T) {
-	db, mock := tests.Setup(t)
+	db, mock := testutils.Setup(t)
 
 	testCases := map[string]struct {
 		gameID       uint
@@ -296,7 +296,7 @@ func TestSoftDeleteGame(t *testing.T) {
 
 func TestGetGameBySlug(t *testing.T) {
 	fixedTime := time.Now()
-	db, mock := tests.Setup(t)
+	db, mock := testutils.Setup(t)
 
 	testCases := map[string]struct {
 		gameSlug  string

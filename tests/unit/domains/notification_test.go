@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/utils"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"regexp"
 	"testing"
 	"time"
@@ -69,7 +69,7 @@ func TestCreateNotification(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			db, mock := tests.Setup(t)
+			db, mock := testutils.Setup(t)
 
 			tc.mockBehavior(mock, tc.notification)
 
@@ -156,7 +156,7 @@ func TestUpdateNotification(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			db, mock := tests.Setup(t)
+			db, mock := testutils.Setup(t)
 
 			tc.mockBehavior(mock, tc.notification)
 
@@ -176,7 +176,7 @@ func TestUpdateNotification(t *testing.T) {
 }
 
 func TestSoftDeleteNotification(t *testing.T) {
-	db, mock := tests.Setup(t)
+	db, mock := testutils.Setup(t)
 
 	testCases := map[string]struct {
 		notificationID uint
@@ -224,7 +224,7 @@ func TestSoftDeleteNotification(t *testing.T) {
 }
 
 func TestGetNotificationByID(t *testing.T) {
-	db, mock := tests.Setup(t)
+	db, mock := testutils.Setup(t)
 
 	testCases := map[string]struct {
 		notificationID   uint

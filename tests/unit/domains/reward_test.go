@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/utils"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"testing"
 	"time"
 
@@ -75,7 +75,7 @@ func CreateRewardTest(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			db, mock := tests.Setup(t)
+			db, mock := testutils.Setup(t)
 
 			tc.mockBehavior(mock, tc.reward)
 
@@ -95,7 +95,7 @@ func CreateRewardTest(t *testing.T) {
 }
 
 func TestSoftDeleteReward(t *testing.T) {
-	db, mock := tests.Setup(t)
+	db, mock := testutils.Setup(t)
 
 	testCases := map[string]struct {
 		rewardID     uint
@@ -210,7 +210,7 @@ func TestUpdateReward(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			db, mock := tests.Setup(t)
+			db, mock := testutils.Setup(t)
 
 			tc.mockBehavior(mock, tc.reward)
 

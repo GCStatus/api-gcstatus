@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/utils"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"testing"
 	"time"
 
@@ -63,7 +63,7 @@ func CreateMissionProgressTest(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			db, mock := tests.Setup(t)
+			db, mock := testutils.Setup(t)
 
 			tc.mockBehavior(mock, tc.missionProgress)
 
@@ -83,7 +83,7 @@ func CreateMissionProgressTest(t *testing.T) {
 }
 
 func TestSoftDeleteMissionProgress(t *testing.T) {
-	db, mock := tests.Setup(t)
+	db, mock := testutils.Setup(t)
 
 	testCases := map[string]struct {
 		missionProgressID uint
@@ -198,7 +198,7 @@ func TestUpdateMissionProgress(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			db, mock := tests.Setup(t)
+			db, mock := testutils.Setup(t)
 
 			tc.mockBehavior(mock, tc.missionProgress)
 

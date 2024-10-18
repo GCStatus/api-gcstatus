@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/utils"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"testing"
 	"time"
 
@@ -78,7 +78,7 @@ func TestCreateReviewable(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			db, mock := tests.Setup(t)
+			db, mock := testutils.Setup(t)
 
 			tc.mockBehavior(mock, tc.reviewable)
 
@@ -173,7 +173,7 @@ func TestUpdateReviewable(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			db, mock := tests.Setup(t)
+			db, mock := testutils.Setup(t)
 
 			tc.mockBehavior(mock, tc.reviewable)
 
@@ -193,7 +193,7 @@ func TestUpdateReviewable(t *testing.T) {
 }
 
 func TestSoftDeleteReviewable(t *testing.T) {
-	db, mock := tests.Setup(t)
+	db, mock := testutils.Setup(t)
 
 	testCases := map[string]struct {
 		reviewableID uint

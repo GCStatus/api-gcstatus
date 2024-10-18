@@ -30,6 +30,8 @@ type User struct {
 	Missions          []UserMission           `gorm:"foreignKey:UserID"`
 	MyMissions        []UserMissionAssignment `gorm:"foreignKey:UserID"`
 	Reviews           []Reviewable            `gorm:"foreignKey:UserID"`
+	Roles             []Roleable              `gorm:"polymorphic:Roleable"`
+	Permissions       []Permissionable        `gorm:"polymorphic:Permissionable"`
 }
 
 func (u *User) ValidateUser() error {

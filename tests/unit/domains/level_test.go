@@ -3,7 +3,7 @@ package tests
 import (
 	"fmt"
 	"gcstatus/internal/domain"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"testing"
 	"time"
 
@@ -65,7 +65,7 @@ func TestCreateLevel(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			db, mock := tests.Setup(t)
+			db, mock := testutils.Setup(t)
 
 			tc.mockBehavior(mock, tc.level)
 
@@ -148,7 +148,7 @@ func TestUpdateLevel(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			db, mock := tests.Setup(t)
+			db, mock := testutils.Setup(t)
 
 			tc.mockBehavior(mock, tc.level)
 
@@ -168,7 +168,7 @@ func TestUpdateLevel(t *testing.T) {
 }
 
 func TestSoftDeleteLevel(t *testing.T) {
-	db, mock := tests.Setup(t)
+	db, mock := testutils.Setup(t)
 
 	testCases := map[string]struct {
 		levelID      uint
@@ -216,7 +216,7 @@ func TestSoftDeleteLevel(t *testing.T) {
 }
 
 func TestGetLevelByID(t *testing.T) {
-	db, mock := tests.Setup(t)
+	db, mock := testutils.Setup(t)
 
 	testCases := map[string]struct {
 		levelID   uint

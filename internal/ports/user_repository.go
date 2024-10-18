@@ -18,8 +18,10 @@ type UpdateUserBasicsRequest struct {
 type UserRepository interface {
 	CreateUser(user *domain.User) error
 	GetUserByID(id uint) (*domain.User, error)
+	GetUserByIDForAdmin(id uint) (*domain.User, error)
 	GetAllUsers() ([]domain.User, error)
 	FindUserByEmailOrNickname(EmailOrNickname string) (*domain.User, error)
+	FindUserByEmailForAdmin(email string) (*domain.User, error)
 	UpdateUserPassword(userID uint, hashedPassword string) error
 	CreateWithProfile(user *domain.User) error
 	UpdateUserNickAndEmail(userID uint, request UpdateNickAndEmailRequest) error

@@ -8,13 +8,13 @@ import (
 	"gcstatus/internal/adapters/db"
 	"gcstatus/internal/ports"
 	"gcstatus/internal/utils"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 
 	"github.com/DATA-DOG/go-sqlmock"
 )
 
 func TestUpdateSocials(t *testing.T) {
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 
 	repo := db.NewProfileRepositoryMySQL(gormDB)
 
@@ -85,7 +85,7 @@ func TestUpdateSocials(t *testing.T) {
 }
 
 func TestUpdatePicture(t *testing.T) {
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 
 	repo := db.NewProfileRepositoryMySQL(gormDB)
 

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"gcstatus/internal/adapters/db"
 	"gcstatus/internal/domain"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"regexp"
 	"testing"
 	"time"
@@ -17,7 +17,7 @@ import (
 
 func TestMissionRepositoryMySQL_FindById(t *testing.T) {
 	fixedTime := time.Now()
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 	repo := db.NewMissionRepositoryMySQL(gormDB)
 
 	testCases := map[string]struct {
@@ -92,7 +92,7 @@ func TestMissionRepositoryMySQL_FindById(t *testing.T) {
 
 func TestMissionRepositoryMySQL_GetAllForUser(t *testing.T) {
 	fixedTime := time.Now()
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 	repo := db.NewMissionRepositoryMySQL(gormDB)
 
 	testCases := map[string]struct {
@@ -271,7 +271,7 @@ func TestMissionRepositoryMySQL_GetAllForUser(t *testing.T) {
 }
 
 func TestMissionRepositoryMySQL_CompleteMission(t *testing.T) {
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 	repo := db.NewMissionRepositoryMySQL(gormDB)
 
 	testCases := map[string]struct {

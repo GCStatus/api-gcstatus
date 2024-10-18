@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"gcstatus/internal/adapters/db"
 	"gcstatus/internal/domain"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"regexp"
 	"testing"
 	"time"
@@ -16,7 +16,7 @@ import (
 )
 
 func TestTaskRepositoryMySQL_GetTitleRequirementsByKey(t *testing.T) {
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 
 	repo := db.NewTaskRepositoryMySQL(gormDB)
 
@@ -96,7 +96,7 @@ func TestTaskRepositoryMySQL_GetTitleRequirementsByKey(t *testing.T) {
 }
 
 func TestTaskRepositoryMySQL_GetMissionRequirementsByKey(t *testing.T) {
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 
 	repo := db.NewTaskRepositoryMySQL(gormDB)
 
@@ -260,7 +260,7 @@ func TestTaskRepositoryMySQL_UpdateTitleProgress(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			gormDB, mock := tests.Setup(t)
+			gormDB, mock := testutils.Setup(t)
 
 			repo := db.NewTaskRepositoryMySQL(gormDB)
 			tc.mock(mock, tc.expectTitleProgress)
@@ -367,7 +367,7 @@ func TestTaskRepositoryMySQL_UpdateMissionProgress(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			gormDB, mock := tests.Setup(t)
+			gormDB, mock := testutils.Setup(t)
 
 			repo := db.NewTaskRepositoryMySQL(gormDB)
 			tc.mock(mock, tc.expectMissionProgress)
@@ -390,7 +390,7 @@ func TestTaskRepositoryMySQL_UpdateMissionProgress(t *testing.T) {
 }
 
 func TestTaskRepositoryMySQL_UserHasTitle(t *testing.T) {
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 	r := db.NewTaskRepositoryMySQL(gormDB)
 
 	testCases := map[string]struct {
@@ -479,7 +479,7 @@ func TestTaskRepositoryMySQL_UserHasTitle(t *testing.T) {
 
 func TestTaskRepositoryMySQL_GetOrCreateTitleProgress(t *testing.T) {
 	fixedTime := time.Now()
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 	r := db.NewTaskRepositoryMySQL(gormDB)
 
 	testCases := map[string]struct {
@@ -560,7 +560,7 @@ func TestTaskRepositoryMySQL_GetOrCreateTitleProgress(t *testing.T) {
 
 func TestTaskRepositoryMySQL_GetOrCreateMissionProgress(t *testing.T) {
 	fixedTime := time.Now()
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 	r := db.NewTaskRepositoryMySQL(gormDB)
 
 	testCases := map[string]struct {
@@ -640,7 +640,7 @@ func TestTaskRepositoryMySQL_GetOrCreateMissionProgress(t *testing.T) {
 }
 
 func TestTaskRepositoryMySQL_AwardTitleToUser(t *testing.T) {
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 	r := db.NewTaskRepositoryMySQL(gormDB)
 
 	userID := uint(1)

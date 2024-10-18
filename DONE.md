@@ -138,5 +138,14 @@
   - [x] Method should return 9 hot games
   - [x] Method should return 9 most liked games
   - [x] Method should return 9 upcoming games
+- [x] Admin system
+  - [x] Create login method for admin
+    - [x] Find by email
+    - [x] Check roles and permiffions before allow login
+    - [x] Check user block on platform
+  - [x] Create logout method for admin
+  - [x] Create me method for admin
+    - [x] Return user permissions
+    - [x] Return user roles
 
 ### Post MVP

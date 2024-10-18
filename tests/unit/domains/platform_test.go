@@ -3,7 +3,7 @@ package tests
 import (
 	"fmt"
 	"gcstatus/internal/domain"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"regexp"
 	"testing"
 	"time"
@@ -62,7 +62,7 @@ func TestCreatePlatform(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			db, mock := tests.Setup(t)
+			db, mock := testutils.Setup(t)
 
 			tc.mockBehavior(mock, tc.platform)
 
@@ -141,7 +141,7 @@ func TestUpdatePlatform(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			db, mock := tests.Setup(t)
+			db, mock := testutils.Setup(t)
 
 			tc.mockBehavior(mock, tc.platform)
 
@@ -161,7 +161,7 @@ func TestUpdatePlatform(t *testing.T) {
 }
 
 func TestSoftDeletePlatform(t *testing.T) {
-	db, mock := tests.Setup(t)
+	db, mock := testutils.Setup(t)
 
 	testCases := map[string]struct {
 		platformID   uint
@@ -209,7 +209,7 @@ func TestSoftDeletePlatform(t *testing.T) {
 }
 
 func TestGetPlatformByID(t *testing.T) {
-	db, mock := tests.Setup(t)
+	db, mock := testutils.Setup(t)
 
 	testCases := map[string]struct {
 		platformID   uint

@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"gcstatus/internal/adapters/api"
 	"gcstatus/internal/usecases"
 	"gcstatus/internal/utils"
 	"net/http"
@@ -14,9 +15,9 @@ func JWTAuthMiddleware(userService *usecases.UserService) gin.HandlerFunc {
 		userID, err := utils.ExtractAuthenticatedUser(c, userService.GetUserByID)
 		if err != nil {
 			if err.Error() == "user is blocked" {
-				c.JSON(http.StatusForbidden, gin.H{"message": "Your account is blocked. Please, contact support."})
+				api.RespondWithError(c, http.StatusForbidden, "Your account is blocked. Please, contact support.")
 			} else {
-				c.JSON(http.StatusUnauthorized, gin.H{"message": err.Error()})
+				api.RespondWithError(c, http.StatusInternalServerError, err.Error())
 			}
 
 			c.Abort()

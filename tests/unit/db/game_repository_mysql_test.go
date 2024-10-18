@@ -5,7 +5,7 @@ import (
 	"gcstatus/internal/adapters/db"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/utils"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"regexp"
 	"testing"
 	"time"
@@ -17,7 +17,7 @@ import (
 
 func TestGameRepositoryMySQL_FindBySlug(t *testing.T) {
 	fixedTime := time.Now()
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 	mockRepo := db.NewGameRepositoryMySQL(gormDB)
 
 	testCases := map[string]struct {
@@ -358,7 +358,7 @@ func TestGameRepositoryMySQL_FindBySlug(t *testing.T) {
 
 func TestGameRepositoryMySQL_FindGamesByCondition(t *testing.T) {
 	fixedTime := time.Now()
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 	mockRepo := db.NewGameRepositoryMySQL(gormDB)
 
 	testCases := map[string]struct {

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"gcstatus/internal/adapters/db"
 	"gcstatus/internal/domain"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"regexp"
 	"testing"
 	"time"
@@ -105,7 +105,7 @@ func TestNotificationRepositoryMySQL_CreateNotification(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			gormDB, mock := tests.Setup(t)
+			gormDB, mock := testutils.Setup(t)
 
 			repo := db.NewNotificationRepositoryMySQL(gormDB)
 
@@ -122,7 +122,7 @@ func TestNotificationRepositoryMySQL_CreateNotification(t *testing.T) {
 
 func TestNotificationRepositoryMySQL_GetAllForUser(t *testing.T) {
 	fixedTime := time.Now()
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 	repo := db.NewNotificationRepositoryMySQL(gormDB)
 
 	notificationData := getNotificationData(t)
@@ -204,7 +204,7 @@ func TestNotificationRepositoryMySQL_GetAllForUser(t *testing.T) {
 
 func TestNotificationRepositoryMySQL_GetNotificationByID(t *testing.T) {
 	fixedTime := time.Now()
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 	repo := db.NewNotificationRepositoryMySQL(gormDB)
 
 	notificationData := getNotificationData(t)
@@ -299,7 +299,7 @@ func TestNotificationRepositoryMySQL_DeleteNotification(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			gormDB, mock := tests.Setup(t)
+			gormDB, mock := testutils.Setup(t)
 
 			repo := db.NewNotificationRepositoryMySQL(gormDB)
 
@@ -353,7 +353,7 @@ func TestNotificationRepositoryMySQL_MarkAsRead(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			gormDB, mock := tests.Setup(t)
+			gormDB, mock := testutils.Setup(t)
 
 			repo := db.NewNotificationRepositoryMySQL(gormDB)
 
@@ -407,7 +407,7 @@ func TestNotificationRepositoryMySQL_MarkAsUnread(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			gormDB, mock := tests.Setup(t)
+			gormDB, mock := testutils.Setup(t)
 
 			repo := db.NewNotificationRepositoryMySQL(gormDB)
 
@@ -461,7 +461,7 @@ func TestNotificationRepositoryMySQL_MarkAllAsRead(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			gormDB, mock := tests.Setup(t)
+			gormDB, mock := testutils.Setup(t)
 
 			repo := db.NewNotificationRepositoryMySQL(gormDB)
 
@@ -515,7 +515,7 @@ func TestNotificationRepositoryMySQL_MarkAllAsUnread(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			gormDB, mock := tests.Setup(t)
+			gormDB, mock := testutils.Setup(t)
 
 			repo := db.NewNotificationRepositoryMySQL(gormDB)
 
@@ -569,7 +569,7 @@ func TestNotificationRepositoryMySQL_DeleteAllNotifications(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			gormDB, mock := tests.Setup(t)
+			gormDB, mock := testutils.Setup(t)
 
 			repo := db.NewNotificationRepositoryMySQL(gormDB)
 

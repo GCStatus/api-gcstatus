@@ -6,7 +6,7 @@ import (
 	"gcstatus/internal/adapters/db"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/ports"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"regexp"
 	"testing"
 	"time"
@@ -17,7 +17,7 @@ import (
 )
 
 func TestUserRepositoryMySQL_GetAllUsers(t *testing.T) {
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 
 	repo := db.NewUserRepositoryMySQL(gormDB)
 
@@ -61,7 +61,7 @@ func TestUserRepositoryMySQL_GetAllUsers(t *testing.T) {
 }
 
 func TestUserRepositoryMySQL_GetUserByID(t *testing.T) {
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 
 	repo := db.NewUserRepositoryMySQL(gormDB)
 
@@ -124,6 +124,103 @@ func TestUserRepositoryMySQL_GetUserByID(t *testing.T) {
 			tc.mockBehavior()
 
 			user, err := repo.GetUserByID(tc.id)
+
+			assert.Equal(t, tc.expectedErr, err)
+			if err == gorm.ErrRecordNotFound {
+				assert.Equal(t, uint(0), user.ID)
+			} else {
+				assert.Equal(t, tc.expectedUser.ID, user.ID)
+			}
+
+			assert.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
+func TestUserRepositoryMySQL_GetUserByIDForAdmin(t *testing.T) {
+	gormDB, mock := testutils.Setup(t)
+
+	repo := db.NewUserRepositoryMySQL(gormDB)
+
+	testCases := map[string]struct {
+		id           uint
+		mockBehavior func()
+		expectedUser *domain.User
+		expectedErr  error
+	}{
+		"valid ID": {
+			id: 1,
+			mockBehavior: func() {
+				userRows := sqlmock.NewRows([]string{"id", "name", "email", "nickname", "created_at", "updated_at"}).
+					AddRow(1, "Fake", "fake@gmail.com", "fake", time.Now(), time.Now())
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ? AND `users`.`deleted_at` IS NULL ORDER BY `users`.`id` LIMIT ?")).
+					WithArgs(1, 1).
+					WillReturnRows(userRows)
+
+				permissionableRows := sqlmock.NewRows([]string{"id", "permissionable_type", "permissionable_id", "permission_id", "created_at", "updated_at"}).
+					AddRow(1, "users", 1, 1, time.Now(), time.Now())
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `permissionables` WHERE `permissionable_type` = ? AND `permissionables`.`permissionable_id` = ? AND `permissionables`.`deleted_at` IS NULL")).
+					WithArgs("users", 1).
+					WillReturnRows(permissionableRows)
+
+				permissionRows := sqlmock.NewRows([]string{"id", "scope", "created_at", "updated_at"}).
+					AddRow(1, "test:rows", time.Now(), time.Now())
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `permissions` WHERE `permissions`.`id` = ? AND `permissions`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(permissionRows)
+
+				profileRows := sqlmock.NewRows([]string{"id", "user_id"}).
+					AddRow(1, 1)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `profiles` WHERE `profiles`.`user_id` = ? AND `profiles`.`deleted_at` IS NULL")).
+					WithArgs(1).WillReturnRows(profileRows)
+
+				roleableRows := sqlmock.NewRows([]string{"id", "roleable_type", "roleable_id", "role_id", "created_at", "updated_at"}).
+					AddRow(1, "users", 1, 1, time.Now(), time.Now())
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `roleables` WHERE `roleable_type` = ? AND `roleables`.`roleable_id` = ? AND `roleables`.`deleted_at` IS NULL")).
+					WithArgs("users", 1).
+					WillReturnRows(roleableRows)
+
+				roleRows := sqlmock.NewRows([]string{"id", "name", "created_at", "updated_at"}).
+					AddRow(1, "Test", time.Now(), time.Now())
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `roles` WHERE `roles`.`id` = ? AND `roles`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(roleRows)
+
+				permissionableRoleRows := sqlmock.NewRows([]string{"id", "permissionable_type", "permissionable_id", "permission_id", "created_at", "updated_at"}).
+					AddRow(1, "roles", 1, 1, time.Now(), time.Now())
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `permissionables` WHERE `permissionable_type` = ? AND `permissionables`.`permissionable_id` = ? AND `permissionables`.`deleted_at` IS NULL")).
+					WithArgs("roles", 1).
+					WillReturnRows(permissionableRoleRows)
+
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `permissions` WHERE `permissions`.`id` = ? AND `permissions`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(permissionRows)
+			},
+			expectedUser: &domain.User{
+				ID:      1,
+				Profile: domain.Profile{ID: 1},
+				Wallet:  domain.Wallet{ID: 1},
+				Titles:  []domain.UserTitle{{ID: 1, UserID: 1, TitleID: 1}},
+			},
+			expectedErr: nil,
+		},
+		"not found ID": {
+			id: 999,
+			mockBehavior: func() {
+				rows := sqlmock.NewRows([]string{"id", "name", "email", "nickname", "created_at", "updated_at"})
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE `users`.`id` = ? AND `users`.`deleted_at` IS NULL ORDER BY `users`.`id` LIMIT ?")).
+					WithArgs(999, 1).WillReturnRows(rows)
+			},
+			expectedUser: &domain.User{ID: 0},
+			expectedErr:  gorm.ErrRecordNotFound,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			tc.mockBehavior()
+
+			user, err := repo.GetUserByIDForAdmin(tc.id)
 
 			assert.Equal(t, tc.expectedErr, err)
 			if err == gorm.ErrRecordNotFound {
@@ -256,7 +353,7 @@ func TestUserRepositoryMySQL_CreateUser(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			gormDB, mock := tests.Setup(t)
+			gormDB, mock := testutils.Setup(t)
 
 			repo := db.NewUserRepositoryMySQL(gormDB)
 
@@ -314,7 +411,7 @@ func TestUserRepositoryMySQL_FindUserByEmailOrNickname(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			gormDB, mock := tests.Setup(t)
+			gormDB, mock := testutils.Setup(t)
 
 			repo := db.NewUserRepositoryMySQL(gormDB)
 
@@ -334,8 +431,72 @@ func TestUserRepositoryMySQL_FindUserByEmailOrNickname(t *testing.T) {
 	}
 }
 
+func TestUserRepositoryMySQL_FindUserByEmailForAdmin(t *testing.T) {
+	testCases := map[string]struct {
+		searchable   string
+		mockBehavior func(mock sqlmock.Sqlmock)
+		expectedUser *domain.User
+		expectedErr  error
+	}{
+		"found": {
+			searchable: "fake",
+			mockBehavior: func(mock sqlmock.Sqlmock) {
+				rows := sqlmock.NewRows([]string{"id", "name", "email", "nickname", "created_at", "updated_at"}).
+					AddRow(1, "Fake", "fake@gmail.com", "fake", time.Now(), time.Now())
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE email = ? AND `users`.`deleted_at` IS NULL ORDER BY `users`.`id` LIMIT ?")).
+					WithArgs("fake", 1).WillReturnRows(rows)
+
+				permissionableRows := sqlmock.NewRows([]string{"id", "permissionable_type", "permissionable_id", "permission_id", "created_at", "updated_at"}).
+					AddRow(1, "users", 1, 1, time.Now(), time.Now())
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `permissionables` WHERE `permissionable_type` = ? AND `permissionables`.`permissionable_id` = ? AND `permissionables`.`deleted_at` IS NULL")).
+					WithArgs("users", 1).
+					WillReturnRows(permissionableRows)
+
+				roleableRows := sqlmock.NewRows([]string{"id", "roleable_type", "roleable_id", "role_id", "created_at", "updated_at"}).
+					AddRow(1, "users", 1, 1, time.Now(), time.Now())
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `roleables` WHERE `roleable_type` = ? AND `roleables`.`roleable_id` = ? AND `roleables`.`deleted_at` IS NULL")).
+					WithArgs("users", 1).
+					WillReturnRows(roleableRows)
+			},
+			expectedUser: &domain.User{ID: 1, Email: "fake@gmail.com"},
+			expectedErr:  nil,
+		},
+		"not found user": {
+			searchable: "wrong",
+			mockBehavior: func(mock sqlmock.Sqlmock) {
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `users` WHERE email = ? AND `users`.`deleted_at` IS NULL ORDER BY `users`.`id` LIMIT ?")).
+					WithArgs("wrong", 1).
+					WillReturnError(gorm.ErrRecordNotFound)
+			},
+			expectedUser: &domain.User{ID: 0},
+			expectedErr:  gorm.ErrRecordNotFound,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			gormDB, mock := testutils.Setup(t)
+
+			repo := db.NewUserRepositoryMySQL(gormDB)
+
+			tc.mockBehavior(mock)
+
+			user, err := repo.FindUserByEmailForAdmin(tc.searchable)
+
+			assert.Equal(t, tc.expectedErr, err)
+			if err == gorm.ErrRecordNotFound {
+				assert.Equal(t, uint(0), user.ID)
+			} else {
+				assert.Equal(t, tc.expectedUser.ID, user.ID)
+			}
+
+			assert.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
 func TestUserRepositoryMySQL_UpdateUserPassword(t *testing.T) {
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 
 	repo := db.NewUserRepositoryMySQL(gormDB)
 
@@ -385,7 +546,7 @@ func TestUserRepositoryMySQL_UpdateUserPassword(t *testing.T) {
 }
 
 func UserRepositoryMySQL_UpdateUserNickAndEmail(t *testing.T) {
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 
 	repo := db.NewUserRepositoryMySQL(gormDB)
 
@@ -488,7 +649,7 @@ func UserRepositoryMySQL_UpdateUserNickAndEmail(t *testing.T) {
 
 func TestUserRepositoryMySQL_UpdateUserBasics(t *testing.T) {
 	fixedTime := time.Now()
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 
 	repo := db.NewUserRepositoryMySQL(gormDB)
 

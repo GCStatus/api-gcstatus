@@ -4,7 +4,7 @@ import (
 	"errors"
 	"gcstatus/internal/adapters/db"
 	"gcstatus/internal/domain"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"regexp"
 	"testing"
 	"time"
@@ -15,7 +15,7 @@ import (
 
 func TestBannerRepositoryMySQL_GetBannersForHome(t *testing.T) {
 	fixedTime := time.Now()
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 	mockRepo := db.NewBannerRepositoryMySQL(gormDB)
 
 	testCases := map[string]struct {

@@ -2,7 +2,7 @@ package tests
 
 import (
 	"errors"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"net/http"
 	"testing"
 
@@ -81,7 +81,7 @@ func TestMockAuthRepository_Me(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := &MockAuthRepository{}
-			c, w := tests.SetupGinTestContext(http.MethodGet, "/me", "")
+			c, w := testutils.SetupGinTestContext(http.MethodGet, "/me", "")
 
 			if tc.expectError {
 				w.WriteHeader(http.StatusInternalServerError)
@@ -127,7 +127,7 @@ func TestMockAuthRepository_Login(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := &MockAuthRepository{}
-			c, w := tests.SetupGinTestContext(http.MethodPost, "/login", "")
+			c, w := testutils.SetupGinTestContext(http.MethodPost, "/login", "")
 
 			if tc.expectError {
 				w.WriteHeader(http.StatusInternalServerError)
@@ -213,7 +213,7 @@ func TestMockAuthRepository_Logout(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := &MockAuthRepository{}
-			c, w := tests.SetupGinTestContext(http.MethodPost, "/logout", "")
+			c, w := testutils.SetupGinTestContext(http.MethodPost, "/logout", "")
 
 			if tc.expectError {
 				w.WriteHeader(http.StatusInternalServerError)
@@ -259,7 +259,7 @@ func TestMockAuthRepository_Register(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := &MockAuthRepository{}
-			c, w := tests.SetupGinTestContext(http.MethodPost, "/register", "")
+			c, w := testutils.SetupGinTestContext(http.MethodPost, "/register", "")
 
 			if tc.expectError {
 				w.WriteHeader(http.StatusInternalServerError)
@@ -352,7 +352,7 @@ func TestMockAuthRepository_SetAuthCookies(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := &MockAuthRepository{}
-			c, w := tests.SetupGinTestContext(http.MethodPost, "/", "")
+			c, w := testutils.SetupGinTestContext(http.MethodPost, "/", "")
 
 			mockRepo.SetAuthCookies(c, tc.tokenKey, tc.tokenValue, tc.authKey, tc.expirationSeconds, tc.secure, tc.httpOnly, tc.domain)
 
@@ -404,7 +404,7 @@ func TestMockAuthRepository_ClearAuthCookies(t *testing.T) {
 			t.Parallel()
 
 			mockRepo := &MockAuthRepository{}
-			c, w := tests.SetupGinTestContext(http.MethodPost, "/", "")
+			c, w := testutils.SetupGinTestContext(http.MethodPost, "/", "")
 
 			mockRepo.ClearAuthCookies(c, tc.tokenKey, tc.authKey, tc.domain)
 

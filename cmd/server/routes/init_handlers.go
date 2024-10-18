@@ -2,7 +2,7 @@ package routes
 
 import (
 	"gcstatus/internal/adapters/api"
-	"gcstatus/internal/adapters/api/admin"
+	api_admin "gcstatus/internal/adapters/api/admin"
 	"gcstatus/internal/usecases"
 
 	"gorm.io/gorm"
@@ -35,7 +35,8 @@ func InitHandlers(
 	missionHandler *api.MissionHandler,
 	gameHandler *api.GameHandler,
 	homeHandler *api.HomeHandler,
-	steamHandler *admin.SteamHandler,
+	steamHandler *api_admin.SteamHandler,
+	adminAuthHandler *api_admin.AuthHandler,
 ) {
 	userHandler = api.NewUserHandler(userService)
 	authHandler = api.NewAuthHandler(authService, userService)
@@ -48,7 +49,8 @@ func InitHandlers(
 	missionHandler = api.NewMissionHandler(missionService, userService)
 	gameHandler = api.NewGameHandler(gameService, userService)
 	homeHandler = api.NewHomeHandler(userService, gameService, bannerService)
-	steamHandler = admin.NewSteamHandler(gameService, db)
+	steamHandler = api_admin.NewSteamHandler(gameService, db)
+	adminAuthHandler = api_admin.NewAuthHandler(authService, userService)
 
 	return authHandler,
 		passwordResetHandler,
@@ -61,5 +63,6 @@ func InitHandlers(
 		missionHandler,
 		gameHandler,
 		homeHandler,
-		steamHandler
+		steamHandler,
+		adminAuthHandler
 }

@@ -3,7 +3,7 @@ package tests
 import (
 	"fmt"
 	"gcstatus/internal/domain"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"testing"
 	"time"
 
@@ -12,7 +12,7 @@ import (
 )
 
 func TestCreateUser(t *testing.T) {
-	db, mock := tests.Setup(t)
+	db, mock := testutils.Setup(t)
 	fixedTime := time.Date(2024, 9, 22, 12, 57, 51, 0, time.UTC)
 
 	testCases := map[string]struct {
@@ -102,7 +102,7 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestGetUserByID(t *testing.T) {
-	db, mock := tests.Setup(t)
+	db, mock := testutils.Setup(t)
 	fixedTime := time.Date(2024, 9, 22, 12, 57, 51, 0, time.UTC)
 
 	testCases := map[string]struct {
@@ -163,7 +163,7 @@ func TestGetUserByID(t *testing.T) {
 }
 
 func TestSoftDeleteUser(t *testing.T) {
-	db, mock := tests.Setup(t)
+	db, mock := testutils.Setup(t)
 
 	testCases := map[string]struct {
 		userID   uint
@@ -212,7 +212,7 @@ func TestSoftDeleteUser(t *testing.T) {
 }
 
 func TestUpdateUser(t *testing.T) {
-	db, mock := tests.Setup(t)
+	db, mock := testutils.Setup(t)
 	fixedTime := time.Date(2024, 9, 22, 12, 57, 51, 0, time.UTC)
 
 	testCases := map[string]struct {

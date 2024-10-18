@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"gcstatus/internal/adapters/db"
 	"gcstatus/internal/domain"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"regexp"
 	"testing"
 	"time"
@@ -70,7 +70,7 @@ func TestPasswordResetRepositoryMySQL_CreatePasswordReset(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			gormDB, mock := tests.Setup(t)
+			gormDB, mock := testutils.Setup(t)
 
 			repo := db.NewPasswordResetRepositoryMySQL(gormDB)
 
@@ -119,7 +119,7 @@ func TestPasswordResetRepositoryMySQL_FindPasswordResetByToken(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			gormDB, mock := tests.Setup(t)
+			gormDB, mock := testutils.Setup(t)
 
 			repo := db.NewPasswordResetRepositoryMySQL(gormDB)
 
@@ -168,7 +168,7 @@ func TestPasswordResetRepositoryMySQL_DeletePasswordResetByID(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			gormDB, mock := tests.Setup(t)
+			gormDB, mock := testutils.Setup(t)
 
 			repo := db.NewPasswordResetRepositoryMySQL(gormDB)
 

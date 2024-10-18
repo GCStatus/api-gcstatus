@@ -52,6 +52,16 @@ func (repo *UserRepositoryMySQL) GetUserByID(id uint) (*domain.User, error) {
 	return &user, err
 }
 
+func (repo *UserRepositoryMySQL) GetUserByIDForAdmin(id uint) (*domain.User, error) {
+	var user domain.User
+	err := repo.db.
+		Preload("Profile").
+		Preload("Permissions.Permission").
+		Preload("Roles.Role.Permissions.Permission").
+		First(&user, id).Error
+	return &user, err
+}
+
 func (repo *UserRepositoryMySQL) GetAllUsers() ([]domain.User, error) {
 	var users []domain.User
 	err := repo.db.Find(&users).Error
@@ -61,6 +71,17 @@ func (repo *UserRepositoryMySQL) GetAllUsers() ([]domain.User, error) {
 func (repo *UserRepositoryMySQL) FindUserByEmailOrNickname(emailOrNickname string) (*domain.User, error) {
 	var user domain.User
 	err := repo.db.Where("nickname = ? OR email = ?", emailOrNickname, emailOrNickname).First(&user).Error
+	return &user, err
+}
+
+func (repo *UserRepositoryMySQL) FindUserByEmailForAdmin(email string) (*domain.User, error) {
+	var user domain.User
+	err := repo.db.Model(&domain.User{}).
+		Preload("Roles").
+		Preload("Permissions").
+		Where("email = ?", email).
+		First(&user).
+		Error
 	return &user, err
 }
 

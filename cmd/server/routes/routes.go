@@ -58,7 +58,8 @@ func SetupRouter(
 		missionHandler,
 		gameHandler,
 		homeHandler,
-		steamHandler := InitHandlers(
+		steamHandler,
+		adminAuthHandler := InitHandlers(
 		authService,
 		userService,
 		passwordResetService,
@@ -84,7 +85,6 @@ func SetupRouter(
 	authRoutes := r.Group("/auth")
 	{
 		authRoutes.POST("/login", authHandler.Login)
-		authRoutes.POST("/logout", authHandler.Logout)
 		authRoutes.POST("/register", authHandler.Register)
 		authRoutes.POST("/password/email/send", middlewares.LimitResetRequestMiddleware(), passwordResetHandler.RequestPasswordReset)
 		authRoutes.POST("/password/reset", passwordResetHandler.ResetUserPassword)
@@ -95,6 +95,7 @@ func SetupRouter(
 	{
 		protected.GET("/me", authHandler.Me)
 		protected.GET("/levels", levelHandler.GetAll)
+		protected.POST("/auth/logout", authHandler.Logout)
 
 		protected.GET("/titles", titleHandler.GetAllForUser)
 		protected.PUT("/titles/:id/toggle", titleHandler.ToggleEnableTitle)
@@ -120,9 +121,13 @@ func SetupRouter(
 		protected.GET("/missions", missionHandler.GetAllForUser)
 		protected.POST("/missions/:id/complete", missionHandler.CompleteMission)
 	}
-	admin.Use(middlewares.JWTAuthMiddleware(userService)) // TODO: add middleware for admin
+
+	admin.POST("/login", adminAuthHandler.Login)
+	admin.Use(middlewares.JWTAuthMiddleware(userService))
 	{
-		admin.POST("/steam/register/:appID", steamHandler.RegisterByAppID)
+		admin.GET("/me", adminAuthHandler.Me)
+		admin.POST("/logout", adminAuthHandler.Logout)
+		admin.POST("/steam/register/:appID", middlewares.PermissionMiddleware(userService, "create:steam-jobs-games"), steamHandler.RegisterByAppID)
 	}
 
 	// Common routes

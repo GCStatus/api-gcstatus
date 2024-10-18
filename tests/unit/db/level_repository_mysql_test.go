@@ -3,7 +3,7 @@ package tests
 import (
 	"gcstatus/internal/adapters/db"
 	"gcstatus/internal/domain"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"regexp"
 	"testing"
 	"time"
@@ -14,7 +14,7 @@ import (
 )
 
 func TestLevelRepositoryMySQL_GetAll(t *testing.T) {
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 
 	repo := db.NewLevelRepositoryMySQL(gormDB)
 
@@ -70,7 +70,7 @@ func TestLevelRepositoryMySQL_GetAll(t *testing.T) {
 }
 
 func TestLevelRepositoryMySQL_FindById(t *testing.T) {
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 
 	repo := db.NewLevelRepositoryMySQL(gormDB)
 

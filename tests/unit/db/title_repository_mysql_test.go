@@ -4,7 +4,7 @@ import (
 	"errors"
 	"gcstatus/internal/adapters/db"
 	"gcstatus/internal/domain"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"regexp"
 	"testing"
 
@@ -14,7 +14,7 @@ import (
 )
 
 func TestTitleRepositoryMySQL_GetAllForUser(t *testing.T) {
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 	repo := db.NewTitleRepositoryMySQL(gormDB)
 
 	testCases := map[string]struct {
@@ -117,7 +117,7 @@ func TestTitleRepositoryMySQL_GetAllForUser(t *testing.T) {
 }
 
 func TestTitleRepositoryMySQL_FindById(t *testing.T) {
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 	repo := db.NewTitleRepositoryMySQL(gormDB)
 
 	testCases := map[string]struct {
@@ -178,7 +178,7 @@ func TestTitleRepositoryMySQL_FindById(t *testing.T) {
 }
 
 func TestTitleRepositoryMySQL_ToggleEnableTitle(t *testing.T) {
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 	repo := db.NewTitleRepositoryMySQL(gormDB)
 
 	testCases := map[string]struct {

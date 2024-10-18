@@ -1,4 +1,4 @@
-package tests
+package testutils
 
 import (
 	"errors"
@@ -62,7 +62,7 @@ func SetupMockDB(t *testing.T) (*gorm.DB, sqlmock.Sqlmock) {
 }
 
 func LoadEnv() error {
-	envPath := filepath.Join(basepath, "..", ".env.testing")
+	envPath := filepath.Join(basepath, "../..", ".env.testing")
 	err := godotenv.Load(envPath)
 
 	return err

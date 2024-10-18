@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"gcstatus/internal/adapters/db"
 	"gcstatus/internal/domain"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"regexp"
 	"testing"
 
@@ -67,7 +67,7 @@ func TestTransactionRepositoryMySQL_CreateTransaction(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			gormDB, mock := tests.Setup(t)
+			gormDB, mock := testutils.Setup(t)
 
 			repo := db.NewTransactionRepositoryMySQL(gormDB)
 
@@ -83,7 +83,7 @@ func TestTransactionRepositoryMySQL_CreateTransaction(t *testing.T) {
 }
 
 func TestTransactionRepositoryMySQL_GetAllForUser(t *testing.T) {
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 	repo := db.NewTransactionRepositoryMySQL(gormDB)
 
 	testCases := map[string]struct {

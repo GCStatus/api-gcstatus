@@ -3,7 +3,7 @@ package tests
 import (
 	"errors"
 	"gcstatus/internal/adapters/db"
-	"gcstatus/tests"
+	testutils "gcstatus/tests/utils"
 	"regexp"
 	"testing"
 
@@ -12,7 +12,7 @@ import (
 )
 
 func TestWalletRepositoryMySQL_Add(t *testing.T) {
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 	repo := db.NewWalletRepositoryMySQL(gormDB)
 
 	testCases := map[string]struct {
@@ -83,7 +83,7 @@ func TestWalletRepositoryMySQL_Add(t *testing.T) {
 }
 
 func TestWalletRepositoryMySQL_Subtract(t *testing.T) {
-	gormDB, mock := tests.Setup(t)
+	gormDB, mock := testutils.Setup(t)
 	repo := db.NewWalletRepositoryMySQL(gormDB)
 
 	testCases := map[string]struct {
