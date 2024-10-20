@@ -143,4 +143,6 @@ jobs:
     name: Deploy to production environment
     needs: [release, build]
     uses: ./.github/workflows/deploy-production.yml
+    with:
+      container-tag: v${{ needs.release.outputs.version }}
     secrets: inherit
