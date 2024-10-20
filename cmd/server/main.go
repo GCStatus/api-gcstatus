@@ -29,6 +29,7 @@ func main() {
 		missionService,
 		gameService,
 		bannerService,
+		adminCategoryService,
 		db := di.InitDependencies()
 
 	// Setup routes with dependency injection
@@ -46,6 +47,7 @@ func main() {
 		missionService,
 		gameService,
 		bannerService,
+		adminCategoryService,
 		db,
 	)
 

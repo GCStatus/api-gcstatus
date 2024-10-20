@@ -333,7 +333,7 @@ func NormalizeWhitespace(str string) string {
 func Slugify(s string) string {
 	s = strings.ToLower(s)
 
-	reg, _ := regexp.Compile(`[^a-z0-9\s]+`)
+	reg, _ := regexp.Compile(`[^a-z0-9\s\-]+`)
 	s = reg.ReplaceAllString(s, "")
 
 	s = strings.ReplaceAll(s, " ", "-")

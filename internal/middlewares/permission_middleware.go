@@ -13,39 +13,41 @@ type UserServiceInterface interface {
 	GetUserByIDForAdmin(userID uint) (*domain.User, error)
 }
 
-func PermissionMiddleware(userService UserServiceInterface, requiredScopes ...string) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		user, err := utils.Auth(c, userService.GetUserByIDForAdmin)
-		if err != nil {
-			api.RespondWithError(c, http.StatusUnauthorized, err.Error())
-			c.Abort()
-			return
-		}
-
-		hasFullAccess := false
-		for _, role := range user.Roles {
-			if role.Role.Name == "Technology" {
-				hasFullAccess = true
-				break
-			}
-		}
-
-		if hasFullAccess {
-			c.Next()
-			return
-		}
-
-		userPermissions := collectPermissions(user)
-
-		for _, requiredScope := range requiredScopes {
-			if !userHasPermission(userPermissions, requiredScope) {
-				api.RespondWithError(c, http.StatusForbidden, "insufficient permissions")
+func NewPermissionMiddleware(userService UserServiceInterface) func(requiredScopes ...string) gin.HandlerFunc {
+	return func(requiredScopes ...string) gin.HandlerFunc {
+		return func(c *gin.Context) {
+			user, err := utils.Auth(c, userService.GetUserByIDForAdmin)
+			if err != nil {
+				api.RespondWithError(c, http.StatusUnauthorized, err.Error())
 				c.Abort()
 				return
 			}
-		}
 
-		c.Next()
+			hasFullAccess := false
+			for _, role := range user.Roles {
+				if role.Role.Name == "Technology" {
+					hasFullAccess = true
+					break
+				}
+			}
+
+			if hasFullAccess {
+				c.Next()
+				return
+			}
+
+			userPermissions := collectPermissions(user)
+
+			for _, requiredScope := range requiredScopes {
+				if !userHasPermission(userPermissions, requiredScope) {
+					api.RespondWithError(c, http.StatusForbidden, "insufficient permissions")
+					c.Abort()
+					return
+				}
+			}
+
+			c.Next()
+		}
 	}
 }
 

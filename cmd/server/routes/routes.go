@@ -4,6 +4,7 @@ import (
 	"gcstatus/config"
 	"gcstatus/internal/middlewares"
 	"gcstatus/internal/usecases"
+	usecases_admin "gcstatus/internal/usecases/admin"
 	"strings"
 
 	"github.com/gin-contrib/cors"
@@ -26,6 +27,7 @@ func SetupRouter(
 	missionService *usecases.MissionService,
 	gameService *usecases.GameService,
 	bannerService *usecases.BannerService,
+	adminCategoryService *usecases_admin.AdminCategoryService,
 	db *gorm.DB,
 ) *gin.Engine {
 	r := gin.Default()
@@ -59,7 +61,8 @@ func SetupRouter(
 		gameHandler,
 		homeHandler,
 		steamHandler,
-		adminAuthHandler := InitHandlers(
+		adminAuthHandler,
+		adminCategoryHandler := InitHandlers(
 		authService,
 		userService,
 		passwordResetService,
@@ -73,11 +76,13 @@ func SetupRouter(
 		missionService,
 		gameService,
 		bannerService,
+		adminCategoryService,
 		db,
 	)
 
 	// Define the middlewares
 	r.Use(middlewares.LimitThrottleMiddleware())
+	permissionMiddleware := middlewares.NewPermissionMiddleware(userService)
 	protected := r.Group("/")
 	admin := r.Group("/admin")
 
@@ -127,7 +132,12 @@ func SetupRouter(
 	{
 		admin.GET("/me", adminAuthHandler.Me)
 		admin.POST("/logout", adminAuthHandler.Logout)
-		admin.POST("/steam/register/:appID", middlewares.PermissionMiddleware(userService, "create:steam-jobs-games"), steamHandler.RegisterByAppID)
+		admin.POST("/steam/register/:appID", permissionMiddleware("create:steam-jobs-games"), steamHandler.RegisterByAppID)
+
+		admin.GET("/categories", permissionMiddleware("view:categories"), adminCategoryHandler.GetAll)
+		admin.POST("/categories", permissionMiddleware("view:categories", "create:categories"), adminCategoryHandler.Create)
+		admin.PUT("/categories/:id", permissionMiddleware("view:categories", "update:categories"), adminCategoryHandler.Update)
+		admin.DELETE("/categories/:id", permissionMiddleware("view:categories", "delete:categories"), adminCategoryHandler.Delete)
 	}
 
 	// Common routes

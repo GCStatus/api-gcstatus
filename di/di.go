@@ -4,6 +4,7 @@ import (
 	"context"
 	"gcstatus/config"
 	"gcstatus/internal/usecases"
+	usecases_admin "gcstatus/internal/usecases/admin"
 	"gcstatus/pkg/cache"
 	"gcstatus/pkg/s3"
 	"gcstatus/pkg/sqs"
@@ -27,6 +28,7 @@ func InitDependencies() (
 	*usecases.MissionService,
 	*usecases.GameService,
 	*usecases.BannerService,
+	*usecases_admin.AdminCategoryService,
 	*gorm.DB,
 ) {
 	cfg := config.LoadConfig()
@@ -54,7 +56,8 @@ func InitDependencies() (
 		notificationService,
 		missionService,
 		gameService,
-		bannerService := Setup(dbConn)
+		bannerService,
+		adminCategoryService := Setup(dbConn)
 
 	// Setup clients for non-test environment
 	if cfg.ENV != "testing" {
@@ -90,5 +93,6 @@ func InitDependencies() (
 		missionService,
 		gameService,
 		bannerService,
+		adminCategoryService,
 		dbConn
 }

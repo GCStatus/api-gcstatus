@@ -4,6 +4,7 @@ import (
 	"gcstatus/internal/adapters/api"
 	api_admin "gcstatus/internal/adapters/api/admin"
 	"gcstatus/internal/usecases"
+	usecases_admin "gcstatus/internal/usecases/admin"
 
 	"gorm.io/gorm"
 )
@@ -22,6 +23,7 @@ func InitHandlers(
 	missionService *usecases.MissionService,
 	gameService *usecases.GameService,
 	bannerService *usecases.BannerService,
+	adminCategoryService *usecases_admin.AdminCategoryService,
 	db *gorm.DB,
 ) (
 	authHandler *api.AuthHandler,
@@ -37,6 +39,7 @@ func InitHandlers(
 	homeHandler *api.HomeHandler,
 	steamHandler *api_admin.SteamHandler,
 	adminAuthHandler *api_admin.AuthHandler,
+	adminCategoryHandler *api_admin.AdminCategoryHandler,
 ) {
 	userHandler = api.NewUserHandler(userService)
 	authHandler = api.NewAuthHandler(authService, userService)
@@ -51,6 +54,7 @@ func InitHandlers(
 	homeHandler = api.NewHomeHandler(userService, gameService, bannerService)
 	steamHandler = api_admin.NewSteamHandler(gameService, db)
 	adminAuthHandler = api_admin.NewAuthHandler(authService, userService)
+	adminCategoryHandler = api_admin.NewAdminCategoryHandler(adminCategoryService)
 
 	return authHandler,
 		passwordResetHandler,
@@ -64,5 +68,6 @@ func InitHandlers(
 		gameHandler,
 		homeHandler,
 		steamHandler,
-		adminAuthHandler
+		adminAuthHandler,
+		adminCategoryHandler
 }

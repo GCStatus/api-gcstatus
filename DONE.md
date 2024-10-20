@@ -147,5 +147,10 @@
   - [x] Create me method for admin
     - [x] Return user permissions
     - [x] Return user roles
+  - [x] Create categories CRUD
+    - [x] Create method to list all categories
+    - [x] Create method to create a new category
+    - [x] Create method to update a category
+    - [x] Create method to delete a category
 
 ### Post MVP

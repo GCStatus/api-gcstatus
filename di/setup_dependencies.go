@@ -2,7 +2,9 @@ package di
 
 import (
 	"gcstatus/internal/adapters/db"
+	db_admin "gcstatus/internal/adapters/db/admin"
 	"gcstatus/internal/usecases"
+	usecases_admin "gcstatus/internal/usecases/admin"
 
 	"gorm.io/gorm"
 )
@@ -21,6 +23,7 @@ func Setup(dbConn *gorm.DB) (
 	*usecases.MissionService,
 	*usecases.GameService,
 	*usecases.BannerService,
+	*usecases_admin.AdminCategoryService,
 ) {
 	// Create repository instances
 	userRepo := db.NewUserRepositoryMySQL(dbConn)
@@ -35,6 +38,7 @@ func Setup(dbConn *gorm.DB) (
 	missionRepo := db.NewMissionRepositoryMySQL(dbConn)
 	gameRepo := db.NewGameRepositoryMySQL(dbConn)
 	bannerRepo := db.NewBannerRepositoryMySQL(dbConn)
+	adminCategoryRepo := db_admin.NewAdminCategoryRepositoryMySQL(dbConn)
 
 	// Create service instances
 	userService := usecases.NewUserService(userRepo)
@@ -50,6 +54,7 @@ func Setup(dbConn *gorm.DB) (
 	missionService := usecases.NewMissionService(missionRepo)
 	gameService := usecases.NewGameService(gameRepo)
 	bannerService := usecases.NewBannerService(bannerRepo)
+	adminCategoryService := usecases_admin.NewAdminCategoryService(adminCategoryRepo)
 
 	return userService,
 		authService,
@@ -63,5 +68,6 @@ func Setup(dbConn *gorm.DB) (
 		notificationService,
 		missionService,
 		gameService,
-		bannerService
+		bannerService,
+		adminCategoryService
 }
