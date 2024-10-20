@@ -1,17 +1,7 @@
 name: Deploy to production environment
 on:
   workflow_call:
-    inputs:
-      container-tag:
-        required: true
-        type: string
-
   workflow_dispatch:
-    inputs:
-      container-tag:
-        description: "Container Tag"
-        required: true
-        type: string
 
 env:
   DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
@@ -22,7 +12,7 @@ env:
   EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
   EC2_USERNAME: ec2-user
   EC2_PORT: 22
-  DOCKER_TAG: ${{ inputs.container-tag }}
+  DOCKER_TAG: latest
 
 jobs:
   deploy:
@@ -35,7 +25,7 @@ jobs:
           username: ${{ env.EC2_USERNAME }}
           key: ${{ env.EC2_SSH_KEY }}
           port: ${{ env.EC2_PORT }}
-          envs: DOCKER_CONTAINER, DOCKER_PORT, DOCKER_HUB_USERNAME, DOCKER_HUB_PAT, DOCKER_TAG
+          envs: DOCKER_CONTAINER, DOCKER_PORT, DOCKER_HUB_USERNAME, DOCKER_HUB_PAT
           script: |
             IMAGE_ID=$(docker inspect -f '{{.Image}}' $(docker ps -q --filter "name=$DOCKER_CONTAINER"))
             echo $DOCKER_HUB_PAT | docker login -u $DOCKER_HUB_USERNAME --password-stdin
