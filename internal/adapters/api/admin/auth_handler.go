@@ -44,7 +44,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		if httpErr, ok := err.(*errors.HttpError); ok {
 			api.RespondWithError(c, httpErr.Code, httpErr.Error())
 		} else {
-			api.RespondWithError(c, http.StatusInternalServerError, "internal server error")
+			api.RespondWithError(c, http.StatusInternalServerError, "Failed to authenticate user: "+err.Error())
 		}
 		return
 	}

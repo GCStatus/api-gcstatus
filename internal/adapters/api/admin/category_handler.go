@@ -32,7 +32,13 @@ func (h *AdminCategoryHandler) GetAll(c *gin.Context) {
 		return
 	}
 
-	transformedCategories := resources.TransformCategories(categories)
+	var transformedCategories []resources.CategoryResource
+
+	if len(categories) > 0 {
+		transformedCategories = resources.TransformCategories(categories)
+	} else {
+		transformedCategories = []resources.CategoryResource{}
+	}
 
 	response := resources.Response{
 		Data: transformedCategories,

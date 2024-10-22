@@ -24,6 +24,9 @@ func InitHandlers(
 	gameService *usecases.GameService,
 	bannerService *usecases.BannerService,
 	adminCategoryService *usecases_admin.AdminCategoryService,
+	adminGenreService *usecases_admin.AdminGenreService,
+	AdminPlatformService *usecases_admin.AdminPlatformService,
+	AdminTagService *usecases_admin.AdminTagService,
 	db *gorm.DB,
 ) (
 	authHandler *api.AuthHandler,
@@ -40,6 +43,9 @@ func InitHandlers(
 	steamHandler *api_admin.SteamHandler,
 	adminAuthHandler *api_admin.AuthHandler,
 	adminCategoryHandler *api_admin.AdminCategoryHandler,
+	adminGenreHandler *api_admin.AdminGenreHandler,
+	adminPlatformHandler *api_admin.AdminPlatformHandler,
+	adminTagHandler *api_admin.AdminTagHandler,
 ) {
 	userHandler = api.NewUserHandler(userService)
 	authHandler = api.NewAuthHandler(authService, userService)
@@ -55,6 +61,9 @@ func InitHandlers(
 	steamHandler = api_admin.NewSteamHandler(gameService, db)
 	adminAuthHandler = api_admin.NewAuthHandler(authService, userService)
 	adminCategoryHandler = api_admin.NewAdminCategoryHandler(adminCategoryService)
+	adminGenreHandler = api_admin.NewAdminGenreHandler(adminGenreService)
+	adminPlatformHandler = api_admin.NewAdminPlatformHandler(AdminPlatformService)
+	adminTagHandler = api_admin.NewAdminTagHandler(AdminTagService)
 
 	return authHandler,
 		passwordResetHandler,
@@ -69,5 +78,8 @@ func InitHandlers(
 		homeHandler,
 		steamHandler,
 		adminAuthHandler,
-		adminCategoryHandler
+		adminCategoryHandler,
+		adminGenreHandler,
+		adminPlatformHandler,
+		adminTagHandler
 }

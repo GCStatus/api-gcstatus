@@ -29,6 +29,9 @@ func InitDependencies() (
 	*usecases.GameService,
 	*usecases.BannerService,
 	*usecases_admin.AdminCategoryService,
+	*usecases_admin.AdminGenreService,
+	*usecases_admin.AdminPlatformService,
+	*usecases_admin.AdminTagService,
 	*gorm.DB,
 ) {
 	cfg := config.LoadConfig()
@@ -57,7 +60,10 @@ func InitDependencies() (
 		missionService,
 		gameService,
 		bannerService,
-		adminCategoryService := Setup(dbConn)
+		adminCategoryService,
+		adminGenreService,
+		adminPlatformService,
+		adminTagService := Setup(dbConn)
 
 	// Setup clients for non-test environment
 	if cfg.ENV != "testing" {
@@ -94,5 +100,8 @@ func InitDependencies() (
 		gameService,
 		bannerService,
 		adminCategoryService,
+		adminGenreService,
+		adminPlatformService,
+		adminTagService,
 		dbConn
 }

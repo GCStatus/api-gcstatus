@@ -17,11 +17,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAdminCategoryRepositoryMySQL_GetAll(t *testing.T) {
+func TestAdminTagRepositoryMySQL_GetAll(t *testing.T) {
 	fixedTime := time.Now()
 	gormDB, mock := testutils.Setup(t)
 
-	repo := db_admin.NewAdminCategoryRepositoryMySQL(gormDB)
+	repo := db_admin.NewAdminTagRepositoryMySQL(gormDB)
 
 	testCases := map[string]struct {
 		mockBehavior func()
@@ -31,9 +31,9 @@ func TestAdminCategoryRepositoryMySQL_GetAll(t *testing.T) {
 		"success case": {
 			mockBehavior: func() {
 				rows := sqlmock.NewRows([]string{"id", "name", "created_at", "updated_at"}).
-					AddRow(1, "Category 1", fixedTime, fixedTime).
-					AddRow(2, "Category 2", fixedTime, fixedTime)
-				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `categories` WHERE `categories`.`deleted_at` IS NULL")).
+					AddRow(1, "Tag 1", fixedTime, fixedTime).
+					AddRow(2, "Tag 2", fixedTime, fixedTime)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `tags` WHERE `tags`.`deleted_at` IS NULL")).
 					WillReturnRows(rows)
 			},
 			expectedLen: 2,
@@ -42,7 +42,7 @@ func TestAdminCategoryRepositoryMySQL_GetAll(t *testing.T) {
 		"no records found": {
 			mockBehavior: func() {
 				rows := sqlmock.NewRows([]string{"id", "name", "created_at", "updated_at"})
-				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `categories` WHERE `categories`.`deleted_at` IS NULL")).
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `tags` WHERE `tags`.`deleted_at` IS NULL")).
 					WillReturnRows(rows)
 			},
 			expectedLen: 0,
@@ -64,61 +64,61 @@ func TestAdminCategoryRepositoryMySQL_GetAll(t *testing.T) {
 	}
 }
 
-func TestAdminCategoryRepositoryMySQL_Create(t *testing.T) {
+func TestAdminTagRepositoryMySQL_Create(t *testing.T) {
 	fixedTime := time.Now()
 
 	testCases := map[string]struct {
-		category     *domain.Category
-		mockBehavior func(mock sqlmock.Sqlmock, category *domain.Category)
+		tag          *domain.Tag
+		mockBehavior func(mock sqlmock.Sqlmock, tag *domain.Tag)
 		expectedErr  error
 		expectedSlug string
 	}{
 		"success case": {
-			category: &domain.Category{
-				Name:      "Category 1",
+			tag: &domain.Tag{
+				Name:      "Tag 1",
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
 			},
-			mockBehavior: func(mock sqlmock.Sqlmock, category *domain.Category) {
-				expectedSlug := utils.Slugify(category.Name)
+			mockBehavior: func(mock sqlmock.Sqlmock, tag *domain.Tag) {
+				expectedSlug := utils.Slugify(tag.Name)
 
 				mock.ExpectBegin()
-				mock.ExpectExec("INSERT INTO `categories`").
+				mock.ExpectExec("INSERT INTO `tags`").
 					WithArgs(
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
-						category.Name,
+						tag.Name,
 						expectedSlug,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
 			},
 			expectedErr:  nil,
-			expectedSlug: utils.Slugify("Category 1"),
+			expectedSlug: utils.Slugify("Tag 1"),
 		},
 		"Failure - Insert Error": {
-			category: &domain.Category{
-				Name:      "Category 1",
+			tag: &domain.Tag{
+				Name:      "Tag 1",
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
 			},
-			mockBehavior: func(mock sqlmock.Sqlmock, category *domain.Category) {
-				expectedSlug := utils.Slugify(category.Name)
+			mockBehavior: func(mock sqlmock.Sqlmock, tag *domain.Tag) {
+				expectedSlug := utils.Slugify(tag.Name)
 				mock.ExpectBegin()
-				mock.ExpectExec("INSERT INTO `categories`").
+				mock.ExpectExec("INSERT INTO `tags`").
 					WithArgs(
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
-						category.Name,
+						tag.Name,
 						expectedSlug,
 					).
 					WillReturnError(fmt.Errorf("database error"))
 				mock.ExpectRollback()
 			},
 			expectedErr:  fmt.Errorf("database error"),
-			expectedSlug: utils.Slugify("Category 1"),
+			expectedSlug: utils.Slugify("Tag 1"),
 		},
 	}
 
@@ -126,41 +126,41 @@ func TestAdminCategoryRepositoryMySQL_Create(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			gormDB, mock := testutils.Setup(t)
 
-			repo := db_admin.NewAdminCategoryRepositoryMySQL(gormDB)
+			repo := db_admin.NewAdminTagRepositoryMySQL(gormDB)
 
-			tc.category.Slug = utils.Slugify(tc.category.Name)
+			tc.tag.Slug = utils.Slugify(tc.tag.Name)
 
-			tc.mockBehavior(mock, tc.category)
+			tc.mockBehavior(mock, tc.tag)
 
-			err := repo.Create(tc.category)
+			err := repo.Create(tc.tag)
 
-			assert.Equal(t, tc.expectedSlug, tc.category.Slug)
+			assert.Equal(t, tc.expectedSlug, tc.tag.Slug)
 			assert.Equal(t, tc.expectedErr, err)
 			assert.NoError(t, mock.ExpectationsWereMet())
 		})
 	}
 }
 
-func TestAdminCategoryRepositoryMySQL_Update(t *testing.T) {
+func TestAdminTagRepositoryMySQL_Update(t *testing.T) {
 	gormDB, mock := testutils.Setup(t)
 
-	repo := db_admin.NewAdminCategoryRepositoryMySQL(gormDB)
+	repo := db_admin.NewAdminTagRepositoryMySQL(gormDB)
 
 	tests := map[string]struct {
-		categoryID uint
-		request    ports_admin.UpdateCategoryInterface
-		mock       func(request ports_admin.UpdateCategoryInterface)
-		expectErr  bool
+		tagID     uint
+		request   ports_admin.UpdateTagInterface
+		mock      func(request ports_admin.UpdateTagInterface)
+		expectErr bool
 	}{
 		"successful picture update": {
-			categoryID: 1,
-			request: ports_admin.UpdateCategoryInterface{
-				Name: "Category 1",
-				Slug: "category-1",
+			tagID: 1,
+			request: ports_admin.UpdateTagInterface{
+				Name: "Tag 1",
+				Slug: "tag-1",
 			},
-			mock: func(request ports_admin.UpdateCategoryInterface) {
+			mock: func(request ports_admin.UpdateTagInterface) {
 				mock.ExpectBegin()
-				mock.ExpectExec(regexp.QuoteMeta("UPDATE `categories` SET `name`=?,`slug`=?,`updated_at`=? WHERE id = ? AND `categories`.`deleted_at` IS NULL")).
+				mock.ExpectExec(regexp.QuoteMeta("UPDATE `tags` SET `name`=?,`slug`=?,`updated_at`=? WHERE id = ? AND `tags`.`deleted_at` IS NULL")).
 					WithArgs(
 						request.Name,
 						request.Slug,
@@ -173,14 +173,14 @@ func TestAdminCategoryRepositoryMySQL_Update(t *testing.T) {
 			expectErr: false,
 		},
 		"failed picture update due to database error": {
-			categoryID: 2,
-			request: ports_admin.UpdateCategoryInterface{
-				Name: "Category 1",
-				Slug: "category-1",
+			tagID: 2,
+			request: ports_admin.UpdateTagInterface{
+				Name: "Tag 1",
+				Slug: "tag-1",
 			},
-			mock: func(request ports_admin.UpdateCategoryInterface) {
+			mock: func(request ports_admin.UpdateTagInterface) {
 				mock.ExpectBegin()
-				mock.ExpectExec(regexp.QuoteMeta("UPDATE `categories` SET `name`=?,`slug`=?,`updated_at`=? WHERE id = ? AND `categories`.`deleted_at` IS NULL")).
+				mock.ExpectExec(regexp.QuoteMeta("UPDATE `tags` SET `name`=?,`slug`=?,`updated_at`=? WHERE id = ? AND `tags`.`deleted_at` IS NULL")).
 					WithArgs(
 						request.Name,
 						request.Slug,
@@ -197,7 +197,7 @@ func TestAdminCategoryRepositoryMySQL_Update(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			tt.mock(tt.request)
-			err := repo.Update(tt.categoryID, tt.request)
+			err := repo.Update(tt.tagID, tt.request)
 
 			if (err != nil) != tt.expectErr {
 				t.Errorf("expected error: %v, got: %v", tt.expectErr, err)
@@ -210,36 +210,36 @@ func TestAdminCategoryRepositoryMySQL_Update(t *testing.T) {
 	}
 }
 
-func TestAdminCategoryRepositoryMySQL_Delete(t *testing.T) {
+func TestAdminTagRepositoryMySQL_Delete(t *testing.T) {
 	gormDB, mock := testutils.Setup(t)
-	repo := db_admin.NewAdminCategoryRepositoryMySQL(gormDB)
+	repo := db_admin.NewAdminTagRepositoryMySQL(gormDB)
 
 	testCases := map[string]struct {
-		categoryID   uint
+		tagID        uint
 		mockBehavior func()
 		expectedErr  error
 	}{
 		"successful delete": {
-			categoryID: 1,
+			tagID: 1,
 			mockBehavior: func() {
 				mock.ExpectBegin()
-				mock.ExpectExec(regexp.QuoteMeta("UPDATE `categories` SET `deleted_at`=? WHERE `categories`.`id` = ? AND `categories`.`deleted_at` IS NULL")).
+				mock.ExpectExec(regexp.QuoteMeta("UPDATE `tags` SET `deleted_at`=? WHERE `tags`.`id` = ? AND `tags`.`deleted_at` IS NULL")).
 					WithArgs(sqlmock.AnyArg(), 1).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
 			},
 			expectedErr: nil,
 		},
-		"category not found": {
-			categoryID: 99,
+		"tag not found": {
+			tagID: 99,
 			mockBehavior: func() {
 				mock.ExpectBegin()
-				mock.ExpectExec(regexp.QuoteMeta("UPDATE `categories` SET `deleted_at`=? WHERE `categories`.`id` = ? AND `categories`.`deleted_at` IS NULL")).
+				mock.ExpectExec(regexp.QuoteMeta("UPDATE `tags` SET `deleted_at`=? WHERE `tags`.`id` = ? AND `tags`.`deleted_at` IS NULL")).
 					WithArgs(sqlmock.AnyArg(), 99).
-					WillReturnError(errors.NewHttpError(http.StatusNotFound, "category not found"))
+					WillReturnError(errors.NewHttpError(http.StatusNotFound, "tag not found"))
 				mock.ExpectRollback()
 			},
-			expectedErr: errors.NewHttpError(http.StatusNotFound, "category not found"),
+			expectedErr: errors.NewHttpError(http.StatusNotFound, "tag not found"),
 		},
 	}
 
@@ -248,7 +248,7 @@ func TestAdminCategoryRepositoryMySQL_Delete(t *testing.T) {
 
 			tc.mockBehavior()
 
-			err := repo.Delete(tc.categoryID)
+			err := repo.Delete(tc.tagID)
 
 			if tc.expectedErr != nil {
 				assert.EqualError(t, err, tc.expectedErr.Error())

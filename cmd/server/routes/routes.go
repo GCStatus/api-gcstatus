@@ -28,6 +28,9 @@ func SetupRouter(
 	gameService *usecases.GameService,
 	bannerService *usecases.BannerService,
 	adminCategoryService *usecases_admin.AdminCategoryService,
+	adminGenreService *usecases_admin.AdminGenreService,
+	AdminPlatformService *usecases_admin.AdminPlatformService,
+	AdminTagService *usecases_admin.AdminTagService,
 	db *gorm.DB,
 ) *gin.Engine {
 	r := gin.Default()
@@ -62,7 +65,10 @@ func SetupRouter(
 		homeHandler,
 		steamHandler,
 		adminAuthHandler,
-		adminCategoryHandler := InitHandlers(
+		adminCategoryHandler,
+		adminGenreHandler,
+		adminPlatformHandler,
+		adminTagHandler := InitHandlers(
 		authService,
 		userService,
 		passwordResetService,
@@ -77,6 +83,9 @@ func SetupRouter(
 		gameService,
 		bannerService,
 		adminCategoryService,
+		adminGenreService,
+		AdminPlatformService,
+		AdminTagService,
 		db,
 	)
 
@@ -138,6 +147,21 @@ func SetupRouter(
 		admin.POST("/categories", permissionMiddleware("view:categories", "create:categories"), adminCategoryHandler.Create)
 		admin.PUT("/categories/:id", permissionMiddleware("view:categories", "update:categories"), adminCategoryHandler.Update)
 		admin.DELETE("/categories/:id", permissionMiddleware("view:categories", "delete:categories"), adminCategoryHandler.Delete)
+
+		admin.GET("/genres", permissionMiddleware("view:genres"), adminGenreHandler.GetAll)
+		admin.POST("/genres", permissionMiddleware("view:genres", "create:genres"), adminGenreHandler.Create)
+		admin.PUT("/genres/:id", permissionMiddleware("view:genres", "update:genres"), adminGenreHandler.Update)
+		admin.DELETE("/genres/:id", permissionMiddleware("view:genres", "delete:genres"), adminGenreHandler.Delete)
+
+		admin.GET("/platforms", permissionMiddleware("view:platforms"), adminPlatformHandler.GetAll)
+		admin.POST("/platforms", permissionMiddleware("view:platforms", "create:platforms"), adminPlatformHandler.Create)
+		admin.PUT("/platforms/:id", permissionMiddleware("view:platforms", "update:platforms"), adminPlatformHandler.Update)
+		admin.DELETE("/platforms/:id", permissionMiddleware("view:platforms", "delete:platforms"), adminPlatformHandler.Delete)
+
+		admin.GET("/tags", permissionMiddleware("view:tags"), adminTagHandler.GetAll)
+		admin.POST("/tags", permissionMiddleware("view:tags", "create:tags"), adminTagHandler.Create)
+		admin.PUT("/tags/:id", permissionMiddleware("view:tags", "update:tags"), adminTagHandler.Update)
+		admin.DELETE("/tags/:id", permissionMiddleware("view:tags", "delete:tags"), adminTagHandler.Delete)
 	}
 
 	// Common routes

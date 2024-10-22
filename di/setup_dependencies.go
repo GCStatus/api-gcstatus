@@ -24,6 +24,9 @@ func Setup(dbConn *gorm.DB) (
 	*usecases.GameService,
 	*usecases.BannerService,
 	*usecases_admin.AdminCategoryService,
+	*usecases_admin.AdminGenreService,
+	*usecases_admin.AdminPlatformService,
+	*usecases_admin.AdminTagService,
 ) {
 	// Create repository instances
 	userRepo := db.NewUserRepositoryMySQL(dbConn)
@@ -39,6 +42,9 @@ func Setup(dbConn *gorm.DB) (
 	gameRepo := db.NewGameRepositoryMySQL(dbConn)
 	bannerRepo := db.NewBannerRepositoryMySQL(dbConn)
 	adminCategoryRepo := db_admin.NewAdminCategoryRepositoryMySQL(dbConn)
+	adminGenreRepo := db_admin.NewAdminGenreRepositoryMySQL(dbConn)
+	adminPlatformRepo := db_admin.NewAdminPlatformRepositoryMySQL(dbConn)
+	adminTagRepo := db_admin.NewAdminTagRepositoryMySQL(dbConn)
 
 	// Create service instances
 	userService := usecases.NewUserService(userRepo)
@@ -55,6 +61,9 @@ func Setup(dbConn *gorm.DB) (
 	gameService := usecases.NewGameService(gameRepo)
 	bannerService := usecases.NewBannerService(bannerRepo)
 	adminCategoryService := usecases_admin.NewAdminCategoryService(adminCategoryRepo)
+	adminGenreService := usecases_admin.NewAdminGenreService(adminGenreRepo)
+	adminPlatformService := usecases_admin.NewAdminPlatformService(adminPlatformRepo)
+	adminTagService := usecases_admin.NewAdminTagService(adminTagRepo)
 
 	return userService,
 		authService,
@@ -69,5 +78,8 @@ func Setup(dbConn *gorm.DB) (
 		missionService,
 		gameService,
 		bannerService,
-		adminCategoryService
+		adminCategoryService,
+		adminGenreService,
+		adminPlatformService,
+		adminTagService
 }

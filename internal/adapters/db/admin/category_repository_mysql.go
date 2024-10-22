@@ -48,7 +48,7 @@ func (h *AdminCategoryRepositoryMySQL) Update(id uint, request ports_admin.Updat
 
 func (h *AdminCategoryRepositoryMySQL) Delete(id uint) error {
 	if err := h.db.Delete(&domain.Category{}, id).Error; err != nil {
-		return errors.NewHttpError(http.StatusNotFound, "category not found.")
+		return errors.NewHttpError(http.StatusInternalServerError, err.Error())
 	}
 	return nil
 }
