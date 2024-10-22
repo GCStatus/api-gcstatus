@@ -28,6 +28,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
       - name: Deploy to EC2 via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -37,17 +40,20 @@ jobs:
           port: ${{ env.EC2_PORT }}
           envs: DOCKER_CONTAINER, DOCKER_PORT, DOCKER_HUB_USERNAME, DOCKER_HUB_PAT, DOCKER_TAG
           script: |
-            IMAGE_ID=$(docker inspect -f '{{.Image}}' $(docker ps -q --filter "name=$DOCKER_CONTAINER"))
-            echo $DOCKER_HUB_PAT | docker login -u $DOCKER_HUB_USERNAME --password-stdin
-
-            docker pull $DOCKER_HUB_USERNAME/$DOCKER_CONTAINER:$DOCKER_TAG
-
+            echo "Stopping and removing old container, if exists..."
             docker stop $DOCKER_CONTAINER || true
             docker rm $DOCKER_CONTAINER || true
 
+            echo $DOCKER_HUB_PAT | docker login -u $DOCKER_HUB_USERNAME --password-stdin
+
+            echo "Pulling container: $DOCKER_HUB_USERNAME/$DOCKER_CONTAINER:$DOCKER_TAG"
+            docker pull $DOCKER_HUB_USERNAME/$DOCKER_CONTAINER:$DOCKER_TAG
+
+            echo "Running the new container..."
             docker run -d --name $DOCKER_CONTAINER -p $DOCKER_PORT:$DOCKER_PORT \
               $DOCKER_HUB_USERNAME/$DOCKER_CONTAINER:$DOCKER_TAG
 
+            echo "Creating .env file inside the container..."
             docker exec $DOCKER_CONTAINER sh -c 'cat <<EOF > /app/.env
               ENV=production
               JWT_TTL=15
@@ -55,7 +61,7 @@ jobs:
               ACCESS_TOKEN_KEY=${{ secrets.ACCESS_TOKEN_KEY }}
               DB_HOST=${{ secrets.DB_HOST }}
               DB_PORT=${{ secrets.DB_PORT }}
-              DB_USEr=${{ secrets.DB_USER }}
+              DB_USER=${{ secrets.DB_USER }}
               DB_PASSWORD=${{ secrets.DB_PASSWORD }}
               DB_NAME=${{ secrets.DB_NAME }}
               IS_AUTH_KEY=${{ secrets.IS_AUTH_KEY }}
@@ -63,7 +69,7 @@ jobs:
               HTTP_ONLY=${{ secrets.HTTP_ONLY }}
               HTTP_DOMAIN=${{ secrets.HTTP_DOMAIN }}
               REDIS_HOST=${{ secrets.REDIS_HOST }}
-              PORT=${{ secrets.DOCKER_PORT }}
+              PORT=${{ env.DOCKER_PORT }}
               AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}
               AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}
               AWS_MAIL_FROM=${{ secrets.AWS_MAIL_FROM }}
@@ -74,5 +80,26 @@ jobs:
               AWS_SQS_REGION=${{ secrets.AWS_SQS_REGION }}
               AWS_SQS_URL=${{ secrets.AWS_SQS_URL }}
             EOF'
+            echo "Environment variables written successfully."
 
-            docker rmi $IMAGE_ID || true
+            echo "Waiting for container to be healthy..."
+            until [ "$(docker inspect --format='{{.State.Health.Status}}' $DOCKER_CONTAINER)" == "healthy" ]; do
+              echo "Still waiting for container health check to pass..."
+              sleep 5
+            done
+            echo "Container is healthy!"
+
+      - name: Cleanup old Docker images
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.EC2_HOST }}
+          username: ${{ env.EC2_USERNAME }}
+          key: ${{ env.EC2_SSH_KEY }}
+          port: ${{ env.EC2_PORT }}
+          script: |
+            echo "Cleaning up unused Docker images..."
+            IMAGE_ID=$(docker images -f "dangling=true" -q)
+            if [ -n "$IMAGE_ID" ]; then
+              docker rmi $IMAGE_ID || true
+            fi
+            echo "Old images cleaned."

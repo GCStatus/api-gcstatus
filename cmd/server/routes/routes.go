@@ -5,6 +5,7 @@ import (
 	"gcstatus/internal/middlewares"
 	"gcstatus/internal/usecases"
 	usecases_admin "gcstatus/internal/usecases/admin"
+	"net/http"
 	"strings"
 
 	"github.com/gin-contrib/cors"
@@ -165,6 +166,9 @@ func SetupRouter(
 	}
 
 	// Common routes
+	r.GET("/health", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{"message": "Everything is ok!"})
+	})
 	r.GET("/home", homeHandler.Home)
 	r.GET("/games/:slug", gameHandler.FindBySlug)
 

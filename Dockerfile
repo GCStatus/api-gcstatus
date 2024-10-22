@@ -35,5 +35,9 @@ COPY ./docker/entrypoint.prod.sh ./docker/entrypoint.sh
 # Set executable permission to entrypoint
 RUN chmod +x ./docker/entrypoint.sh
 
+# Set healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl --silent --fail http://localhost:8080/health || exit 1
+
 # Start supervisord via the entrypoint script
 ENTRYPOINT [ "./docker/entrypoint.sh" ]
