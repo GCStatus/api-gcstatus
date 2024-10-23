@@ -109,6 +109,8 @@ func (h *ProfileHandler) UpdatePicture(c *gin.Context) {
 
 	h.createTrackProfilePictureSQS(c, user)
 
+	cache.GlobalCache.RemoveUserFromCache(user.ID)
+
 	c.JSON(http.StatusOK, gin.H{"message": "Your profile picture was successfully updated!"})
 }
 

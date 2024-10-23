@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"gcstatus/config"
 	"gcstatus/internal/domain"
-	"gcstatus/pkg/cache"
 	"io"
 	"os"
 	"regexp"
@@ -74,7 +73,7 @@ func Decrypt(decryptable string, key string) (string, error) {
 
 type UserFetcher func(id uint) (*domain.User, error)
 
-func ExtractAuthenticatedUser(c *gin.Context, fetchUser UserFetcher) (any, error) {
+func ExtractAuthenticatedUser(c *gin.Context, fetchUser UserFetcher) (*domain.User, error) {
 	env := config.LoadConfig()
 
 	encryptedToken, err := c.Cookie(env.AccessTokenKey)
@@ -113,7 +112,7 @@ func ExtractAuthenticatedUser(c *gin.Context, fetchUser UserFetcher) (any, error
 				return nil, errors.New("user is blocked")
 			}
 
-			return userIDUint, nil
+			return user, nil
 		}
 
 		return nil, errors.New("invalid user ID format")
@@ -271,27 +270,10 @@ func IsHashEqualsValue(hash string, value string) bool {
 }
 
 func Auth(c *gin.Context, fetchUser UserFetcher) (*domain.User, error) {
-	authUser, err := ExtractAuthenticatedUser(c, fetchUser)
+	user, err := ExtractAuthenticatedUser(c, fetchUser)
 	if err != nil {
 		return nil, fmt.Errorf("unauthorized: %v", err)
 	}
-
-	userID, ok := authUser.(uint)
-	if !ok {
-		return nil, fmt.Errorf("invalid user ID format")
-	}
-
-	user, found := cache.GlobalCache.GetUserFromCache(userID)
-	if found {
-		return user, nil
-	}
-
-	user, err = fetchUser(userID)
-	if err != nil {
-		return nil, fmt.Errorf("error fetching user: %v", err)
-	}
-
-	cache.GlobalCache.SetUserInCache(user)
 
 	return user, nil
 }
