@@ -2,6 +2,7 @@ package api_admin
 
 import (
 	"gcstatus/internal/adapters/api"
+	"gcstatus/internal/domain"
 	"gcstatus/internal/jobs"
 	"gcstatus/internal/usecases"
 	"net/http"
@@ -22,9 +23,20 @@ func NewSteamHandler(gameService *usecases.GameService, db *gorm.DB) *SteamHandl
 
 func (h *SteamHandler) RegisterByAppID(c *gin.Context) {
 	appIDStr := c.Param("appID")
-	appID, err := strconv.ParseInt(appIDStr, 10, 32)
+	appID, err := strconv.ParseUint(appIDStr, 10, 32)
 	if err != nil {
 		api.RespondWithError(c, http.StatusBadRequest, "Invalid app ID: "+err.Error())
+		return
+	}
+
+	exists, err := h.gameService.ExistsForStore(domain.SteamStoreID, uint(appID))
+	if err != nil {
+		api.RespondWithError(c, http.StatusInternalServerError, "Failed to check if game already exists: "+err.Error())
+		return
+	}
+
+	if exists {
+		api.RespondWithError(c, http.StatusConflict, "The game you are trying to add already exists from Steam!")
 		return
 	}
 

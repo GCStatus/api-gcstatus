@@ -185,3 +185,16 @@ func (h *GameRepositoryMySQL) FindBySlug(slug string, userID uint) (domain.Game,
 
 	return game, nil
 }
+
+func (h *GameRepositoryMySQL) ExistsForStore(storeID uint, appID uint) (bool, error) {
+	var count int64
+	err := h.db.Model(&domain.GameStore{}).
+		Where("store_id = ? AND store_game_id = ?", storeID, appID).
+		Count(&count).Error
+
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}

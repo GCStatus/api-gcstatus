@@ -30,8 +30,9 @@ func SetupRouter(
 	bannerService *usecases.BannerService,
 	adminCategoryService *usecases_admin.AdminCategoryService,
 	adminGenreService *usecases_admin.AdminGenreService,
-	AdminPlatformService *usecases_admin.AdminPlatformService,
-	AdminTagService *usecases_admin.AdminTagService,
+	adminPlatformService *usecases_admin.AdminPlatformService,
+	adminTagService *usecases_admin.AdminTagService,
+	adminGameService *usecases_admin.AdminGameService,
 	db *gorm.DB,
 ) *gin.Engine {
 	r := gin.Default()
@@ -69,7 +70,8 @@ func SetupRouter(
 		adminCategoryHandler,
 		adminGenreHandler,
 		adminPlatformHandler,
-		adminTagHandler := InitHandlers(
+		adminTagHandler,
+		adminGameHandler := InitHandlers(
 		authService,
 		userService,
 		passwordResetService,
@@ -85,8 +87,9 @@ func SetupRouter(
 		bannerService,
 		adminCategoryService,
 		adminGenreService,
-		AdminPlatformService,
-		AdminTagService,
+		adminPlatformService,
+		adminTagService,
+		adminGameService,
 		db,
 	)
 
@@ -163,6 +166,9 @@ func SetupRouter(
 		admin.POST("/tags", permissionMiddleware("view:tags", "create:tags"), adminTagHandler.Create)
 		admin.PUT("/tags/:id", permissionMiddleware("view:tags", "update:tags"), adminTagHandler.Update)
 		admin.DELETE("/tags/:id", permissionMiddleware("view:tags", "delete:tags"), adminTagHandler.Delete)
+
+		admin.GET("/games", permissionMiddleware("view:games"), adminGameHandler.GetAll)
+		admin.GET("/games/:id", permissionMiddleware("view:games"), adminGameHandler.FindByID)
 	}
 
 	// Common routes

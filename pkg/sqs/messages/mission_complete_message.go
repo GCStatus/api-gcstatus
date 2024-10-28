@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/usecases"
-	"gcstatus/pkg/cache"
 	"log"
 
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
@@ -86,8 +85,6 @@ func (h *MissionCompleteMessageHandler) HandleCompleteMissionMessage(ctx context
 	if err := h.userService.AddExperience(completeMissionMsg.UserID, mission.Experience, h.taskService.AwardTitleToUser); err != nil {
 		log.Fatalf("failed to experience to user %+v. Error: %+s", completeMissionMsg.UserID, err.Error())
 	}
-
-	cache.GlobalCache.RemoveUserFromCache(completeMissionMsg.UserID)
 }
 
 func (h *MissionCompleteMessageHandler) createTransactionForMissionCoins(mission domain.Mission, userID uint) {

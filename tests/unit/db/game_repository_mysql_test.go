@@ -601,6 +601,71 @@ func TestGameRepositoryMySQL_FindGamesByCondition(t *testing.T) {
 	}
 }
 
+func TestGameRepositoryMySQL_ExistsForStore(t *testing.T) {
+	gormDB, mock := testutils.Setup(t)
+
+	repo := db.NewGameRepositoryMySQL(gormDB)
+
+	testCases := map[string]struct {
+		storeID      uint
+		appID        uint
+		mockBehavior func()
+		expected     bool
+		expectedErr  error
+	}{
+		"record exists": {
+			storeID: 100,
+			appID:   200,
+			mockBehavior: func() {
+				rows := sqlmock.NewRows([]string{"count"}).
+					AddRow(1)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT count(*) FROM `game_stores` WHERE (store_id = ? AND store_game_id = ?) AND `game_stores`.`deleted_at` IS NULL")).
+					WithArgs(100, 200).
+					WillReturnRows(rows)
+			},
+			expected:    true,
+			expectedErr: nil,
+		},
+		"no record exists": {
+			storeID: 100,
+			appID:   200,
+			mockBehavior: func() {
+				rows := sqlmock.NewRows([]string{"count"}).
+					AddRow(0)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT count(*) FROM `game_stores` WHERE (store_id = ? AND store_game_id = ?) AND `game_stores`.`deleted_at` IS NULL")).
+					WithArgs(100, 200).
+					WillReturnRows(rows)
+			},
+			expected:    false,
+			expectedErr: nil,
+		},
+		"query error": {
+			storeID: 100,
+			appID:   200,
+			mockBehavior: func() {
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT count(*) FROM `game_stores` WHERE (store_id = ? AND store_game_id = ?) AND `game_stores`.`deleted_at` IS NULL")).
+					WithArgs(100, 200).
+					WillReturnError(errors.New("query error"))
+			},
+			expected:    false,
+			expectedErr: errors.New("query error"),
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			tc.mockBehavior()
+
+			exists, err := repo.ExistsForStore(tc.storeID, tc.appID)
+
+			assert.Equal(t, tc.expectedErr, err)
+			assert.Equal(t, tc.expected, exists)
+
+			assert.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
 func gameRepositoryMySQL_GamesEqual(expected, actual []domain.Game) bool {
 	if len(expected) != len(actual) {
 		return false

@@ -6,7 +6,6 @@ import (
 	"gcstatus/internal/resources"
 	"gcstatus/internal/usecases"
 	"gcstatus/internal/utils"
-	"gcstatus/pkg/cache"
 	"gcstatus/pkg/s3"
 	"log"
 	"net/http"
@@ -123,8 +122,6 @@ func (h *UserHandler) UpdateUserNickAndEmail(c *gin.Context) {
 		return
 	}
 
-	cache.GlobalCache.RemoveUserFromCache(user.ID)
-
 	c.JSON(http.StatusOK, gin.H{"message": "Your nickname or email was successfully updated!"})
 }
 
@@ -159,8 +156,6 @@ func (h *UserHandler) UpdateUserBasics(c *gin.Context) {
 		RespondWithError(c, http.StatusInternalServerError, "Failed to update your informations: "+err.Error())
 		return
 	}
-
-	cache.GlobalCache.RemoveUserFromCache(user.ID)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Your informations was successfully updated!"})
 }
