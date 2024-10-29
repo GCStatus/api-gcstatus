@@ -1,13 +1,10 @@
 package resources_admin
 
 import (
-	"context"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/resources"
 	"gcstatus/internal/utils"
 	"gcstatus/pkg/s3"
-	"log"
-	"time"
 )
 
 type UserResource struct {
@@ -24,12 +21,11 @@ type UserResource struct {
 }
 
 type MinimalUserResource struct {
-	ID        uint    `json:"id"`
-	Name      string  `json:"name"`
-	Photo     *string `json:"photo"`
-	Email     string  `json:"email"`
-	Nickname  string  `json:"nickname"`
-	CreatedAt string  `json:"created_at"`
+	ID        uint   `json:"id"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Nickname  string `json:"nickname"`
+	CreatedAt string `json:"created_at"`
 }
 
 func TransformUser(user domain.User, s3Client s3.S3ClientInterface) UserResource {
@@ -72,23 +68,12 @@ func TransformUsers(users []domain.User, s3Client s3.S3ClientInterface) []UserRe
 	return resources
 }
 
-func TransformMinimalUser(user domain.User, s3Client s3.S3ClientInterface) MinimalUserResource {
-	userResource := MinimalUserResource{
+func TransformMinimalUser(user domain.User) MinimalUserResource {
+	return MinimalUserResource{
 		ID:        user.ID,
 		Name:      user.Name,
 		Email:     user.Email,
 		Nickname:  user.Nickname,
 		CreatedAt: utils.FormatTimestamp(user.CreatedAt),
 	}
-
-	if user.Profile.Photo != "" {
-		url, err := s3Client.GetPresignedURL(context.TODO(), user.Profile.Photo, time.Hour*3)
-		if err != nil {
-			log.Printf("Error generating presigned URL: %v", err)
-		} else {
-			userResource.Photo = &url
-		}
-	}
-
-	return userResource
 }

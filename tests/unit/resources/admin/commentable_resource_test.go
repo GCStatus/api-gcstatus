@@ -4,7 +4,6 @@ import (
 	"gcstatus/internal/domain"
 	resources_admin "gcstatus/internal/resources/admin"
 	"gcstatus/internal/utils"
-	testutils "gcstatus/tests/utils"
 	"testing"
 	"time"
 )
@@ -71,7 +70,6 @@ func TestTransformCommentable(t *testing.T) {
 				By: resources_admin.MinimalUserResource{
 					ID:        1,
 					Name:      "John Doe",
-					Photo:     utils.StringPtr("https://mock-presigned-url.com/photo-key-1"),
 					Email:     "johndoe@example.com",
 					Nickname:  "johnny",
 					CreatedAt: formattedTime,
@@ -86,7 +84,6 @@ func TestTransformCommentable(t *testing.T) {
 						By: resources_admin.MinimalUserResource{
 							ID:        1,
 							Name:      "John Doe",
-							Photo:     utils.StringPtr("https://mock-presigned-url.com/photo-key-1"),
 							Email:     "johndoe@example.com",
 							Nickname:  "johnny",
 							CreatedAt: formattedTime,
@@ -130,7 +127,6 @@ func TestTransformCommentable(t *testing.T) {
 				By: resources_admin.MinimalUserResource{
 					ID:        1,
 					Name:      "John Doe",
-					Photo:     utils.StringPtr("https://mock-presigned-url.com/photo-key-1"),
 					Email:     "johndoe@example.com",
 					Nickname:  "johnny",
 					CreatedAt: formattedTime,
@@ -173,7 +169,6 @@ func TestTransformCommentable(t *testing.T) {
 				By: resources_admin.MinimalUserResource{
 					ID:        1,
 					Name:      "John Doe",
-					Photo:     utils.StringPtr("https://mock-presigned-url.com/photo-key-1"),
 					Email:     "johndoe@example.com",
 					Nickname:  "johnny",
 					CreatedAt: formattedTime,
@@ -207,7 +202,6 @@ func TestTransformCommentable(t *testing.T) {
 				By: resources_admin.MinimalUserResource{
 					ID:        1,
 					Name:      "John Doe",
-					Photo:     utils.StringPtr("https://mock-presigned-url.com/photo-key-1"),
 					Email:     "johndoe@example.com",
 					Nickname:  "johnny",
 					CreatedAt: formattedTime,
@@ -255,7 +249,6 @@ func TestTransformCommentable(t *testing.T) {
 				By: resources_admin.MinimalUserResource{
 					ID:        1,
 					Name:      "Main User",
-					Photo:     nil,
 					Email:     "mainuser@example.com",
 					Nickname:  "mainuser",
 					CreatedAt: formattedTime,
@@ -269,7 +262,6 @@ func TestTransformCommentable(t *testing.T) {
 						By: resources_admin.MinimalUserResource{
 							ID:        2,
 							Name:      "Reply User",
-							Photo:     nil,
 							Email:     "replyuser@example.com",
 							Nickname:  "replyuser",
 							CreatedAt: formattedTime,
@@ -282,8 +274,7 @@ func TestTransformCommentable(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			mockS3Client := &testutils.MockS3Client{}
-			result := resources_admin.TransformCommentable(tc.input, mockS3Client)
+			result := resources_admin.TransformCommentable(tc.input)
 
 			if !compareCommentableResources_admin(tc.expected, result) {
 				t.Errorf("Expected %+v, got %+v", tc.expected, result)
@@ -323,15 +314,6 @@ func compareMinimalUserResources_admin(expected, actual resources_admin.MinimalU
 		expected.Email != actual.Email ||
 		expected.Nickname != actual.Nickname ||
 		expected.CreatedAt != actual.CreatedAt {
-		return false
-	}
-
-	if (expected.Photo == nil && actual.Photo != nil) ||
-		(expected.Photo != nil && actual.Photo == nil) {
-		return false
-	}
-
-	if expected.Photo != nil && actual.Photo != nil && *expected.Photo != *actual.Photo {
 		return false
 	}
 

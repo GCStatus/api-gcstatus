@@ -48,12 +48,18 @@ func (h *HomeHandler) Home(c *gin.Context) {
 		return
 	}
 
+	var transformedNextGreatRelease any
+	if nextGreatRelease != nil {
+		transformedNextGreatRelease = resources.TransformGame(*nextGreatRelease, s3.GlobalS3Client, userID)
+	} else {
+		transformedNextGreatRelease = nil
+	}
+
 	transformedBanners := resources.TransformBanners(banners, s3.GlobalS3Client, userID)
 	transformedHotGames := resources.TransformGames(hotGames, s3.GlobalS3Client, userID)
 	transformedPopularGames := resources.TransformGames(popularGames, s3.GlobalS3Client, userID)
 	transformedUpcomingGames := resources.TransformGames(upcomingGames, s3.GlobalS3Client, userID)
 	transformedMostLikedGames := resources.TransformGames(mostHeartedGames, s3.GlobalS3Client, userID)
-	transformedNextGreatRelease := resources.TransformGame(*nextGreatRelease, s3.GlobalS3Client, userID)
 
 	response := resources.Response{
 		Data: map[string]any{

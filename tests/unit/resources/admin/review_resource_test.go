@@ -4,7 +4,6 @@ import (
 	"gcstatus/internal/domain"
 	resources_admin "gcstatus/internal/resources/admin"
 	"gcstatus/internal/utils"
-	testutils "gcstatus/tests/utils"
 	"reflect"
 	"testing"
 	"time"
@@ -65,7 +64,6 @@ func TestTransformReview(t *testing.T) {
 					Name:      "Fake",
 					Nickname:  "fake",
 					CreatedAt: utils.FormatTimestamp(fixedTime),
-					Photo:     utils.StringPtr("https://mock-presigned-url.com/profile-photo-key"),
 				},
 			},
 		},
@@ -73,8 +71,7 @@ func TestTransformReview(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			mockS3Client := &testutils.MockS3Client{}
-			result := resources_admin.TransformReview(tc.input, mockS3Client)
+			result := resources_admin.TransformReview(tc.input)
 
 			if !reflect.DeepEqual(result, tc.expected) {
 				t.Errorf("Expected %+v, got %+v", tc.expected, result)
@@ -167,7 +164,6 @@ func TestTransformReviews(t *testing.T) {
 						Name:      "Fake",
 						Nickname:  "fake",
 						CreatedAt: utils.FormatTimestamp(fixedTime),
-						Photo:     utils.StringPtr("https://mock-presigned-url.com/photo-1-key"),
 					},
 				},
 				{
@@ -183,7 +179,6 @@ func TestTransformReviews(t *testing.T) {
 						Name:      "Fake",
 						Nickname:  "fake",
 						CreatedAt: utils.FormatTimestamp(fixedTime),
-						Photo:     utils.StringPtr("https://mock-presigned-url.com/photo-2-key"),
 					},
 				},
 			},
@@ -192,8 +187,7 @@ func TestTransformReviews(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			mockS3Client := &testutils.MockS3Client{}
-			result := resources_admin.TransformReviews(tc.input, mockS3Client)
+			result := resources_admin.TransformReviews(tc.input)
 
 			if !reflect.DeepEqual(result, tc.expected) {
 				t.Errorf("Expected %+v, got %+v", tc.expected, result)

@@ -84,14 +84,19 @@ func (h *GameRepositoryMySQL) HomeGames() (
 	}
 
 	var nextGreatReleaseGame *domain.Game
-	if err := h.db.Model(&domain.Game{}).
+	err := h.db.Model(&domain.Game{}).
 		Preload("Platforms.Platform").
 		Preload("Genres.Genre").
 		Where("`great_release` = ?", true).
 		Where("`release_date` > ?", time.Now()).
-		First(&nextGreatReleaseGame).
-		Error; err != nil {
+		First(&nextGreatReleaseGame).Error
+
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil, nil, nil, nil, err
+	}
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		nextGreatReleaseGame = nil
 	}
 
 	var upcomingGames []domain.Game

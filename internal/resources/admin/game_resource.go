@@ -77,10 +77,10 @@ func TransformGame(game domain.Game, s3Client s3.S3ClientInterface) GameResource
 	resource.Torrents = transformTorrents(game.Torrents)
 	resource.Publishers = transformPublishers(game.Publishers)
 	resource.Developers = transformDevelopers(game.Developers)
-	resource.Reviews = transformReviews(game.Reviews, s3Client)
+	resource.Reviews = transformReviews(game.Reviews)
 	resource.Critics = transformCritics(game.Critics)
 	resource.Stores = transformStores(game.Stores)
-	resource.Comments = transformComments(game.Comments, s3Client)
+	resource.Comments = transformComments(game.Comments)
 	resource.Galleries = transformGalleries(game.Galleries, s3Client)
 	resource.DLCs = transformDLCs(game.DLCs, s3Client)
 
@@ -206,11 +206,11 @@ func transformDevelopers(developers []domain.GameDeveloper) []DeveloperResource 
 	return developerResources
 }
 
-func transformReviews(reviews []domain.Reviewable, s3Client s3.S3ClientInterface) []ReviewResource {
+func transformReviews(reviews []domain.Reviewable) []ReviewResource {
 	reviewResources := make([]ReviewResource, 0)
 	for _, r := range reviews {
 		if r.ID != 0 {
-			reviewResources = append(reviewResources, TransformReview(r, s3Client))
+			reviewResources = append(reviewResources, TransformReview(r))
 		}
 	}
 
@@ -239,11 +239,11 @@ func transformStores(stores []domain.GameStore) []GameStoreResource {
 	return storeResources
 }
 
-func transformComments(comments []domain.Commentable, s3Client s3.S3ClientInterface) []CommentableResource {
+func transformComments(comments []domain.Commentable) []CommentableResource {
 	commentResources := make([]CommentableResource, 0)
 	for _, c := range comments {
 		if c.ID != 0 {
-			commentResources = append(commentResources, TransformCommentable(c, s3Client))
+			commentResources = append(commentResources, TransformCommentable(c))
 		}
 	}
 

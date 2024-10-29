@@ -3,7 +3,6 @@ package resources_admin
 import (
 	"gcstatus/internal/domain"
 	"gcstatus/internal/utils"
-	"gcstatus/pkg/s3"
 )
 
 type CommentableResource struct {
@@ -16,19 +15,19 @@ type CommentableResource struct {
 	Replies     []CommentableResource `json:"replies"`
 }
 
-func TransformCommentable(commentable domain.Commentable, s3Client s3.S3ClientInterface) CommentableResource {
+func TransformCommentable(commentable domain.Commentable) CommentableResource {
 	resource := CommentableResource{
 		ID:          commentable.ID,
 		Comment:     commentable.Comment,
 		CreatedAt:   utils.FormatTimestamp(commentable.CreatedAt),
 		UpdatedAt:   utils.FormatTimestamp(commentable.UpdatedAt),
-		By:          TransformMinimalUser(commentable.User, s3Client),
+		By:          TransformMinimalUser(commentable.User),
 		HeartsCount: uint(len(commentable.Hearts)),
 	}
 
 	replies := make([]CommentableResource, len(commentable.Replies))
 	for i, reply := range commentable.Replies {
-		replies[i] = TransformCommentable(reply, s3Client)
+		replies[i] = TransformCommentable(reply)
 	}
 
 	resource.Replies = replies
