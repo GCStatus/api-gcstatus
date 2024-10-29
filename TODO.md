@@ -100,3 +100,4 @@
 - [ ] Create the best price for games, when applicable, search for the best on stores
 - [ ] Admin system
   - [ ] ...
+  - [ ] Create logs for changes on admin platform

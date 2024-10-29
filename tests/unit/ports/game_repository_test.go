@@ -35,6 +35,17 @@ func (m *MockGameRepository) CreateGame(game *domain.Game) error {
 	return nil
 }
 
+func (m *MockGameRepository) ExistsForStore(storeID uint, appID string) (bool, error) {
+	for _, game := range m.games {
+		for _, gameStore := range game.Stores {
+			if gameStore.StoreID == storeID && gameStore.StoreGameID == appID {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
+}
+
 func (m *MockGameRepository) HomeGames() ([]domain.Game, []domain.Game, []domain.Game, *domain.Game, []domain.Game, error) {
 	var hotGames, popularGames, mostHeartedGames, upcomingGames []domain.Game
 	var nextGreatReleaseGame *domain.Game
@@ -261,6 +272,69 @@ func TestMockGameRepository_FindGamesByCondition(t *testing.T) {
 			}
 			if len(games) != tt.expectedCount {
 				t.Errorf("expected %d games, got %d", tt.expectedCount, len(games))
+			}
+		})
+	}
+}
+
+func TestMockGameRepository_ExistsForStore(t *testing.T) {
+	mockRepo := NewMockGameRepository()
+
+	if err := mockRepo.CreateGame(&domain.Game{ID: 1, Slug: "game1", Stores: []domain.GameStore{
+		{
+			StoreID:     1,
+			StoreGameID: "100",
+		},
+	}}); err != nil {
+		t.Fatalf("Failed to create game")
+	}
+	if err := mockRepo.CreateGame(&domain.Game{ID: 2, Slug: "game2", Stores: []domain.GameStore{
+		{
+			StoreID:     2,
+			StoreGameID: "200",
+		},
+	}}); err != nil {
+		t.Fatalf("Failed to create game")
+	}
+
+	tests := map[string]struct {
+		appID       string
+		storeID     uint
+		expected    bool
+		expectError bool
+	}{
+		"game exists in store": {
+			appID:       "100",
+			storeID:     1,
+			expected:    true,
+			expectError: false,
+		},
+		"game does not exist in store": {
+			appID:       "300",
+			storeID:     1,
+			expected:    false,
+			expectError: false,
+		},
+		"appID does not match any game": {
+			appID:       "100",
+			storeID:     999,
+			expected:    false,
+			expectError: false,
+		},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			exists, err := mockRepo.ExistsForStore(tt.storeID, tt.appID)
+
+			if tt.expectError && err == nil {
+				t.Fatalf("expected error, got nil")
+			}
+			if !tt.expectError && err != nil {
+				t.Fatalf("expected no error, got %v", err)
+			}
+			if exists != tt.expected {
+				t.Errorf("expected exists to be %v, got %v", tt.expected, exists)
 			}
 		})
 	}

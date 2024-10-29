@@ -8,20 +8,18 @@ type DeveloperResource struct {
 	Acting bool   `json:"acting"`
 }
 
-func TransformDeveloper(Developer domain.Developer) DeveloperResource {
+func TransformDeveloper(developer domain.Developer) DeveloperResource {
 	return DeveloperResource{
-		ID:     Developer.ID,
-		Name:   Developer.Name,
-		Acting: Developer.Acting,
+		ID:     developer.ID,
+		Name:   developer.Name,
+		Acting: developer.Acting,
 	}
 }
 
-func TransformDevelopers(Developers []domain.Developer) []DeveloperResource {
+func TransformDevelopers(developers []domain.Developer) []DeveloperResource {
 	var resources []DeveloperResource
-
-	for _, Developer := range Developers {
-		resources = append(resources, TransformDeveloper(Developer))
+	for _, developer := range developers {
+		resources = append(resources, TransformDeveloper(developer))
 	}
-
 	return resources
 }

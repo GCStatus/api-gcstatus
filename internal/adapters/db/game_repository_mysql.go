@@ -84,14 +84,19 @@ func (h *GameRepositoryMySQL) HomeGames() (
 	}
 
 	var nextGreatReleaseGame *domain.Game
-	if err := h.db.Model(&domain.Game{}).
+	err := h.db.Model(&domain.Game{}).
 		Preload("Platforms.Platform").
 		Preload("Genres.Genre").
 		Where("`great_release` = ?", true).
 		Where("`release_date` > ?", time.Now()).
-		First(&nextGreatReleaseGame).
-		Error; err != nil {
+		First(&nextGreatReleaseGame).Error
+
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, nil, nil, nil, nil, err
+	}
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		nextGreatReleaseGame = nil
 	}
 
 	var upcomingGames []domain.Game
@@ -184,4 +189,17 @@ func (h *GameRepositoryMySQL) FindBySlug(slug string, userID uint) (domain.Game,
 	}
 
 	return game, nil
+}
+
+func (h *GameRepositoryMySQL) ExistsForStore(storeID uint, appID uint) (bool, error) {
+	var count int64
+	err := h.db.Model(&domain.GameStore{}).
+		Where("store_id = ? AND store_game_id = ?", storeID, appID).
+		Count(&count).Error
+
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
 }

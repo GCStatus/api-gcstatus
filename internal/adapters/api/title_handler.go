@@ -5,7 +5,6 @@ import (
 	"gcstatus/internal/resources"
 	"gcstatus/internal/usecases"
 	"gcstatus/internal/utils"
-	"gcstatus/pkg/cache"
 	"gcstatus/pkg/sqs"
 	"log"
 	"net/http"
@@ -90,8 +89,6 @@ func (h *TitleHandler) ToggleEnableTitle(c *gin.Context) {
 		return
 	}
 
-	cache.GlobalCache.RemoveUserFromCache(user.ID)
-
 	c.JSON(http.StatusOK, gin.H{"message": "The selected title was successfully enabled/disabled!"})
 }
 
@@ -169,8 +166,6 @@ func (h *TitleHandler) BuyTitle(c *gin.Context) {
 	if err != nil {
 		log.Fatalf("failed to enqueue purchase message to SQS: %+v", err)
 	}
-
-	cache.GlobalCache.RemoveUserFromCache(user.ID)
 
 	c.JSON(http.StatusOK, gin.H{"message": "You have successfully purchased the selected title!"})
 }

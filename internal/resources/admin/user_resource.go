@@ -20,6 +20,14 @@ type UserResource struct {
 	Permissions []PermissionResource       `json:"permissions"`
 }
 
+type MinimalUserResource struct {
+	ID        uint   `json:"id"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Nickname  string `json:"nickname"`
+	CreatedAt string `json:"created_at"`
+}
+
 func TransformUser(user domain.User, s3Client s3.S3ClientInterface) UserResource {
 	userResource := UserResource{
 		ID:          user.ID,
@@ -58,4 +66,14 @@ func TransformUsers(users []domain.User, s3Client s3.S3ClientInterface) []UserRe
 		resources = append(resources, TransformUser(user, s3Client))
 	}
 	return resources
+}
+
+func TransformMinimalUser(user domain.User) MinimalUserResource {
+	return MinimalUserResource{
+		ID:        user.ID,
+		Name:      user.Name,
+		Email:     user.Email,
+		Nickname:  user.Nickname,
+		CreatedAt: utils.FormatTimestamp(user.CreatedAt),
+	}
 }

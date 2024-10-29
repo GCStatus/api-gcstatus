@@ -5,7 +5,6 @@ import (
 	"gcstatus/internal/resources"
 	"gcstatus/internal/usecases"
 	"gcstatus/internal/utils"
-	"gcstatus/pkg/cache"
 	"gcstatus/pkg/sqs"
 	"log"
 	"net/http"
@@ -99,8 +98,6 @@ func (h *MissionHandler) CompleteMission(c *gin.Context) {
 		RespondWithError(c, http.StatusInternalServerError, "Failed to complete the mission: "+err.Error())
 		return
 	}
-
-	cache.GlobalCache.RemoveUserFromCache(user.ID)
 
 	c.JSON(http.StatusOK, gin.H{"message": "You have successfully completed the mission!"})
 }

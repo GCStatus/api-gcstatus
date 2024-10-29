@@ -145,8 +145,6 @@ func (h *PasswordResetHandler) ResetUserPassword(c *gin.Context) {
 		return
 	}
 
-	cache.GlobalCache.RemoveUserFromCache(user.ID)
-
 	c.JSON(http.StatusOK, gin.H{"message": "You password was successfully reseted!"})
 }
 
@@ -193,8 +191,6 @@ func (h *PasswordResetHandler) ResetPasswordProfile(c *gin.Context) {
 	}
 
 	h.authService.ClearAuthCookies(c, env.AccessTokenKey, env.IsAuthKey, env.Domain)
-
-	cache.GlobalCache.RemoveUserFromCache(user.ID)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Your password was successfully changed!"})
 }

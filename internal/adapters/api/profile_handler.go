@@ -8,7 +8,6 @@ import (
 	"gcstatus/internal/ports"
 	"gcstatus/internal/usecases"
 	"gcstatus/internal/utils"
-	"gcstatus/pkg/cache"
 	"gcstatus/pkg/s3"
 	"gcstatus/pkg/sqs"
 	"log"
@@ -109,8 +108,6 @@ func (h *ProfileHandler) UpdatePicture(c *gin.Context) {
 
 	h.createTrackProfilePictureSQS(c, user)
 
-	cache.GlobalCache.RemoveUserFromCache(user.ID)
-
 	c.JSON(http.StatusOK, gin.H{"message": "Your profile picture was successfully updated!"})
 }
 
@@ -134,8 +131,6 @@ func (h *ProfileHandler) UpdateSocials(c *gin.Context) {
 		RespondWithError(c, http.StatusInternalServerError, "Could not update socials: "+err.Error())
 		return
 	}
-
-	cache.GlobalCache.RemoveUserFromCache(user.ID)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Your profile socials was successfully updated!"})
 }
