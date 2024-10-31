@@ -5,7 +5,6 @@ import (
 	"gcstatus/internal/middlewares"
 	"gcstatus/internal/usecases"
 	usecases_admin "gcstatus/internal/usecases/admin"
-	"net/http"
 	"strings"
 
 	"github.com/gin-contrib/cors"
@@ -13,7 +12,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// SetupRouter initializes the routes for the API
 func SetupRouter(
 	userService *usecases.UserService,
 	authService *usecases.AuthService,
@@ -33,6 +31,7 @@ func SetupRouter(
 	adminPlatformService *usecases_admin.AdminPlatformService,
 	adminTagService *usecases_admin.AdminTagService,
 	adminGameService *usecases_admin.AdminGameService,
+	heartService *usecases.HeartService,
 	db *gorm.DB,
 ) *gin.Engine {
 	r := gin.Default()
@@ -43,7 +42,6 @@ func SetupRouter(
 		corsDomains = append(corsDomains, strings.TrimSpace(domain))
 	}
 
-	// CORS configuration
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     corsDomains,
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
@@ -53,25 +51,7 @@ func SetupRouter(
 		AllowCredentials: true,
 	}))
 
-	// Initialize the handlers
-	authHandler,
-		passwordResetHandler,
-		levelHandler,
-		profileHandler,
-		userHandler,
-		titleHandler,
-		transactionHandler,
-		notificationHandler,
-		missionHandler,
-		gameHandler,
-		homeHandler,
-		steamHandler,
-		adminAuthHandler,
-		adminCategoryHandler,
-		adminGenreHandler,
-		adminPlatformHandler,
-		adminTagHandler,
-		adminGameHandler := InitHandlers(
+	handlers, adminHandlers := InitHandlers(
 		authService,
 		userService,
 		passwordResetService,
@@ -90,93 +70,16 @@ func SetupRouter(
 		adminPlatformService,
 		adminTagService,
 		adminGameService,
+		heartService,
 		db,
 	)
 
-	// Define the middlewares
 	r.Use(middlewares.LimitThrottleMiddleware())
-	permissionMiddleware := middlewares.NewPermissionMiddleware(userService)
-	protected := r.Group("/")
-	admin := r.Group("/admin")
 
-	// Define the routes
-	authRoutes := r.Group("/auth")
-	{
-		authRoutes.POST("/login", authHandler.Login)
-		authRoutes.POST("/register", authHandler.Register)
-		authRoutes.POST("/password/email/send", middlewares.LimitResetRequestMiddleware(), passwordResetHandler.RequestPasswordReset)
-		authRoutes.POST("/password/reset", passwordResetHandler.ResetUserPassword)
-	}
-
-	// Define the auth protected routes
-	protected.Use(middlewares.JWTAuthMiddleware(userService))
-	{
-		protected.GET("/me", authHandler.Me)
-		protected.GET("/levels", levelHandler.GetAll)
-		protected.POST("/auth/logout", authHandler.Logout)
-
-		protected.GET("/titles", titleHandler.GetAllForUser)
-		protected.PUT("/titles/:id/toggle", titleHandler.ToggleEnableTitle)
-		protected.POST("/titles/:id/buy", titleHandler.BuyTitle)
-
-		protected.PUT("/profile/password", passwordResetHandler.ResetPasswordProfile)
-		protected.PUT("/profile/picture", profileHandler.UpdatePicture)
-		protected.PUT("/profile/socials", profileHandler.UpdateSocials)
-
-		protected.PUT("/user/update/basics", userHandler.UpdateUserBasics)
-		protected.PUT("/user/update/sensitive", userHandler.UpdateUserNickAndEmail)
-
-		protected.GET("/transactions", transactionHandler.GetAllForUser)
-
-		protected.GET("/notifications", notificationHandler.GetAllForUser)
-		protected.PUT("/notifications/:id/read", notificationHandler.MarkAsRead)
-		protected.PUT("/notifications/:id/unread", notificationHandler.MarkAsUnread)
-		protected.PUT("/notifications/all/read", notificationHandler.MarkAllAsRead)
-		protected.PUT("/notifications/all/unread", notificationHandler.MarkAllAsUnread)
-		protected.DELETE("/notifications/:id", notificationHandler.DeleteNotification)
-		protected.DELETE("/notifications/all", notificationHandler.DeleteAllNotifications)
-
-		protected.GET("/missions", missionHandler.GetAllForUser)
-		protected.POST("/missions/:id/complete", missionHandler.CompleteMission)
-	}
-
-	admin.POST("/login", adminAuthHandler.Login)
-	admin.Use(middlewares.JWTAuthMiddleware(userService))
-	{
-		admin.GET("/me", adminAuthHandler.Me)
-		admin.POST("/logout", adminAuthHandler.Logout)
-		admin.POST("/steam/register/:appID", permissionMiddleware("create:steam-jobs-games"), steamHandler.RegisterByAppID)
-
-		admin.GET("/categories", permissionMiddleware("view:categories"), adminCategoryHandler.GetAll)
-		admin.POST("/categories", permissionMiddleware("view:categories", "create:categories"), adminCategoryHandler.Create)
-		admin.PUT("/categories/:id", permissionMiddleware("view:categories", "update:categories"), adminCategoryHandler.Update)
-		admin.DELETE("/categories/:id", permissionMiddleware("view:categories", "delete:categories"), adminCategoryHandler.Delete)
-
-		admin.GET("/genres", permissionMiddleware("view:genres"), adminGenreHandler.GetAll)
-		admin.POST("/genres", permissionMiddleware("view:genres", "create:genres"), adminGenreHandler.Create)
-		admin.PUT("/genres/:id", permissionMiddleware("view:genres", "update:genres"), adminGenreHandler.Update)
-		admin.DELETE("/genres/:id", permissionMiddleware("view:genres", "delete:genres"), adminGenreHandler.Delete)
-
-		admin.GET("/platforms", permissionMiddleware("view:platforms"), adminPlatformHandler.GetAll)
-		admin.POST("/platforms", permissionMiddleware("view:platforms", "create:platforms"), adminPlatformHandler.Create)
-		admin.PUT("/platforms/:id", permissionMiddleware("view:platforms", "update:platforms"), adminPlatformHandler.Update)
-		admin.DELETE("/platforms/:id", permissionMiddleware("view:platforms", "delete:platforms"), adminPlatformHandler.Delete)
-
-		admin.GET("/tags", permissionMiddleware("view:tags"), adminTagHandler.GetAll)
-		admin.POST("/tags", permissionMiddleware("view:tags", "create:tags"), adminTagHandler.Create)
-		admin.PUT("/tags/:id", permissionMiddleware("view:tags", "update:tags"), adminTagHandler.Update)
-		admin.DELETE("/tags/:id", permissionMiddleware("view:tags", "delete:tags"), adminTagHandler.Delete)
-
-		admin.GET("/games", permissionMiddleware("view:games"), adminGameHandler.GetAll)
-		admin.GET("/games/:id", permissionMiddleware("view:games"), adminGameHandler.FindByID)
-	}
-
-	// Common routes
-	r.GET("/health", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "Everything is ok!"})
-	})
-	r.GET("/home", homeHandler.Home)
-	r.GET("/games/:slug", gameHandler.FindBySlug)
+	RegisterCommonRoutes(r, handlers)
+	RegisterAuthRoutes(r.Group("/auth"), handlers)
+	RegisterProtectedRoutes(r.Group("/"), userService, handlers)
+	RegisterAdminRoutes(r.Group("/admin"), userService, adminHandlers)
 
 	return r
 }

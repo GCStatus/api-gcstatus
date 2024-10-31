@@ -34,6 +34,7 @@ func main() {
 		adminPlatformService,
 		adminTagService,
 		adminGameService,
+		heartService,
 		db := di.InitDependencies()
 
 	// Setup routes with dependency injection
@@ -56,6 +57,7 @@ func main() {
 		adminPlatformService,
 		adminTagService,
 		adminGameService,
+		heartService,
 		db,
 	)
 

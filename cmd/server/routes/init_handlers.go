@@ -9,6 +9,31 @@ import (
 	"gorm.io/gorm"
 )
 
+type Handlers struct {
+	AuthHandler          *api.AuthHandler
+	PasswordResetHandler *api.PasswordResetHandler
+	LevelHandler         *api.LevelHandler
+	ProfileHandler       *api.ProfileHandler
+	UserHandler          *api.UserHandler
+	TitleHandler         *api.TitleHandler
+	TransactionHandler   *api.TransactionHandler
+	NotificationHandler  *api.NotificationHandler
+	MissionHandler       *api.MissionHandler
+	GameHandler          *api.GameHandler
+	HomeHandler          *api.HomeHandler
+	HeartHandler         *api.HeartHandler
+}
+
+type AdminHandlers struct {
+	AdminAuthHandler     *api_admin.AuthHandler
+	AdminCategoryHandler *api_admin.AdminCategoryHandler
+	AdminGenreHandler    *api_admin.AdminGenreHandler
+	AdminPlatformHandler *api_admin.AdminPlatformHandler
+	AdminTagHandler      *api_admin.AdminTagHandler
+	AdminGameHandler     *api_admin.AdminGameHandler
+	AdminSteamHandler    *api_admin.SteamHandler
+}
+
 func InitHandlers(
 	authService *usecases.AuthService,
 	userService *usecases.UserService,
@@ -28,62 +53,30 @@ func InitHandlers(
 	AdminPlatformService *usecases_admin.AdminPlatformService,
 	adminTagService *usecases_admin.AdminTagService,
 	adminGameService *usecases_admin.AdminGameService,
+	heartService *usecases.HeartService,
 	db *gorm.DB,
-) (
-	authHandler *api.AuthHandler,
-	passwordResetHandler *api.PasswordResetHandler,
-	levelHandler *api.LevelHandler,
-	profileHandler *api.ProfileHandler,
-	userHandler *api.UserHandler,
-	titleHandler *api.TitleHandler,
-	transactionHandler *api.TransactionHandler,
-	notificationHandler *api.NotificationHandler,
-	missionHandler *api.MissionHandler,
-	gameHandler *api.GameHandler,
-	homeHandler *api.HomeHandler,
-	steamHandler *api_admin.SteamHandler,
-	adminAuthHandler *api_admin.AuthHandler,
-	adminCategoryHandler *api_admin.AdminCategoryHandler,
-	adminGenreHandler *api_admin.AdminGenreHandler,
-	adminPlatformHandler *api_admin.AdminPlatformHandler,
-	adminTagHandler *api_admin.AdminTagHandler,
-	adminGameHandler *api_admin.AdminGameHandler,
-) {
-	userHandler = api.NewUserHandler(userService)
-	authHandler = api.NewAuthHandler(authService, userService)
-	passwordResetHandler = api.NewPasswordResetHandler(passwordResetService, userService, authService)
-	levelHandler = api.NewLevelHandler(levelService)
-	profileHandler = api.NewProfileHandler(profileService, userService)
-	titleHandler = api.NewTitleHandler(titleService, userService, walletService, taskService, transactionService, notificationService)
-	transactionHandler = api.NewTransactionHandler(transactionService, userService)
-	notificationHandler = api.NewNotificationHandler(notificationService, userService)
-	missionHandler = api.NewMissionHandler(missionService, userService)
-	gameHandler = api.NewGameHandler(gameService, userService)
-	homeHandler = api.NewHomeHandler(userService, gameService, bannerService)
-	steamHandler = api_admin.NewSteamHandler(gameService, db)
-	adminAuthHandler = api_admin.NewAuthHandler(authService, userService)
-	adminCategoryHandler = api_admin.NewAdminCategoryHandler(adminCategoryService)
-	adminGenreHandler = api_admin.NewAdminGenreHandler(adminGenreService)
-	adminPlatformHandler = api_admin.NewAdminPlatformHandler(AdminPlatformService)
-	adminTagHandler = api_admin.NewAdminTagHandler(adminTagService)
-	adminGameHandler = api_admin.NewAdminGameHandler(adminGameService)
-
-	return authHandler,
-		passwordResetHandler,
-		levelHandler,
-		profileHandler,
-		userHandler,
-		titleHandler,
-		transactionHandler,
-		notificationHandler,
-		missionHandler,
-		gameHandler,
-		homeHandler,
-		steamHandler,
-		adminAuthHandler,
-		adminCategoryHandler,
-		adminGenreHandler,
-		adminPlatformHandler,
-		adminTagHandler,
-		adminGameHandler
+) (*Handlers, *AdminHandlers) {
+	return &Handlers{
+			AuthHandler:          api.NewAuthHandler(authService, userService),
+			PasswordResetHandler: api.NewPasswordResetHandler(passwordResetService, userService, authService),
+			LevelHandler:         api.NewLevelHandler(levelService),
+			ProfileHandler:       api.NewProfileHandler(profileService, userService),
+			UserHandler:          api.NewUserHandler(userService),
+			TitleHandler:         api.NewTitleHandler(titleService, userService, walletService, taskService, transactionService, notificationService),
+			TransactionHandler:   api.NewTransactionHandler(transactionService, userService),
+			NotificationHandler:  api.NewNotificationHandler(notificationService, userService),
+			MissionHandler:       api.NewMissionHandler(missionService, userService),
+			GameHandler:          api.NewGameHandler(gameService, userService),
+			HomeHandler:          api.NewHomeHandler(userService, gameService, bannerService),
+			HeartHandler:         api.NewHeartHandler(userService, heartService),
+		},
+		&AdminHandlers{
+			AdminAuthHandler:     api_admin.NewAuthHandler(authService, userService),
+			AdminCategoryHandler: api_admin.NewAdminCategoryHandler(adminCategoryService),
+			AdminGenreHandler:    api_admin.NewAdminGenreHandler(adminGenreService),
+			AdminPlatformHandler: api_admin.NewAdminPlatformHandler(AdminPlatformService),
+			AdminTagHandler:      api_admin.NewAdminTagHandler(adminTagService),
+			AdminGameHandler:     api_admin.NewAdminGameHandler(adminGameService),
+			AdminSteamHandler:    api_admin.NewSteamHandler(gameService, db),
+		}
 }
