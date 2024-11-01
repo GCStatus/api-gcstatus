@@ -5,6 +5,7 @@ import (
 	"gcstatus/internal/usecases"
 	"gcstatus/internal/utils"
 	"gcstatus/pkg/s3"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -44,6 +45,40 @@ func (h *GameHandler) FindBySlug(c *gin.Context) {
 
 	response := resources.Response{
 		Data: transformedGame,
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *GameHandler) Search(c *gin.Context) {
+	authUserID := utils.GetAuthenticatedUserID(c, h.userService.GetUserByID)
+
+	var userID uint
+	if authUserID != nil {
+		userID = *authUserID
+	}
+	searchQuery := c.Query("search")
+	if searchQuery == "" {
+		RespondWithError(c, http.StatusUnprocessableEntity, "Search query parameter is required")
+		return
+	}
+
+	games, err := h.gameService.Search(searchQuery)
+	if err != nil {
+		RespondWithError(c, http.StatusInternalServerError, "Failed to search games")
+		log.Printf("failed to search games: %+v", err)
+		return
+	}
+
+	var transformedGames []resources.GameResource
+	if len(games) > 0 {
+		transformedGames = resources.TransformGames(games, s3.GlobalS3Client, userID)
+	} else {
+		transformedGames = []resources.GameResource{}
+	}
+
+	response := resources.Response{
+		Data: transformedGames,
 	}
 
 	c.JSON(http.StatusOK, response)

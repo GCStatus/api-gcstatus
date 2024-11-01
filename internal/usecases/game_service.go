@@ -28,3 +28,7 @@ func (h *GameService) FindBySlug(slug string, userID uint) (domain.Game, error) 
 func (h *GameService) ExistsForStore(storeID uint, appID uint) (bool, error) {
 	return h.repo.ExistsForStore(storeID, appID)
 }
+
+func (h *GameService) Search(input string) ([]domain.Game, error) {
+	return h.repo.Search(input)
+}

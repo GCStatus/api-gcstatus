@@ -4,6 +4,7 @@ import (
 	"errors"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/utils"
+	"strings"
 	"testing"
 	"time"
 )
@@ -44,6 +45,20 @@ func (m *MockGameRepository) ExistsForStore(storeID uint, appID string) (bool, e
 		}
 	}
 	return false, nil
+}
+
+func (m *MockGameRepository) Search(input string) ([]domain.Game, error) {
+	var games []domain.Game
+
+	for _, game := range m.games {
+		if strings.Contains(game.Title, input) || strings.Contains(game.ShortDescription, input) || strings.Contains(game.Description, input) || strings.Contains(game.Title, input) {
+			games = append(games, *game)
+		} else {
+			return nil, errors.New("no one games found")
+		}
+	}
+
+	return games, nil
 }
 
 func (m *MockGameRepository) HomeGames() ([]domain.Game, []domain.Game, []domain.Game, *domain.Game, []domain.Game, error) {
@@ -147,6 +162,63 @@ func TestMockGameRepository_FindBySlug(t *testing.T) {
 				}
 				if game == nil || game.Slug != tc.gameSlug {
 					t.Fatalf("expected game Slug %s, got %v", tc.gameSlug, game)
+				}
+			}
+		})
+	}
+}
+
+func TestMockGameRepository_Search(t *testing.T) {
+	fixedTime := time.Now()
+
+	mockRepo := NewMockGameRepository()
+	if err := mockRepo.CreateGame(&domain.Game{
+		ID:               1,
+		Slug:             "valid",
+		Age:              18,
+		Title:            "Game Test",
+		Cover:            "https://placehold.co/600x400/EEE/31343C",
+		About:            "About game",
+		Description:      "Description",
+		ShortDescription: "Short description",
+		Free:             false,
+		ReleaseDate:      fixedTime,
+		CreatedAt:        fixedTime,
+		UpdatedAt:        fixedTime,
+	}); err != nil {
+		t.Fatalf("failed to create the game: %s", err.Error())
+	}
+
+	testCases := map[string]struct {
+		input       string
+		expectError bool
+	}{
+		"valid game slug": {
+			input:       "Game Test",
+			expectError: false,
+		},
+		"invalid game slug": {
+			input:       "invalid",
+			expectError: true,
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+
+			games, err := mockRepo.Search(tc.input)
+
+			if tc.expectError {
+				if err == nil {
+					t.Fatalf("expected error, got nil")
+				}
+				if games != nil {
+					t.Fatalf("expected nil games, got %v", games)
+				}
+			} else {
+				if err != nil {
+					t.Fatalf("expected no error, got %v", err)
 				}
 			}
 		})

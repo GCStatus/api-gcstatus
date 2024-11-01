@@ -204,3 +204,31 @@ func (h *GameRepositoryMySQL) ExistsForStore(storeID uint, appID uint) (bool, er
 
 	return count > 0, nil
 }
+
+func (h *GameRepositoryMySQL) Search(input string) ([]domain.Game, error) {
+	var games []domain.Game
+
+	likeInput := "%" + input + "%"
+
+	query := h.db.Model(&domain.Game{}).
+		Preload("Platforms.Platform").
+		Preload("Categories.Category").
+		Preload("Genres.Genre").
+		Preload("Tags.Tag").
+		Preload("Hearts").
+		Preload("Views").
+		Preload("Crack.Cracker").
+		Preload("Crack.Protection")
+
+	columns := []string{"title", "description", "about", "short_description"}
+
+	for _, column := range columns {
+		query = query.Or(column+" LIKE ?", likeInput)
+	}
+
+	if err := query.Limit(100).Find(&games).Error; err != nil {
+		return nil, err
+	}
+
+	return games, nil
+}

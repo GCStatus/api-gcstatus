@@ -666,6 +666,159 @@ func TestGameRepositoryMySQL_ExistsForStore(t *testing.T) {
 	}
 }
 
+func TestGameRepositoryMySQL_Search(t *testing.T) {
+	fixedTime := time.Now()
+	gormDB, mock := testutils.Setup(t)
+	repo := db.NewGameRepositoryMySQL(gormDB)
+
+	testCases := map[string]struct {
+		input        string
+		mockBehavior func()
+		expected     []domain.Game
+		expectedErr  error
+	}{
+		"matching records": {
+			input: "example",
+			mockBehavior: func() {
+				rows := sqlmock.NewRows([]string{"id", "title", "description", "about", "short_description"}).
+					AddRow(1, "Example Game 1", "Description 1", "About Game 1", "Short description 1").
+					AddRow(20, "Example Game 2", "Description 2", "About Game 2", "Short description 2")
+
+				mock.ExpectQuery(
+					regexp.QuoteMeta(
+						"SELECT * FROM `games` WHERE (title LIKE ? OR description LIKE ? OR about LIKE ? OR short_description LIKE ?) AND `games`.`deleted_at` IS NULL LIMIT ?",
+					),
+				).WithArgs("%example%", "%example%", "%example%", "%example%", 100).WillReturnRows(rows)
+
+				categoriableRows := mock.NewRows([]string{"id", "categoriable_id", "categoriable_type", "category_id"}).
+					AddRow(1, 1, "games", 1)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `categoriables` WHERE `categoriable_type` = ? AND `categoriables`.`categoriable_id` IN (?,?) AND `categoriables`.`deleted_at` IS NULL")).
+					WithArgs("games", 1, 20).
+					WillReturnRows(categoriableRows)
+
+				categoriesRows := mock.NewRows([]string{"id", "name"}).
+					AddRow(1, "FPS")
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `categories` WHERE `categories`.`id` = ? AND `categories`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(categoriesRows)
+
+				crackRows := mock.NewRows([]string{"id", "status", "cracked_at", "cracker_id", "protection_id", "game_id"}).
+					AddRow(1, "uncracked", fixedTime, 1, 1, 1)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `cracks` WHERE `cracks`.`game_id` IN (?,?) AND `cracks`.`deleted_at` IS NULL")).
+					WithArgs(1, 20).
+					WillReturnRows(crackRows)
+
+				crackerRows := mock.NewRows([]string{"id", "name", "acting"}).
+					AddRow(1, "GOLDBERG", true)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `crackers` WHERE `crackers`.`id` = ? AND `crackers`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(crackerRows)
+
+				protectionRows := mock.NewRows([]string{"id", "name"}).
+					AddRow(1, "Denuvo")
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `protections` WHERE `protections`.`id` = ? AND `protections`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(protectionRows)
+
+				genreableRows := mock.NewRows([]string{"id", "genreable_id", "genreable_type", "genre_id"}).
+					AddRow(1, 1, "games", 1)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `genreables` WHERE `genreable_type` = ? AND `genreables`.`genreable_id` IN (?,?) AND `genreables`.`deleted_at` IS NULL")).
+					WithArgs("games", 1, 20).
+					WillReturnRows(genreableRows)
+
+				genresRows := mock.NewRows([]string{"id", "name"}).
+					AddRow(1, "Action")
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `genres` WHERE `genres`.`id` = ? AND `genres`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(genresRows)
+
+				heartsRows := mock.NewRows([]string{"id", "heartable_id", "heartable_type", "user_id"}).
+					AddRow(1, 1, "games", 1)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `heartables` WHERE `heartable_type` = ? AND `heartables`.`heartable_id` IN (?,?) AND `heartables`.`deleted_at` IS NULL")).
+					WithArgs("games", 1, 20).
+					WillReturnRows(heartsRows)
+
+				platformableDlcsRows := mock.NewRows([]string{"id", "platformable_id", "platformable_type", "platform_id"}).
+					AddRow(1, 1, "dlcs", 1)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `platformables` WHERE `platformable_type` = ? AND `platformables`.`platformable_id` IN (?,?) AND `platformables`.`deleted_at` IS NULL")).
+					WithArgs("games", 1, 20).
+					WillReturnRows(platformableDlcsRows)
+
+				platformsRows := mock.NewRows([]string{"id", "name"}).
+					AddRow(1, "PC")
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `platforms` WHERE `platforms`.`id` = ? AND `platforms`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(platformsRows)
+
+				taggablesRows := mock.NewRows([]string{"id", "taggable_id", "taggable_type", "tag_id"}).
+					AddRow(1, 1, "games", 1)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `taggables` WHERE `taggable_type` = ? AND `taggables`.`taggable_id` IN (?,?) AND `taggables`.`deleted_at` IS NULL")).
+					WithArgs("games", 1, 20).
+					WillReturnRows(taggablesRows)
+
+				tagsRows := mock.NewRows([]string{"id", "name"}).
+					AddRow(1, "Adventure")
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `tags` WHERE `tags`.`id` = ? AND `tags`.`deleted_at` IS NULL")).
+					WithArgs(1).
+					WillReturnRows(tagsRows)
+
+				viewRows := mock.NewRows([]string{"id", "viewable_id", "viewable_type", "user_id"}).
+					AddRow(1, 1, "games", 1)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `viewables` WHERE `viewable_type` = ? AND `viewables`.`viewable_id` IN (?,?) AND `viewables`.`deleted_at` IS NULL")).
+					WithArgs("games", 1, 20).
+					WillReturnRows(viewRows)
+			},
+			expected: []domain.Game{
+				{ID: 1},
+				{ID: 20},
+			},
+			expectedErr: nil,
+		},
+		"no matching records": {
+			input: "nonexistent",
+			mockBehavior: func() {
+				rows := sqlmock.NewRows([]string{"id", "title", "description", "about", "short_description"})
+				mock.ExpectQuery(
+					regexp.QuoteMeta(
+						"SELECT * FROM `games` WHERE (title LIKE ? OR description LIKE ? OR about LIKE ? OR short_description LIKE ?) AND `games`.`deleted_at` IS NULL LIMIT ?",
+					),
+				).WithArgs("%nonexistent%", "%nonexistent%", "%nonexistent%", "%nonexistent%", 100).WillReturnRows(rows)
+			},
+			expected:    []domain.Game{},
+			expectedErr: nil,
+		},
+		"query error": {
+			input: "error",
+			mockBehavior: func() {
+				mock.ExpectQuery(
+					regexp.QuoteMeta(
+						"SELECT * FROM `games` WHERE (title LIKE ? OR description LIKE ? OR about LIKE ? OR short_description LIKE ?) AND `games`.`deleted_at` IS NULL LIMIT ?",
+					),
+				).WithArgs("%error%", "%error%", "%error%", "%error%", 100).WillReturnError(errors.New("query error"))
+			},
+			expected:    nil,
+			expectedErr: errors.New("query error"),
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			tc.mockBehavior()
+
+			games, err := repo.Search(tc.input)
+
+			assert.Equal(t, tc.expectedErr, err)
+
+			expectedIDs := extractIDs(tc.expected)
+			actualIDs := extractIDs(games)
+
+			assert.Equal(t, expectedIDs, actualIDs)
+
+			assert.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
 func gameRepositoryMySQL_GamesEqual(expected, actual []domain.Game) bool {
 	if len(expected) != len(actual) {
 		return false
@@ -679,4 +832,12 @@ func gameRepositoryMySQL_GamesEqual(expected, actual []domain.Game) bool {
 		}
 	}
 	return true
+}
+
+func extractIDs(games []domain.Game) []uint {
+	ids := make([]uint, len(games))
+	for i, game := range games {
+		ids[i] = game.ID
+	}
+	return ids
 }

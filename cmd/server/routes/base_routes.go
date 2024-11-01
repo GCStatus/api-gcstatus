@@ -14,5 +14,6 @@ func RegisterCommonRoutes(
 		ctx.JSON(http.StatusOK, gin.H{"message": "Everything is ok!"})
 	})
 	r.GET("/home", handlers.HomeHandler.Home)
+	r.GET("/games/search", handlers.GameHandler.Search)
 	r.GET("/games/:slug", handlers.GameHandler.FindBySlug)
 }
