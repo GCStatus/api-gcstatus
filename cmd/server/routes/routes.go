@@ -32,6 +32,7 @@ func SetupRouter(
 	adminTagService *usecases_admin.AdminTagService,
 	adminGameService *usecases_admin.AdminGameService,
 	heartService *usecases.HeartService,
+	commentService *usecases.CommentService,
 	db *gorm.DB,
 ) *gin.Engine {
 	r := gin.Default()
@@ -71,6 +72,7 @@ func SetupRouter(
 		adminTagService,
 		adminGameService,
 		heartService,
+		commentService,
 		db,
 	)
 

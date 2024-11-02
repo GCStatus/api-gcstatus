@@ -43,4 +43,7 @@ func RegisterProtectedRoutes(
 	r.POST("/missions/:id/complete", handlers.MissionHandler.CompleteMission)
 
 	r.POST("/hearts", handlers.HeartHandler.ToggleHeartable)
+
+	r.POST("/comments", handlers.CommentHandler.Create)
+	r.DELETE("/comments/:id", handlers.CommentHandler.Delete)
 }

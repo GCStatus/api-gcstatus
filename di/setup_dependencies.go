@@ -29,6 +29,7 @@ func Setup(dbConn *gorm.DB) (
 	*usecases_admin.AdminTagService,
 	*usecases_admin.AdminGameService,
 	*usecases.HeartService,
+	*usecases.CommentService,
 ) {
 	// Create repository instances
 	userRepo := db.NewUserRepositoryMySQL(dbConn)
@@ -49,6 +50,7 @@ func Setup(dbConn *gorm.DB) (
 	adminTagRepo := db_admin.NewAdminTagRepositoryMySQL(dbConn)
 	adminGameRepo := db_admin.NewAdminGameRepositoryMySQL(dbConn)
 	heartRepo := db.NewHeartRepositoryMySQL(dbConn)
+	commentRepo := db.NewCommentRepositoryMySQL(dbConn)
 
 	// Create service instances
 	userService := usecases.NewUserService(userRepo)
@@ -70,6 +72,7 @@ func Setup(dbConn *gorm.DB) (
 	adminTagService := usecases_admin.NewAdminTagService(adminTagRepo)
 	adminGameService := usecases_admin.NewAdminGameService(adminGameRepo)
 	heartService := usecases.NewHeartService(heartRepo)
+	commentService := usecases.NewCommentService(commentRepo)
 
 	return userService,
 		authService,
@@ -89,5 +92,6 @@ func Setup(dbConn *gorm.DB) (
 		adminPlatformService,
 		adminTagService,
 		adminGameService,
-		heartService
+		heartService,
+		commentService
 }

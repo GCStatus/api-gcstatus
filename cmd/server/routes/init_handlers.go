@@ -22,6 +22,7 @@ type Handlers struct {
 	GameHandler          *api.GameHandler
 	HomeHandler          *api.HomeHandler
 	HeartHandler         *api.HeartHandler
+	CommentHandler       *api.CommentHandler
 }
 
 type AdminHandlers struct {
@@ -54,6 +55,7 @@ func InitHandlers(
 	adminTagService *usecases_admin.AdminTagService,
 	adminGameService *usecases_admin.AdminGameService,
 	heartService *usecases.HeartService,
+	commentService *usecases.CommentService,
 	db *gorm.DB,
 ) (*Handlers, *AdminHandlers) {
 	return &Handlers{
@@ -69,6 +71,7 @@ func InitHandlers(
 			GameHandler:          api.NewGameHandler(gameService, userService),
 			HomeHandler:          api.NewHomeHandler(userService, gameService, bannerService),
 			HeartHandler:         api.NewHeartHandler(userService, heartService),
+			CommentHandler:       api.NewCommentHandler(userService, commentService),
 		},
 		&AdminHandlers{
 			AdminAuthHandler:     api_admin.NewAuthHandler(authService, userService),
