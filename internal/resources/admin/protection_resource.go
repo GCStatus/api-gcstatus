@@ -8,6 +8,7 @@ import (
 type ProtectionResource struct {
 	ID        uint   `json:"id"`
 	Name      string `json:"name"`
+	Slug      string `json:"slug"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }
@@ -16,6 +17,7 @@ func TransformProtection(protection domain.Protection) *ProtectionResource {
 	return &ProtectionResource{
 		ID:        protection.ID,
 		Name:      protection.Name,
+		Slug:      protection.Slug,
 		CreatedAt: utils.FormatTimestamp(protection.CreatedAt),
 		UpdatedAt: utils.FormatTimestamp(protection.UpdatedAt),
 	}

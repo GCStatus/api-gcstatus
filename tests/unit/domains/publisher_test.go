@@ -21,6 +21,7 @@ func TestCreatePublisher(t *testing.T) {
 		"Success": {
 			publisher: domain.Publisher{
 				Name:   "Game Science",
+				Slug:   "game-science",
 				Acting: false,
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, publisher domain.Publisher) {
@@ -31,6 +32,7 @@ func TestCreatePublisher(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						publisher.Name,
+						publisher.Slug,
 						publisher.Acting,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
@@ -41,6 +43,7 @@ func TestCreatePublisher(t *testing.T) {
 		"Failure - Insert Error": {
 			publisher: domain.Publisher{
 				Name:   "Game Science",
+				Slug:   "game-science",
 				Acting: false,
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, publisher domain.Publisher) {
@@ -51,6 +54,7 @@ func TestCreatePublisher(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						publisher.Name,
+						publisher.Slug,
 						publisher.Acting,
 					).
 					WillReturnError(fmt.Errorf("some error"))
@@ -93,6 +97,7 @@ func TestUpdatePublisher(t *testing.T) {
 			publisher: domain.Publisher{
 				ID:        1,
 				Name:      "Game Science",
+				Slug:      "game-science",
 				Acting:    true,
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
@@ -105,6 +110,7 @@ func TestUpdatePublisher(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						publisher.Name,
+						publisher.Slug,
 						publisher.Acting,
 						publisher.ID,
 					).
@@ -117,6 +123,7 @@ func TestUpdatePublisher(t *testing.T) {
 			publisher: domain.Publisher{
 				ID:        1,
 				Name:      "Game Science",
+				Slug:      "game-science",
 				Acting:    false,
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
@@ -129,6 +136,7 @@ func TestUpdatePublisher(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						publisher.Name,
+						publisher.Slug,
 						publisher.Acting,
 						publisher.ID,
 					).
@@ -215,6 +223,7 @@ func TestValidatePublisher(t *testing.T) {
 		"Can empty validations errors": {
 			publisher: domain.Publisher{
 				Name:   "Game Science",
+				Slug:   "game-science",
 				Acting: true,
 			},
 		},
@@ -236,7 +245,8 @@ func TestCreatePublisherWithMissingFields(t *testing.T) {
 		"Missing required fields": {
 			publisher: domain.Publisher{},
 			wantErr: `
-				Name is a required field
+				Name is a required field,
+				Slug is a required field
 			`,
 		},
 	}

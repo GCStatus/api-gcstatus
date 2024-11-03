@@ -21,6 +21,7 @@ func TestCreateProtection(t *testing.T) {
 		"Success": {
 			protection: domain.Protection{
 				Name: "Denuvo",
+				Slug: "denuvo",
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, protection domain.Protection) {
 				mock.ExpectBegin()
@@ -30,6 +31,7 @@ func TestCreateProtection(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						protection.Name,
+						protection.Slug,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
@@ -39,6 +41,7 @@ func TestCreateProtection(t *testing.T) {
 		"Failure - Insert Error": {
 			protection: domain.Protection{
 				Name: "Denuvo",
+				Slug: "denuvo",
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, protection domain.Protection) {
 				mock.ExpectBegin()
@@ -48,6 +51,7 @@ func TestCreateProtection(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						protection.Name,
+						protection.Slug,
 					).
 					WillReturnError(fmt.Errorf("some error"))
 				mock.ExpectRollback()
@@ -89,6 +93,7 @@ func TestUpdateProtection(t *testing.T) {
 			protection: domain.Protection{
 				ID:        1,
 				Name:      "Denuvo",
+				Slug:      "denuvo",
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
 			},
@@ -100,6 +105,7 @@ func TestUpdateProtection(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						protection.Name,
+						protection.Slug,
 						protection.ID,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
@@ -111,6 +117,7 @@ func TestUpdateProtection(t *testing.T) {
 			protection: domain.Protection{
 				ID:        1,
 				Name:      "Denuvo",
+				Slug:      "denuvo",
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
 			},
@@ -122,6 +129,7 @@ func TestUpdateProtection(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						protection.Name,
+						protection.Slug,
 						protection.ID,
 					).
 					WillReturnError(fmt.Errorf("some error"))
@@ -207,6 +215,7 @@ func TestValidateProtection(t *testing.T) {
 		"Can empty validations errors": {
 			protection: domain.Protection{
 				Name: "Denuvo",
+				Slug: "denuvo",
 			},
 		},
 	}
@@ -227,7 +236,8 @@ func TestCreateProtectionWithMissingFields(t *testing.T) {
 		"Missing required fields": {
 			protection: domain.Protection{},
 			wantErr: `
-				Name is a required field
+				Name is a required field,
+				Slug is a required field
 			`,
 		},
 	}

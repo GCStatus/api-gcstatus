@@ -218,6 +218,7 @@ func TestValidateDLCPublisher(t *testing.T) {
 			DLCPublisher: domain.DLCPublisher{
 				Publisher: domain.Publisher{
 					Name:      "Game Science",
+					Slug:      "game-science",
 					Acting:    true,
 					CreatedAt: fixedTime,
 					UpdatedAt: fixedTime,
@@ -285,7 +286,8 @@ func TestCreateDLCPublisherWithMissingFields(t *testing.T) {
 				Description is a required field,
 				ShortDescription is a required field,
 				ReleaseDate is a required field,
-				Name is a required field
+				Name is a required field,
+				Slug is a required field
 			`,
 		},
 	}

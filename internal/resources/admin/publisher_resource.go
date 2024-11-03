@@ -8,6 +8,7 @@ import (
 type PublisherResource struct {
 	ID        uint   `json:"id"`
 	Name      string `json:"name"`
+	Slug      string `json:"slug"`
 	Acting    bool   `json:"acting"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
@@ -17,6 +18,7 @@ func TransformPublisher(publisher domain.Publisher) PublisherResource {
 	return PublisherResource{
 		ID:        publisher.ID,
 		Name:      publisher.Name,
+		Slug:      publisher.Slug,
 		Acting:    publisher.Acting,
 		CreatedAt: utils.FormatTimestamp(publisher.CreatedAt),
 		UpdatedAt: utils.FormatTimestamp(publisher.UpdatedAt),

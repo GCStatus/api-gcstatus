@@ -218,6 +218,7 @@ func TestValidateGameDeveloper(t *testing.T) {
 			gameDeveloper: domain.GameDeveloper{
 				Developer: domain.Developer{
 					Name:      "Game Science",
+					Slug:      "game-science",
 					Acting:    true,
 					CreatedAt: fixedTime,
 					UpdatedAt: fixedTime,

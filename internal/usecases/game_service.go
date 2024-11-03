@@ -37,16 +37,21 @@ func (h *GameService) Search(input string) ([]domain.Game, error) {
 
 func (h *GameService) FindByClassification(classification string, filterable string) ([]domain.Game, error) {
 	validClassifications := map[string]bool{
-		"categories": true,
-		"genres":     true,
-		"tags":       true,
-		"platforms":  true,
+		"categories":  true,
+		"genres":      true,
+		"tags":        true,
+		"platforms":   true,
+		"crackers":    true,
+		"developers":  true,
+		"publishers":  true,
+		"protections": true,
+		"cracks":      true,
 	}
 
 	if !validClassifications[classification] {
 		return nil, errors.NewHttpError(
 			http.StatusBadRequest,
-			"The given classification is not valid. The valid classifications are: platforms, genres, tags and categories.",
+			"The given classification is not valid. The valid classifications are: crackers, cracks, publishers, protections, developers, platforms, genres, tags and categories.",
 		)
 	}
 

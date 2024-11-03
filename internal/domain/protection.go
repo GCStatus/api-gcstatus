@@ -10,6 +10,7 @@ type Protection struct {
 	gorm.Model
 	ID        uint   `gorm:"primaryKey"`
 	Name      string `gorm:"size:255;not null" validate:"required"`
+	Slug      string `gorm:"size:255;not null" validate:"required"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

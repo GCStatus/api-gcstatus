@@ -4,6 +4,7 @@ import "gcstatus/internal/domain"
 
 type ProtectionResource struct {
 	ID   uint   `json:"id"`
+	Slug string `json:"slug"`
 	Name string `json:"name"`
 }
 
@@ -11,6 +12,7 @@ func TransformProtection(protection domain.Protection) *ProtectionResource {
 	return &ProtectionResource{
 		ID:   protection.ID,
 		Name: protection.Name,
+		Slug: protection.Slug,
 	}
 }
 

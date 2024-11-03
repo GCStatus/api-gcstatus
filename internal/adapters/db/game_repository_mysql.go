@@ -262,11 +262,30 @@ func (h *GameRepositoryMySQL) FindByClassification(classification string, filter
 		query = query.Joins("JOIN genreables ON genreables.genreable_id = games.id AND genreables.genreable_type = 'games'").
 			Joins("JOIN genres ON genres.id = genreables.genre_id").
 			Where("genres.slug = ?", filterable)
+	case "crackers":
+		query = query.Joins("JOIN cracks ON cracks.game_id = games.id").
+			Joins("JOIN crackers ON crackers.id = cracks.cracker_id").
+			Where("crackers.slug = ?", filterable)
+	case "publishers":
+		query = query.Joins("JOIN game_publishers ON game_publishers.game_id = games.id").
+			Joins("JOIN publishers ON publishers.id = game_publishers.publisher_id").
+			Where("publishers.slug = ?", filterable)
+	case "developers":
+		query = query.Joins("JOIN game_developers ON game_developers.game_id = games.id").
+			Joins("JOIN developers ON developers.id = game_developers.developer_id").
+			Where("developers.slug = ?", filterable)
+	case "protections":
+		query = query.Joins("JOIN cracks ON cracks.game_id = games.id").
+			Joins("JOIN protections ON protections.id = cracks.protection_id").
+			Where("protections.slug = ?", filterable)
+	case "cracks":
+		query = query.Joins("JOIN cracks ON cracks.game_id = games.id").
+			Where("cracks.status = ?", filterable)
 	default:
 		return []domain.Game{}, nil
 	}
 
-	err := query.Find(&games).Error
+	err := query.Limit(100).Find(&games).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return games, err
 	}

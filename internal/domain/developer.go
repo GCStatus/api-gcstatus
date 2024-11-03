@@ -10,6 +10,7 @@ type Developer struct {
 	gorm.Model
 	ID        uint   `gorm:"primaryKey"`
 	Name      string `gorm:"size:255;not null" validate:"required"`
+	Slug      string `gorm:"size:255;not null" validate:"required"`
 	Acting    bool   `gorm:"not null" validate:"boolean"`
 	CreatedAt time.Time
 	UpdatedAt time.Time

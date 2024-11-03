@@ -21,6 +21,7 @@ func TestCreateCracker(t *testing.T) {
 		"Success": {
 			cracker: domain.Cracker{
 				Name:   "GOLDBERG",
+				Slug:   "goldberg",
 				Acting: false,
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, cracker domain.Cracker) {
@@ -31,6 +32,7 @@ func TestCreateCracker(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						cracker.Name,
+						cracker.Slug,
 						cracker.Acting,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
@@ -41,6 +43,7 @@ func TestCreateCracker(t *testing.T) {
 		"Failure - Insert Error": {
 			cracker: domain.Cracker{
 				Name:   "GOLDBERG",
+				Slug:   "goldberg",
 				Acting: false,
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, cracker domain.Cracker) {
@@ -51,6 +54,7 @@ func TestCreateCracker(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						cracker.Name,
+						cracker.Slug,
 						cracker.Acting,
 					).
 					WillReturnError(fmt.Errorf("some error"))
@@ -93,6 +97,7 @@ func TestUpdateCracker(t *testing.T) {
 			cracker: domain.Cracker{
 				ID:        1,
 				Name:      "GOLDBERG",
+				Slug:      "goldberg",
 				Acting:    true,
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
@@ -105,6 +110,7 @@ func TestUpdateCracker(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						cracker.Name,
+						cracker.Slug,
 						cracker.Acting,
 						cracker.ID,
 					).
@@ -117,6 +123,7 @@ func TestUpdateCracker(t *testing.T) {
 			cracker: domain.Cracker{
 				ID:        1,
 				Name:      "GOLDBERG",
+				Slug:      "goldberg",
 				Acting:    true,
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
@@ -129,6 +136,7 @@ func TestUpdateCracker(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						cracker.Name,
+						cracker.Slug,
 						cracker.Acting,
 						cracker.ID,
 					).
@@ -215,6 +223,7 @@ func TestValidateCracker(t *testing.T) {
 		"Can empty validations errors": {
 			cracker: domain.Cracker{
 				Name:   "GOLDBERG",
+				Slug:   "goldberg",
 				Acting: true,
 			},
 		},
@@ -236,7 +245,8 @@ func TestCreateCrackerWithMissingFields(t *testing.T) {
 		"Missing required fields": {
 			cracker: domain.Cracker{},
 			wantErr: `
-				Name is a required field
+				Name is a required field,
+				Slug is a required field
 			`,
 		},
 	}

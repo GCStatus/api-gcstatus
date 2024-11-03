@@ -105,12 +105,14 @@ func MapSteamGenresAndCategories(
 ) {
 	if len(genres) > 0 {
 		for _, genre := range genres {
+			slug := utils.Slugify(genre.Name)
+
 			dbGenre := domain.Genre{
 				Name: genre.Name,
-				Slug: utils.Slugify(genre.Name),
+				Slug: slug,
 			}
 
-			err := db.Model(&domain.Genre{}).Where("name = ?", genre.Name).FirstOrCreate(&dbGenre).Error
+			err := db.Model(&domain.Genre{}).Where("slug = ?", slug).FirstOrCreate(&dbGenre).Error
 			if err != nil && err != gorm.ErrRecordNotFound {
 				log.Printf("Database error while fetching or creating genre: %v", err)
 				continue
@@ -129,12 +131,14 @@ func MapSteamGenresAndCategories(
 
 	if len(categories) > 0 {
 		for _, category := range categories {
+			slug := utils.Slugify(category.Name)
+
 			dbCategory := domain.Category{
 				Name: category.Name,
-				Slug: utils.Slugify(category.Name),
+				Slug: slug,
 			}
 
-			err := db.Model(&domain.Category{}).Where("name = ?", category.Name).FirstOrCreate(&dbCategory).Error
+			err := db.Model(&domain.Category{}).Where("slug = ?", slug).FirstOrCreate(&dbCategory).Error
 			if err != nil && err != gorm.ErrRecordNotFound {
 				log.Printf("Database error while fetching or creating category: %v", err)
 				continue
@@ -161,12 +165,15 @@ func MapSteamPublishersAndDevelopers(
 ) {
 	if len(developers) > 0 {
 		for _, developer := range developers {
+			slug := utils.Slugify(developer)
+
 			dbDeveloper := domain.Developer{
 				Name:   developer,
+				Slug:   slug,
 				Acting: true,
 			}
 
-			err := db.Model(&domain.Developer{}).Where("name = ?", developer).FirstOrCreate(&dbDeveloper).Error
+			err := db.Model(&domain.Developer{}).Where("slug = ?", slug).FirstOrCreate(&dbDeveloper).Error
 			if err != nil && err != gorm.ErrRecordNotFound {
 				log.Printf("Database error while fetching or creating developer: %v", err)
 				continue
@@ -194,12 +201,15 @@ func MapSteamPublishersAndDevelopers(
 
 	if len(publishers) > 0 {
 		for _, publisher := range publishers {
+			slug := utils.Slugify(publisher)
+
 			dbPublisher := domain.Publisher{
 				Name:   publisher,
+				Slug:   slug,
 				Acting: true,
 			}
 
-			err := db.Model(&domain.Publisher{}).Where("name = ?", publisher).FirstOrCreate(&dbPublisher).Error
+			err := db.Model(&domain.Publisher{}).Where("slug = ?", slug).FirstOrCreate(&dbPublisher).Error
 			if err != nil && err != gorm.ErrRecordNotFound {
 				log.Printf("Database error while fetching or creating publisher: %v", err)
 				continue

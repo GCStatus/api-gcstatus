@@ -242,10 +242,12 @@ func TestValidateCrack(t *testing.T) {
 				Status: domain.UncrackedStatus,
 				Cracker: domain.Cracker{
 					Name:   "GOLDBERG",
+					Slug:   "goldberg",
 					Acting: true,
 				},
 				Protection: domain.Protection{
 					Name: "Denuvo",
+					Slug: "denuvo",
 				},
 				Game: domain.Game{
 					Slug:             "valid",
@@ -290,7 +292,9 @@ func TestCreateCrackWithMissingFields(t *testing.T) {
 			wantErr: `
 				Status is a required field,
 				Name is a required field,
+				Slug is a required field,
 				Name is a required field,
+				Slug is a required field,
 				Age is a required field,
 				Slug is a required field,
 				Title is a required field,

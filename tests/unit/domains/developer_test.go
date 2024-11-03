@@ -21,6 +21,7 @@ func TestCreateDeveloper(t *testing.T) {
 		"Success": {
 			developer: domain.Developer{
 				Name:   "Game Science",
+				Slug:   "game-science",
 				Acting: false,
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, developer domain.Developer) {
@@ -31,6 +32,7 @@ func TestCreateDeveloper(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						developer.Name,
+						developer.Slug,
 						developer.Acting,
 					).
 					WillReturnResult(sqlmock.NewResult(1, 1))
@@ -41,6 +43,7 @@ func TestCreateDeveloper(t *testing.T) {
 		"Failure - Insert Error": {
 			developer: domain.Developer{
 				Name:   "Game Science",
+				Slug:   "game-science",
 				Acting: false,
 			},
 			mockBehavior: func(mock sqlmock.Sqlmock, developer domain.Developer) {
@@ -51,6 +54,7 @@ func TestCreateDeveloper(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						developer.Name,
+						developer.Slug,
 						developer.Acting,
 					).
 					WillReturnError(fmt.Errorf("some error"))
@@ -93,6 +97,7 @@ func TestUpdateDeveloper(t *testing.T) {
 			developer: domain.Developer{
 				ID:        1,
 				Name:      "Game Science",
+				Slug:      "game-science",
 				Acting:    true,
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
@@ -105,6 +110,7 @@ func TestUpdateDeveloper(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						developer.Name,
+						developer.Slug,
 						developer.Acting,
 						developer.ID,
 					).
@@ -117,6 +123,7 @@ func TestUpdateDeveloper(t *testing.T) {
 			developer: domain.Developer{
 				ID:        1,
 				Name:      "Game Science",
+				Slug:      "game-science",
 				Acting:    false,
 				CreatedAt: fixedTime,
 				UpdatedAt: fixedTime,
@@ -129,6 +136,7 @@ func TestUpdateDeveloper(t *testing.T) {
 						sqlmock.AnyArg(),
 						sqlmock.AnyArg(),
 						developer.Name,
+						developer.Slug,
 						developer.Acting,
 						developer.ID,
 					).
@@ -215,6 +223,7 @@ func TestValidateDeveloper(t *testing.T) {
 		"Can empty validations errors": {
 			developer: domain.Developer{
 				Name:   "Game Science",
+				Slug:   "game-science",
 				Acting: true,
 			},
 		},
@@ -236,7 +245,8 @@ func TestCreateDeveloperWithMissingFields(t *testing.T) {
 		"Missing required fields": {
 			developer: domain.Developer{},
 			wantErr: `
-				Name is a required field
+				Name is a required field,
+				Slug is a required field
 			`,
 		},
 	}

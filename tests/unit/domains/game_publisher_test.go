@@ -218,6 +218,7 @@ func TestValidateGamePublisher(t *testing.T) {
 			gamePublisher: domain.GamePublisher{
 				Publisher: domain.Publisher{
 					Name:      "Game Science",
+					Slug:      "game-science",
 					Acting:    true,
 					CreatedAt: fixedTime,
 					UpdatedAt: fixedTime,

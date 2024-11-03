@@ -608,8 +608,8 @@ func TestGameRepositoryMySQL_FindByClassification(t *testing.T) {
 			filterable:     "adventure",
 			mockBehavior: func(mock sqlmock.Sqlmock, classification, filterable string) {
 				mock.ExpectQuery(regexp.QuoteMeta(
-					"SELECT `games`.`id`,`games`.`created_at`,`games`.`updated_at`,`games`.`deleted_at`,`games`.`age`,`games`.`slug`,`games`.`title`,`games`.`condition`,`games`.`cover`,`games`.`about`,`games`.`description`,`games`.`short_description`,`games`.`free`,`games`.`great_release`,`games`.`legal`,`games`.`website`,`games`.`release_date` FROM `games` JOIN categoriables ON categoriables.categoriable_id = games.id AND categoriables.categoriable_type = 'games' JOIN categories ON categories.id = categoriables.category_id WHERE categories.slug = ? AND `games`.`deleted_at` IS NULL")).
-					WithArgs(filterable).
+					"SELECT `games`.`id`,`games`.`created_at`,`games`.`updated_at`,`games`.`deleted_at`,`games`.`age`,`games`.`slug`,`games`.`title`,`games`.`condition`,`games`.`cover`,`games`.`about`,`games`.`description`,`games`.`short_description`,`games`.`free`,`games`.`great_release`,`games`.`legal`,`games`.`website`,`games`.`release_date` FROM `games` JOIN categoriables ON categoriables.categoriable_id = games.id AND categoriables.categoriable_type = 'games' JOIN categories ON categories.id = categoriables.category_id WHERE categories.slug = ? AND `games`.`deleted_at` IS NULL LIMIT ?")).
+					WithArgs(filterable, 100).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1).AddRow(2))
 
 				baseQueries(mock, fixedTime, 1, 2)
@@ -622,8 +622,8 @@ func TestGameRepositoryMySQL_FindByClassification(t *testing.T) {
 			filterable:     "ps5",
 			mockBehavior: func(mock sqlmock.Sqlmock, classification, filterable string) {
 				mock.ExpectQuery(regexp.QuoteMeta(
-					"SELECT `games`.`id`,`games`.`created_at`,`games`.`updated_at`,`games`.`deleted_at`,`games`.`age`,`games`.`slug`,`games`.`title`,`games`.`condition`,`games`.`cover`,`games`.`about`,`games`.`description`,`games`.`short_description`,`games`.`free`,`games`.`great_release`,`games`.`legal`,`games`.`website`,`games`.`release_date` FROM `games` JOIN platformables ON platformables.platformable_id = games.id AND platformables.platformable_type = 'games' JOIN platforms ON platforms.id = platformables.platform_id WHERE platforms.slug = ? AND `games`.`deleted_at` IS NULL")).
-					WithArgs(filterable).
+					"SELECT `games`.`id`,`games`.`created_at`,`games`.`updated_at`,`games`.`deleted_at`,`games`.`age`,`games`.`slug`,`games`.`title`,`games`.`condition`,`games`.`cover`,`games`.`about`,`games`.`description`,`games`.`short_description`,`games`.`free`,`games`.`great_release`,`games`.`legal`,`games`.`website`,`games`.`release_date` FROM `games` JOIN platformables ON platformables.platformable_id = games.id AND platformables.platformable_type = 'games' JOIN platforms ON platforms.id = platformables.platform_id WHERE platforms.slug = ? AND `games`.`deleted_at` IS NULL LIMIT ?")).
+					WithArgs(filterable, 100).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1).AddRow(2))
 
 				baseQueries(mock, fixedTime, 1, 2)
@@ -636,8 +636,8 @@ func TestGameRepositoryMySQL_FindByClassification(t *testing.T) {
 			filterable:     "multiplayer",
 			mockBehavior: func(mock sqlmock.Sqlmock, classification, filterable string) {
 				mock.ExpectQuery(regexp.QuoteMeta(
-					"SELECT `games`.`id`,`games`.`created_at`,`games`.`updated_at`,`games`.`deleted_at`,`games`.`age`,`games`.`slug`,`games`.`title`,`games`.`condition`,`games`.`cover`,`games`.`about`,`games`.`description`,`games`.`short_description`,`games`.`free`,`games`.`great_release`,`games`.`legal`,`games`.`website`,`games`.`release_date` FROM `games` JOIN taggables ON taggables.taggable_id = games.id AND taggables.taggable_type = 'games' JOIN tags ON tags.id = taggables.tag_id WHERE tags.slug = ? AND `games`.`deleted_at` IS NULL")).
-					WithArgs(filterable).
+					"SELECT `games`.`id`,`games`.`created_at`,`games`.`updated_at`,`games`.`deleted_at`,`games`.`age`,`games`.`slug`,`games`.`title`,`games`.`condition`,`games`.`cover`,`games`.`about`,`games`.`description`,`games`.`short_description`,`games`.`free`,`games`.`great_release`,`games`.`legal`,`games`.`website`,`games`.`release_date` FROM `games` JOIN taggables ON taggables.taggable_id = games.id AND taggables.taggable_type = 'games' JOIN tags ON tags.id = taggables.tag_id WHERE tags.slug = ? AND `games`.`deleted_at` IS NULL LIMIT ?")).
+					WithArgs(filterable, 100).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1).AddRow(2).AddRow(3).AddRow(4))
 
 				baseQueries(mock, fixedTime, 1, 2, 3, 4)
@@ -650,8 +650,8 @@ func TestGameRepositoryMySQL_FindByClassification(t *testing.T) {
 			filterable:     "action",
 			mockBehavior: func(mock sqlmock.Sqlmock, classification, filterable string) {
 				mock.ExpectQuery(regexp.QuoteMeta(
-					"SELECT `games`.`id`,`games`.`created_at`,`games`.`updated_at`,`games`.`deleted_at`,`games`.`age`,`games`.`slug`,`games`.`title`,`games`.`condition`,`games`.`cover`,`games`.`about`,`games`.`description`,`games`.`short_description`,`games`.`free`,`games`.`great_release`,`games`.`legal`,`games`.`website`,`games`.`release_date` FROM `games` JOIN genreables ON genreables.genreable_id = games.id AND genreables.genreable_type = 'games' JOIN genres ON genres.id = genreables.genre_id WHERE genres.slug = ? AND `games`.`deleted_at` IS NULL")).
-					WithArgs(filterable).
+					"SELECT `games`.`id`,`games`.`created_at`,`games`.`updated_at`,`games`.`deleted_at`,`games`.`age`,`games`.`slug`,`games`.`title`,`games`.`condition`,`games`.`cover`,`games`.`about`,`games`.`description`,`games`.`short_description`,`games`.`free`,`games`.`great_release`,`games`.`legal`,`games`.`website`,`games`.`release_date` FROM `games` JOIN genreables ON genreables.genreable_id = games.id AND genreables.genreable_type = 'games' JOIN genres ON genres.id = genreables.genre_id WHERE genres.slug = ? AND `games`.`deleted_at` IS NULL LIMIT ?")).
+					WithArgs(filterable, 100).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1).AddRow(2).AddRow(3))
 
 				baseQueries(mock, fixedTime, 1, 2, 3)
@@ -659,13 +659,83 @@ func TestGameRepositoryMySQL_FindByClassification(t *testing.T) {
 			expectedCount: 3,
 			wantErr:       false,
 		},
+		"find by crackers": {
+			classification: "crackers",
+			filterable:     "rune",
+			mockBehavior: func(mock sqlmock.Sqlmock, classification, filterable string) {
+				mock.ExpectQuery(regexp.QuoteMeta(
+					"SELECT `games`.`id`,`games`.`created_at`,`games`.`updated_at`,`games`.`deleted_at`,`games`.`age`,`games`.`slug`,`games`.`title`,`games`.`condition`,`games`.`cover`,`games`.`about`,`games`.`description`,`games`.`short_description`,`games`.`free`,`games`.`great_release`,`games`.`legal`,`games`.`website`,`games`.`release_date` FROM `games` JOIN cracks ON cracks.game_id = games.id JOIN crackers ON crackers.id = cracks.cracker_id WHERE crackers.slug = ? AND `games`.`deleted_at` IS NULL LIMIT ?")).
+					WithArgs(filterable, 100).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1).AddRow(2).AddRow(3))
+
+				baseQueries(mock, fixedTime, 1, 2, 3)
+			},
+			expectedCount: 3,
+			wantErr:       false,
+		},
+		"find by cracks": {
+			classification: "cracks",
+			filterable:     "cracked",
+			mockBehavior: func(mock sqlmock.Sqlmock, classification, filterable string) {
+				mock.ExpectQuery(regexp.QuoteMeta(
+					"SELECT `games`.`id`,`games`.`created_at`,`games`.`updated_at`,`games`.`deleted_at`,`games`.`age`,`games`.`slug`,`games`.`title`,`games`.`condition`,`games`.`cover`,`games`.`about`,`games`.`description`,`games`.`short_description`,`games`.`free`,`games`.`great_release`,`games`.`legal`,`games`.`website`,`games`.`release_date` FROM `games` JOIN cracks ON cracks.game_id = games.id WHERE cracks.status = ? AND `games`.`deleted_at` IS NULL LIMIT ?")).
+					WithArgs(filterable, 100).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1).AddRow(2).AddRow(3))
+
+				baseQueries(mock, fixedTime, 1, 2, 3)
+			},
+			expectedCount: 3,
+			wantErr:       false,
+		},
+		"find by protections": {
+			classification: "protections",
+			filterable:     "steam",
+			mockBehavior: func(mock sqlmock.Sqlmock, classification, filterable string) {
+				mock.ExpectQuery(regexp.QuoteMeta(
+					"SELECT `games`.`id`,`games`.`created_at`,`games`.`updated_at`,`games`.`deleted_at`,`games`.`age`,`games`.`slug`,`games`.`title`,`games`.`condition`,`games`.`cover`,`games`.`about`,`games`.`description`,`games`.`short_description`,`games`.`free`,`games`.`great_release`,`games`.`legal`,`games`.`website`,`games`.`release_date` FROM `games` JOIN cracks ON cracks.game_id = games.id JOIN protections ON protections.id = cracks.protection_id WHERE protections.slug = ? AND `games`.`deleted_at` IS NULL LIMIT ?")).
+					WithArgs(filterable, 100).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1).AddRow(2).AddRow(3))
+
+				baseQueries(mock, fixedTime, 1, 2, 3)
+			},
+			expectedCount: 3,
+			wantErr:       false,
+		},
+		"find by publishers": {
+			classification: "publishers",
+			filterable:     "bandai",
+			mockBehavior: func(mock sqlmock.Sqlmock, classification, filterable string) {
+				mock.ExpectQuery(regexp.QuoteMeta(
+					"SELECT `games`.`id`,`games`.`created_at`,`games`.`updated_at`,`games`.`deleted_at`,`games`.`age`,`games`.`slug`,`games`.`title`,`games`.`condition`,`games`.`cover`,`games`.`about`,`games`.`description`,`games`.`short_description`,`games`.`free`,`games`.`great_release`,`games`.`legal`,`games`.`website`,`games`.`release_date` FROM `games` JOIN game_publishers ON game_publishers.game_id = games.id JOIN publishers ON publishers.id = game_publishers.publisher_id WHERE publishers.slug = ? AND `games`.`deleted_at` IS NULL LIMIT ?")).
+					WithArgs(filterable, 100).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1).AddRow(2))
+
+				baseQueries(mock, fixedTime, 1, 2)
+			},
+			expectedCount: 2,
+			wantErr:       false,
+		},
+		"find by developers": {
+			classification: "developers",
+			filterable:     "bandai",
+			mockBehavior: func(mock sqlmock.Sqlmock, classification, filterable string) {
+				mock.ExpectQuery(regexp.QuoteMeta(
+					"SELECT `games`.`id`,`games`.`created_at`,`games`.`updated_at`,`games`.`deleted_at`,`games`.`age`,`games`.`slug`,`games`.`title`,`games`.`condition`,`games`.`cover`,`games`.`about`,`games`.`description`,`games`.`short_description`,`games`.`free`,`games`.`great_release`,`games`.`legal`,`games`.`website`,`games`.`release_date` FROM `games` JOIN game_developers ON game_developers.game_id = games.id JOIN developers ON developers.id = game_developers.developer_id WHERE developers.slug = ? AND `games`.`deleted_at` IS NULL LIMIT ?")).
+					WithArgs(filterable, 100).
+					WillReturnRows(sqlmock.NewRows([]string{"id"}).AddRow(1).AddRow(2))
+
+				baseQueries(mock, fixedTime, 1, 2)
+			},
+			expectedCount: 2,
+			wantErr:       false,
+		},
 		"no games found": {
 			classification: "categories",
 			filterable:     "nonexistent",
 			mockBehavior: func(mock sqlmock.Sqlmock, classification, filterable string) {
 				mock.ExpectQuery(regexp.QuoteMeta(
-					"SELECT `games`.`id`,`games`.`created_at`,`games`.`updated_at`,`games`.`deleted_at`,`games`.`age`,`games`.`slug`,`games`.`title`,`games`.`condition`,`games`.`cover`,`games`.`about`,`games`.`description`,`games`.`short_description`,`games`.`free`,`games`.`great_release`,`games`.`legal`,`games`.`website`,`games`.`release_date` FROM `games` JOIN categoriables ON categoriables.categoriable_id = games.id AND categoriables.categoriable_type = 'games' JOIN categories ON categories.id = categoriables.category_id WHERE categories.slug = ? AND `games`.`deleted_at` IS NULL")).
-					WithArgs(filterable).
+					"SELECT `games`.`id`,`games`.`created_at`,`games`.`updated_at`,`games`.`deleted_at`,`games`.`age`,`games`.`slug`,`games`.`title`,`games`.`condition`,`games`.`cover`,`games`.`about`,`games`.`description`,`games`.`short_description`,`games`.`free`,`games`.`great_release`,`games`.`legal`,`games`.`website`,`games`.`release_date` FROM `games` JOIN categoriables ON categoriables.categoriable_id = games.id AND categoriables.categoriable_type = 'games' JOIN categories ON categories.id = categoriables.category_id WHERE categories.slug = ? AND `games`.`deleted_at` IS NULL LIMIT ?")).
+					WithArgs(filterable, 100).
 					WillReturnRows(sqlmock.NewRows([]string{"id"}))
 			},
 			expectedCount: 0,
@@ -676,8 +746,8 @@ func TestGameRepositoryMySQL_FindByClassification(t *testing.T) {
 			filterable:     "errorcase",
 			mockBehavior: func(mock sqlmock.Sqlmock, classification, filterable string) {
 				mock.ExpectQuery(regexp.QuoteMeta(
-					"SELECT `games`.`id`,`games`.`created_at`,`games`.`updated_at`,`games`.`deleted_at`,`games`.`age`,`games`.`slug`,`games`.`title`,`games`.`condition`,`games`.`cover`,`games`.`about`,`games`.`description`,`games`.`short_description`,`games`.`free`,`games`.`great_release`,`games`.`legal`,`games`.`website`,`games`.`release_date` FROM `games` JOIN taggables ON taggables.taggable_id = games.id AND taggables.taggable_type = 'games' JOIN tags ON tags.id = taggables.tag_id WHERE tags.slug = ? AND `games`.`deleted_at` IS NULL")).
-					WithArgs(filterable).
+					"SELECT `games`.`id`,`games`.`created_at`,`games`.`updated_at`,`games`.`deleted_at`,`games`.`age`,`games`.`slug`,`games`.`title`,`games`.`condition`,`games`.`cover`,`games`.`about`,`games`.`description`,`games`.`short_description`,`games`.`free`,`games`.`great_release`,`games`.`legal`,`games`.`website`,`games`.`release_date` FROM `games` JOIN taggables ON taggables.taggable_id = games.id AND taggables.taggable_type = 'games' JOIN tags ON tags.id = taggables.tag_id WHERE tags.slug = ? AND `games`.`deleted_at` IS NULL LIMIT ?")).
+					WithArgs(filterable, 100).
 					WillReturnError(fmt.Errorf("database query error"))
 			},
 			expectedCount: 0,

@@ -218,6 +218,7 @@ func TestValidateDLCDeveloper(t *testing.T) {
 			DLCDeveloper: domain.DLCDeveloper{
 				Developer: domain.Developer{
 					Name:      "Game Science",
+					Slug:      "game-science",
 					Acting:    true,
 					CreatedAt: fixedTime,
 					UpdatedAt: fixedTime,
@@ -285,7 +286,8 @@ func TestCreateDLCDeveloperWithMissingFields(t *testing.T) {
 				Description is a required field,
 				ShortDescription is a required field,
 				ReleaseDate is a required field,
-				Name is a required field
+				Name is a required field,
+				Slug is a required field
 			`,
 		},
 	}
