@@ -18,6 +18,7 @@ func NewMockGameRepository() *MockGameRepository {
 		games: make(map[uint]*domain.Game),
 	}
 }
+
 func (m *MockGameRepository) FindBySlug(slug string) (*domain.Game, error) {
 	for _, game := range m.games {
 		if game.Slug == slug {
@@ -56,6 +57,47 @@ func (m *MockGameRepository) Search(input string) ([]domain.Game, error) {
 		} else {
 			return nil, errors.New("no one games found")
 		}
+	}
+
+	return games, nil
+}
+
+func (m *MockGameRepository) FindByClassification(classification string, filterable string) ([]domain.Game, error) {
+	var games []domain.Game
+
+	for _, game := range m.games {
+		switch classification {
+		case "genres":
+			for _, genre := range game.Genres {
+				if genre.Genre.Slug == filterable {
+					games = append(games, *game)
+				}
+			}
+		case "categories":
+			for _, category := range game.Categories {
+				if category.Category.Slug == filterable {
+					games = append(games, *game)
+				}
+			}
+		case "tags":
+			for _, tag := range game.Tags {
+				if tag.Tag.Slug == filterable {
+					games = append(games, *game)
+				}
+			}
+		case "platforms":
+			for _, platform := range game.Platforms {
+				if platform.Platform.Slug == filterable {
+					games = append(games, *game)
+				}
+			}
+		default:
+			return nil, errors.New("invalid classification")
+		}
+	}
+
+	if len(games) == 0 {
+		return nil, errors.New("games not found for this classification")
 	}
 
 	return games, nil
@@ -407,6 +449,87 @@ func TestMockGameRepository_ExistsForStore(t *testing.T) {
 			}
 			if exists != tt.expected {
 				t.Errorf("expected exists to be %v, got %v", tt.expected, exists)
+			}
+		})
+	}
+}
+
+func TestMockGameRepository_FindByClassification(t *testing.T) {
+	mockRepo := NewMockGameRepository()
+
+	if err := mockRepo.CreateGame(&domain.Game{ID: 1, Genres: []domain.Genreable{
+		{ID: 1, GenreableID: 1, GenreableType: "games", Genre: domain.Genre{ID: 1, Name: "Action", Slug: "action"}},
+	}}); err != nil {
+		t.Fatalf("Failed to create game: %+v", err)
+	}
+	if err := mockRepo.CreateGame(&domain.Game{ID: 2, Genres: []domain.Genreable{
+		{ID: 2, GenreableID: 2, GenreableType: "games", Genre: domain.Genre{ID: 1, Name: "Action", Slug: "action"}},
+	}, Platforms: []domain.Platformable{
+		{ID: 1, PlatformableID: 1, PlatformableType: "games", Platform: domain.Platform{ID: 1, Name: "PS5", Slug: "ps5"}},
+	}}); err != nil {
+		t.Fatalf("Failed to create game: %+v", err)
+	}
+	if err := mockRepo.CreateGame(&domain.Game{ID: 3, Genres: []domain.Genreable{
+		{ID: 3, GenreableID: 3, GenreableType: "games", Genre: domain.Genre{ID: 1, Name: "Action", Slug: "action"}},
+	}, Platforms: []domain.Platformable{
+		{ID: 2, PlatformableID: 3, PlatformableType: "games", Platform: domain.Platform{ID: 1, Name: "PS5", Slug: "ps5"}},
+	}, Categories: []domain.Categoriable{
+		{ID: 1, CategoriableID: 3, CategoriableType: "games", Category: domain.Category{ID: 1, Name: "Adventure", Slug: "adventure"}},
+	}}); err != nil {
+		t.Fatalf("Failed to create game: %+v", err)
+	}
+
+	tests := map[string]struct {
+		classification string
+		filter         string
+		expectedCount  int
+		expectError    bool
+	}{
+		"Find games by genre 'action'": {
+			classification: "genres",
+			filter:         "action",
+			expectedCount:  3,
+			expectError:    false,
+		},
+		"Find games by platform 'ps5'": {
+			classification: "platforms",
+			filter:         "ps5",
+			expectedCount:  2,
+			expectError:    false,
+		},
+		"Find games by category 'adventure'": {
+			classification: "categories",
+			filter:         "adventure",
+			expectedCount:  1,
+			expectError:    false,
+		},
+		"No games for nonexistent tag": {
+			classification: "tags",
+			filter:         "nonexistent",
+			expectedCount:  0,
+			expectError:    true,
+		},
+		"Invalid classification": {
+			classification: "invalid_classification",
+			filter:         "anything",
+			expectedCount:  0,
+			expectError:    true,
+		},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			games, err := mockRepo.FindByClassification(tt.classification, tt.filter)
+
+			if tt.expectError && err == nil {
+				t.Fatalf("expected error, got nil")
+			}
+			if !tt.expectError && err != nil {
+				t.Fatalf("expected no error, got %v", err)
+			}
+
+			if len(games) != tt.expectedCount {
+				t.Errorf("expected %d games, got %d", tt.expectedCount, len(games))
 			}
 		})
 	}

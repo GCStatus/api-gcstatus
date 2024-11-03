@@ -1,6 +1,7 @@
 package api
 
 import (
+	"gcstatus/internal/errors"
 	"gcstatus/internal/resources"
 	"gcstatus/internal/usecases"
 	"gcstatus/internal/utils"
@@ -76,6 +77,35 @@ func (h *GameHandler) Search(c *gin.Context) {
 	} else {
 		transformedGames = []resources.GameResource{}
 	}
+
+	response := resources.Response{
+		Data: transformedGames,
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *GameHandler) FindByClassification(c *gin.Context) {
+	filterable := c.Param("filterable")
+	classification := c.Param("classification")
+	authUserID := utils.GetAuthenticatedUserID(c, h.userService.GetUserByID)
+
+	var userID uint
+	if authUserID != nil {
+		userID = *authUserID
+	}
+
+	games, err := h.gameService.FindByClassification(classification, filterable)
+	if err != nil {
+		if httpErr, ok := err.(*errors.HttpError); ok {
+			RespondWithError(c, httpErr.Code, httpErr.Error())
+		} else {
+			RespondWithError(c, http.StatusInternalServerError, "Failed to fetch the games: "+err.Error())
+		}
+		return
+	}
+
+	transformedGames := resources.TransformGames(games, s3.GlobalS3Client, userID)
 
 	response := resources.Response{
 		Data: transformedGames,

@@ -2,7 +2,9 @@ package usecases
 
 import (
 	"gcstatus/internal/domain"
+	"gcstatus/internal/errors"
 	"gcstatus/internal/ports"
+	"net/http"
 )
 
 type GameService struct {
@@ -31,4 +33,22 @@ func (h *GameService) ExistsForStore(storeID uint, appID uint) (bool, error) {
 
 func (h *GameService) Search(input string) ([]domain.Game, error) {
 	return h.repo.Search(input)
+}
+
+func (h *GameService) FindByClassification(classification string, filterable string) ([]domain.Game, error) {
+	validClassifications := map[string]bool{
+		"categories": true,
+		"genres":     true,
+		"tags":       true,
+		"platforms":  true,
+	}
+
+	if !validClassifications[classification] {
+		return nil, errors.NewHttpError(
+			http.StatusBadRequest,
+			"The given classification is not valid. The valid classifications are: platforms, genres, tags and categories.",
+		)
+	}
+
+	return h.repo.FindByClassification(classification, filterable)
 }

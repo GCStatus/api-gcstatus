@@ -88,7 +88,7 @@ func (h *GameRepositoryMySQL) HomeGames() (
 		Preload("Platforms.Platform").
 		Preload("Genres.Genre").
 		Where("`great_release` = ?", true).
-		Where("`release_date` > ?", time.Now()).
+		Where("`release_date` >= ?", time.Now()).
 		First(&nextGreatReleaseGame).Error
 
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -228,6 +228,47 @@ func (h *GameRepositoryMySQL) Search(input string) ([]domain.Game, error) {
 
 	if err := query.Limit(100).Find(&games).Error; err != nil {
 		return nil, err
+	}
+
+	return games, nil
+}
+
+func (h *GameRepositoryMySQL) FindByClassification(classification string, filterable string) ([]domain.Game, error) {
+	var games []domain.Game
+	query := h.db.Model(&domain.Game{}).
+		Preload("Hearts").
+		Preload("Views").
+		Preload("Crack.Cracker").
+		Preload("Crack.Protection").
+		Preload("Platforms.Platform").
+		Preload("Categories.Category").
+		Preload("Tags.Tag").
+		Preload("Genres.Genre")
+
+	switch classification {
+	case "categories":
+		query = query.Joins("JOIN categoriables ON categoriables.categoriable_id = games.id AND categoriables.categoriable_type = 'games'").
+			Joins("JOIN categories ON categories.id = categoriables.category_id").
+			Where("categories.slug = ?", filterable)
+	case "platforms":
+		query = query.Joins("JOIN platformables ON platformables.platformable_id = games.id AND platformables.platformable_type = 'games'").
+			Joins("JOIN platforms ON platforms.id = platformables.platform_id").
+			Where("platforms.slug = ?", filterable)
+	case "tags":
+		query = query.Joins("JOIN taggables ON taggables.taggable_id = games.id AND taggables.taggable_type = 'games'").
+			Joins("JOIN tags ON tags.id = taggables.tag_id").
+			Where("tags.slug = ?", filterable)
+	case "genres":
+		query = query.Joins("JOIN genreables ON genreables.genreable_id = games.id AND genreables.genreable_type = 'games'").
+			Joins("JOIN genres ON genres.id = genreables.genre_id").
+			Where("genres.slug = ?", filterable)
+	default:
+		return []domain.Game{}, nil
+	}
+
+	err := query.Find(&games).Error
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return games, err
 	}
 
 	return games, nil
