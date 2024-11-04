@@ -105,7 +105,7 @@ func (m *MockGameRepository) FindByClassification(classification string, filtera
 
 func (m *MockGameRepository) CalendarGames() ([]domain.Game, error) {
 	var games []domain.Game
-	now := time.Now()
+	now := time.Now().UTC().Truncate(24 * time.Hour)
 
 	startDate := now.AddDate(0, -1, 0)
 
@@ -555,7 +555,7 @@ func TestMockGameRepository_FindByClassification(t *testing.T) {
 }
 
 func TestMockGameRepository_CalendarGames(t *testing.T) {
-	fixedTime := time.Now()
+	fixedTime := time.Now().UTC().Truncate(24 * time.Hour)
 	startDate := fixedTime.AddDate(0, -1, 0)
 
 	tests := map[string]struct {
