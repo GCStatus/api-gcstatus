@@ -4,6 +4,7 @@ import (
 	"errors"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/utils"
+	"sort"
 	"testing"
 	"time"
 
@@ -187,10 +188,15 @@ func TestMockBannerRepository_GetBannersForHome(t *testing.T) {
 
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-
 			tc.setupFunc()
 
 			actual, err := mockRepo.GetBannersForHome()
+			sort.Slice(actual, func(i, j int) bool {
+				return actual[i].ID < actual[j].ID
+			})
+			sort.Slice(tc.expected, func(i, j int) bool {
+				return tc.expected[i].ID < tc.expected[j].ID
+			})
 
 			if tc.expectedErr != nil {
 				assert.EqualError(t, err, tc.expectedErr.Error())

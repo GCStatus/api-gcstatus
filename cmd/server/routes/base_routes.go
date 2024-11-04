@@ -16,5 +16,7 @@ func RegisterCommonRoutes(
 	r.GET("/home", handlers.HomeHandler.Home)
 	r.GET("/games/search", handlers.GameHandler.Search)
 	r.GET("/games/:slug", handlers.GameHandler.FindBySlug)
+	r.GET("/games/calendar", handlers.GameHandler.CalendarGames)
+	r.GET("/games/condition/:condition", handlers.GameHandler.FindByCondition)
 	r.GET("/games/filters/:classification/:filterable", handlers.GameHandler.FindByClassification)
 }

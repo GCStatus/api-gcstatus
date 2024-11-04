@@ -103,6 +103,25 @@ func (m *MockGameRepository) FindByClassification(classification string, filtera
 	return games, nil
 }
 
+func (m *MockGameRepository) CalendarGames() ([]domain.Game, error) {
+	var games []domain.Game
+	now := time.Now()
+
+	startDate := now.AddDate(0, -1, 0)
+
+	for _, game := range m.games {
+		if game.ReleaseDate.Equal(startDate) || game.ReleaseDate.After(startDate) {
+			games = append(games, *game)
+		}
+	}
+
+	if len(games) == 0 {
+		return nil, errors.New("no games found")
+	}
+
+	return games, nil
+}
+
 func (m *MockGameRepository) HomeGames() ([]domain.Game, []domain.Game, []domain.Game, *domain.Game, []domain.Game, error) {
 	var hotGames, popularGames, mostHeartedGames, upcomingGames []domain.Game
 	var nextGreatReleaseGame *domain.Game
@@ -527,6 +546,55 @@ func TestMockGameRepository_FindByClassification(t *testing.T) {
 			if !tt.expectError && err != nil {
 				t.Fatalf("expected no error, got %v", err)
 			}
+
+			if len(games) != tt.expectedCount {
+				t.Errorf("expected %d games, got %d", tt.expectedCount, len(games))
+			}
+		})
+	}
+}
+
+func TestMockGameRepository_CalendarGames(t *testing.T) {
+	fixedTime := time.Now()
+	startDate := fixedTime.AddDate(0, -1, 0)
+	mockRepo := NewMockGameRepository()
+
+	tests := map[string]struct {
+		expectedCount int
+		mockBehavior  func()
+	}{
+		"Find all games for calendar": {
+			expectedCount: 3,
+			mockBehavior: func() {
+				if err := mockRepo.CreateGame(&domain.Game{ID: 1, ReleaseDate: fixedTime}); err != nil {
+					t.Fatalf("Failed to create game: %+v", err)
+				}
+				if err := mockRepo.CreateGame(&domain.Game{ID: 2, ReleaseDate: startDate}); err != nil {
+					t.Fatalf("Failed to create game: %+v", err)
+				}
+				if err := mockRepo.CreateGame(&domain.Game{ID: 3, ReleaseDate: fixedTime.AddDate(0, 2, 0)}); err != nil {
+					t.Fatalf("Failed to create game: %+v", err)
+				}
+			},
+		},
+		"No games found": {
+			expectedCount: 0,
+			mockBehavior: func() {
+				if err := mockRepo.CreateGame(&domain.Game{ID: 1, ReleaseDate: fixedTime.AddDate(-1, 0, 0)}); err != nil {
+					t.Fatalf("Failed to create game: %+v", err)
+				}
+				if err := mockRepo.CreateGame(&domain.Game{ID: 2, ReleaseDate: fixedTime.AddDate(0, -1, -1)}); err != nil {
+					t.Fatalf("Failed to create game: %+v", err)
+				}
+			},
+		},
+	}
+
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			tt.mockBehavior()
+
+			games, _ := mockRepo.CalendarGames()
 
 			if len(games) != tt.expectedCount {
 				t.Errorf("expected %d games, got %d", tt.expectedCount, len(games))

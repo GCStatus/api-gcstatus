@@ -35,6 +35,10 @@ func (h *GameService) Search(input string) ([]domain.Game, error) {
 	return h.repo.Search(input)
 }
 
+func (h *GameService) CalendarGames() ([]domain.Game, error) {
+	return h.repo.CalendarGames()
+}
+
 func (h *GameService) FindByClassification(classification string, filterable string) ([]domain.Game, error) {
 	validClassifications := map[string]bool{
 		"categories":  true,

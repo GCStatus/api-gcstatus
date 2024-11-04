@@ -779,6 +779,78 @@ func TestGameRepositoryMySQL_FindByClassification(t *testing.T) {
 	}
 }
 
+func TestGameRepositoryMySQL_CalendarGames(t *testing.T) {
+	fixedTime := time.Now()
+	gormDB, mock := testutils.Setup(t)
+	repo := db.NewGameRepositoryMySQL(gormDB)
+
+	testCases := map[string]struct {
+		mockBehavior func()
+		expected     []domain.Game
+		expectedErr  error
+	}{
+		"matching records": {
+			mockBehavior: func() {
+				rows := sqlmock.NewRows([]string{"id", "release_date"}).
+					AddRow(1, fixedTime.AddDate(0, 1, 0)).
+					AddRow(2, fixedTime.AddDate(0, 6, 0))
+
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `games` WHERE release_date >= ? AND `games`.`deleted_at` IS NULL LIMIT ?")).
+					WithArgs(sqlmock.AnyArg(), 100).
+					WillReturnRows(rows)
+
+				crackRows := mock.NewRows([]string{"id", "status", "cracked_at", "cracker_id", "protection_id", "game_id"}).
+					AddRow(1, "uncracked", fixedTime, 1, 1, 1).
+					AddRow(2, "uncracked", fixedTime, 1, 1, 2)
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `cracks` WHERE `cracks`.`game_id` IN (?,?) AND `cracks`.`deleted_at` IS NULL")).
+					WithArgs(1, 2).
+					WillReturnRows(crackRows)
+			},
+			expected: []domain.Game{
+				{ID: 1},
+				{ID: 2},
+			},
+			expectedErr: nil,
+		},
+		"no matching records": {
+			mockBehavior: func() {
+				rows := sqlmock.NewRows([]string{"id", "title", "description", "about", "short_description"})
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `games` WHERE release_date >= ? AND `games`.`deleted_at` IS NULL LIMIT ?")).
+					WithArgs(sqlmock.AnyArg(), 100).
+					WillReturnRows(rows)
+			},
+			expected:    []domain.Game{},
+			expectedErr: nil,
+		},
+		"query error": {
+			mockBehavior: func() {
+				mock.ExpectQuery(regexp.QuoteMeta("SELECT * FROM `games` WHERE release_date >= ? AND `games`.`deleted_at` IS NULL LIMIT ?")).
+					WithArgs(sqlmock.AnyArg(), 100).
+					WillReturnError(errors.New("query error"))
+			},
+			expected:    nil,
+			expectedErr: errors.New("query error"),
+		},
+	}
+
+	for name, tc := range testCases {
+		t.Run(name, func(t *testing.T) {
+			tc.mockBehavior()
+
+			games, err := repo.CalendarGames()
+
+			assert.Equal(t, tc.expectedErr, err)
+
+			expectedIDs := extractIDs(tc.expected)
+			actualIDs := extractIDs(games)
+
+			assert.Equal(t, expectedIDs, actualIDs)
+
+			assert.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
 func gameRepositoryMySQL_GamesEqual(expected, actual []domain.Game) bool {
 	if len(expected) != len(actual) {
 		return false

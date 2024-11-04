@@ -51,6 +51,55 @@ func (h *GameHandler) FindBySlug(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+func (h *GameHandler) FindByCondition(c *gin.Context) {
+	condition := c.Param("condition")
+	authUserID := utils.GetAuthenticatedUserID(c, h.userService.GetUserByID)
+
+	var userID uint
+	if authUserID != nil {
+		userID = *authUserID
+	}
+
+	games, err := h.gameService.FindGamesByCondition(condition, utils.UintPtr(100))
+	if err != nil {
+		RespondWithError(c, http.StatusInternalServerError, "Failed to find games by condition.")
+		log.Printf("failed to find games by condition: %+v", err)
+		return
+	}
+
+	transformedGames := resources.TransformGames(games, s3.GlobalS3Client, userID)
+
+	response := resources.Response{
+		Data: transformedGames,
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *GameHandler) CalendarGames(c *gin.Context) {
+	authUserID := utils.GetAuthenticatedUserID(c, h.userService.GetUserByID)
+
+	var userID uint
+	if authUserID != nil {
+		userID = *authUserID
+	}
+
+	games, err := h.gameService.CalendarGames()
+	if err != nil {
+		RespondWithError(c, http.StatusInternalServerError, "Failed to find calendar games.")
+		log.Printf("failed to find calendar games: %+v", err)
+		return
+	}
+
+	transformedGames := resources.TransformGames(games, s3.GlobalS3Client, userID)
+
+	response := resources.Response{
+		Data: transformedGames,
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *GameHandler) Search(c *gin.Context) {
 	authUserID := utils.GetAuthenticatedUserID(c, h.userService.GetUserByID)
 

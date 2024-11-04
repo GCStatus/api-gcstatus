@@ -292,3 +292,19 @@ func (h *GameRepositoryMySQL) FindByClassification(classification string, filter
 
 	return games, nil
 }
+
+func (h *GameRepositoryMySQL) CalendarGames() ([]domain.Game, error) {
+	var games []domain.Game
+
+	now := time.Now()
+
+	oneMonthAgo := now.AddDate(0, -1, 0)
+
+	err := h.db.Model(&domain.Game{}).
+		Preload("Crack").
+		Where("release_date >= ?", oneMonthAgo).
+		Limit(100).
+		Find(&games).Error
+
+	return games, err
+}
