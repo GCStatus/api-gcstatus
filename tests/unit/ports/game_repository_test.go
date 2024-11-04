@@ -557,15 +557,14 @@ func TestMockGameRepository_FindByClassification(t *testing.T) {
 func TestMockGameRepository_CalendarGames(t *testing.T) {
 	fixedTime := time.Now()
 	startDate := fixedTime.AddDate(0, -1, 0)
-	mockRepo := NewMockGameRepository()
 
 	tests := map[string]struct {
 		expectedCount int
-		mockBehavior  func()
+		mockBehavior  func(mockRepo *MockGameRepository)
 	}{
 		"Find all games for calendar": {
 			expectedCount: 3,
-			mockBehavior: func() {
+			mockBehavior: func(mockRepo *MockGameRepository) {
 				if err := mockRepo.CreateGame(&domain.Game{ID: 1, ReleaseDate: fixedTime}); err != nil {
 					t.Fatalf("Failed to create game: %+v", err)
 				}
@@ -579,7 +578,7 @@ func TestMockGameRepository_CalendarGames(t *testing.T) {
 		},
 		"No games found": {
 			expectedCount: 0,
-			mockBehavior: func() {
+			mockBehavior: func(mockRepo *MockGameRepository) {
 				if err := mockRepo.CreateGame(&domain.Game{ID: 1, ReleaseDate: fixedTime.AddDate(-1, 0, 0)}); err != nil {
 					t.Fatalf("Failed to create game: %+v", err)
 				}
@@ -592,7 +591,9 @@ func TestMockGameRepository_CalendarGames(t *testing.T) {
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			tt.mockBehavior()
+			mockRepo := NewMockGameRepository()
+
+			tt.mockBehavior(mockRepo)
 
 			games, _ := mockRepo.CalendarGames()
 
