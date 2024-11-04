@@ -138,6 +138,17 @@
   - [x] Method should return 9 hot games
   - [x] Method should return 9 most liked games
   - [x] Method should return 9 upcoming games
+- [x] Create the search method for games
+- [x] Create search by classifications
+  - [x] Search by developers
+  - [x] Search by publishers
+  - [x] Search by crackers
+  - [x] Search by cracks
+  - [x] Search by tags
+  - [x] Search by categories
+  - [x] Search by platforms
+  - [x] Search by genres
+  - [x] Search by protections
 - [x] Admin system
   - [x] Create login method for admin
     - [x] Find by email
