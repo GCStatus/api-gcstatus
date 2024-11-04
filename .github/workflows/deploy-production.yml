@@ -89,7 +89,7 @@ jobs:
             done
             echo "Container is healthy!"
 
-      - name: Cleanup old Docker images
+      - name: Cleanup old Docker containers and images
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ env.EC2_HOST }}
@@ -97,9 +97,14 @@ jobs:
           key: ${{ env.EC2_SSH_KEY }}
           port: ${{ env.EC2_PORT }}
           script: |
-            echo "Cleaning up unused Docker images..."
-            IMAGE_ID=$(docker images -f "dangling=true" -q)
-            if [ -n "$IMAGE_ID" ]; then
-              docker rmi $IMAGE_ID || true
-            fi
-            echo "Old images cleaned."
+            echo "Stopping and removing all containers except the currently running container..."
+            docker ps -aq --filter "name=$DOCKER_CONTAINER" --filter "status=exited" | xargs -r docker rm -f
+
+            echo "Removing unused images to free up space..."
+            docker image prune -af || true
+
+            echo "Pruning unused networks and volumes to reclaim space..."
+            docker network prune -f || true
+            docker volume prune -f || true
+
+            echo "Cleanup complete."
