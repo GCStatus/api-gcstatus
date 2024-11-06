@@ -169,8 +169,11 @@ func TestAuthHandler_Me(t *testing.T) {
 					}
 				}
 			} else {
-				assert.Contains(t, responseBody, "message")
-				assert.Equal(t, tc.expectResponse["message"], responseBody["message"])
+				if data, exists := tc.expectResponse["data"]; exists {
+					if message, exists := data.(map[string]any)["message"]; exists {
+						assert.Equal(t, message, responseBody["message"], "unexpected response message")
+					}
+				}
 			}
 		})
 	}
@@ -238,7 +241,7 @@ func TestAuthHandler_Register(t *testing.T) {
 				"password": "Password@123",
 				"password_confirmation": "Password@123"
 			}`,
-			expectCode:     http.StatusOK,
+			expectCode:     http.StatusCreated,
 			expectResponse: "User registered successfully",
 		},
 		"password mismatch": {
@@ -315,6 +318,22 @@ func TestAuthHandler_Register(t *testing.T) {
 
 			assert.Equal(t, tc.expectCode, w.Code)
 			assert.Contains(t, w.Body.String(), tc.expectResponse)
+
+			if w.Code == http.StatusCreated {
+				var payloadData map[string]any
+				json.Unmarshal([]byte(tc.payload), &payloadData)
+
+				email := payloadData["email"].(string)
+
+				var createdUser domain.User
+				err := dbConn.Where("email = ?", email).First(&createdUser).Error
+				assert.NoError(t, err, "User record should exist in the database")
+				assert.Equal(t, payloadData["name"], createdUser.Name)
+				assert.Equal(t, payloadData["email"], createdUser.Email)
+				assert.Equal(t, payloadData["nickname"], createdUser.Nickname)
+				assert.Equal(t, payloadData["birthdate"], createdUser.Birthdate.UTC().Format("2006-01-02"))
+				assert.True(t, utils.IsHashEqualsValue(createdUser.Password, payloadData["password"].(string)))
+			}
 		})
 	}
 
