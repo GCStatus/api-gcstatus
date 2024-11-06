@@ -5,7 +5,6 @@ import (
 	"gcstatus/config"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/errors"
-	"gcstatus/internal/ports"
 	"gcstatus/internal/resources"
 	"gcstatus/internal/utils"
 	"gcstatus/pkg/s3"
@@ -27,7 +26,6 @@ type UserAuthenticator interface {
 }
 
 type AuthService struct {
-	repo        ports.AuthRepository
 	env         config.Config
 	userService UserAuthenticator
 }
@@ -51,12 +49,10 @@ func (h *AuthService) SetUserService(userService *UserService) {
 }
 
 func NewAuthService(
-	repo ports.AuthRepository,
 	env config.Config,
 	userService UserAuthenticator,
 ) *AuthService {
 	return &AuthService{
-		repo:        repo,
 		env:         env,
 		userService: userService,
 	}

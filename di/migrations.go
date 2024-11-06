@@ -8,7 +8,17 @@ import (
 )
 
 func MigrateModels(dbConn *gorm.DB) {
-	models := []any{
+	models := GetModels()
+
+	for _, model := range models {
+		if err := dbConn.AutoMigrate(model); err != nil {
+			log.Fatalf("Failed to migrate model %T: %v", model, err)
+		}
+	}
+}
+
+func GetModels() []any {
+	return []any{
 		&domain.Reward{},
 		&domain.Level{},
 		&domain.Wallet{},
@@ -69,11 +79,5 @@ func MigrateModels(dbConn *gorm.DB) {
 		&domain.Permission{},
 		&domain.Roleable{},
 		&domain.Permissionable{},
-	}
-
-	for _, model := range models {
-		if err := dbConn.AutoMigrate(model); err != nil {
-			log.Fatalf("Failed to migrate model %T: %v", model, err)
-		}
 	}
 }

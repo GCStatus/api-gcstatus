@@ -12,8 +12,14 @@ type AuthHandler struct {
 	userService *usecases.UserService
 }
 
-func NewAuthHandler(authService *usecases.AuthService, userService *usecases.UserService) *AuthHandler {
-	return &AuthHandler{authService: authService, userService: userService}
+func NewAuthHandler(
+	authService *usecases.AuthService,
+	userService *usecases.UserService,
+) *AuthHandler {
+	return &AuthHandler{
+		authService: authService,
+		userService: userService,
+	}
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {

@@ -55,7 +55,7 @@ func Setup(dbConn *gorm.DB, env config.Config) (
 
 	// Create service instances
 	userService := usecases.NewUserService(userRepo)
-	authService := usecases.NewAuthService(nil, env, nil)
+	authService := usecases.NewAuthService(env, nil)
 	passwordResetService := usecases.NewPasswordResetService(passwordResetRepo)
 	levelService := usecases.NewLevelService(levelRepo)
 	profileService := usecases.NewProfileService(profileRepo)
@@ -75,6 +75,7 @@ func Setup(dbConn *gorm.DB, env config.Config) (
 	heartService := usecases.NewHeartService(heartRepo)
 	commentService := usecases.NewCommentService(commentRepo)
 
+	// Set dependencies that require service instances to avoid circular references
 	authService.SetUserService(userService)
 
 	return userService,
