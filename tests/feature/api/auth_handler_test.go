@@ -9,7 +9,6 @@ import (
 	"gcstatus/internal/domain"
 	"gcstatus/internal/usecases"
 	"gcstatus/internal/utils"
-	data_test "gcstatus/tests/data"
 	test_mocks "gcstatus/tests/data/mocks"
 	testutils "gcstatus/tests/utils"
 	"net/http"
@@ -29,9 +28,7 @@ var authTruncateModels = []any{
 	&domain.Profile{},
 }
 
-func setupAuthHandler(t *testing.T, dbConn *gorm.DB) *api.AuthHandler {
-	data_test.Seed(t, dbConn)
-
+func setupAuthHandler(dbConn *gorm.DB) *api.AuthHandler {
 	userService := usecases.NewUserService(db.NewUserRepositoryMySQL(dbConn))
 	authService := usecases.NewAuthService(*config.LoadConfig(), userService)
 	return api.NewAuthHandler(authService, userService)
@@ -43,7 +40,7 @@ func TestAuthHandler_Login(t *testing.T) {
 		t.Fatalf("failed to create dummy user: %+v", err)
 	}
 
-	authHandler := setupAuthHandler(t, dbConn)
+	authHandler := setupAuthHandler(dbConn)
 
 	tests := map[string]struct {
 		payload        string
@@ -99,7 +96,7 @@ func TestAuthHandler_Me(t *testing.T) {
 		t.Fatalf("failed to create dummy user: %+v", err)
 	}
 
-	authHandler := setupAuthHandler(t, dbConn)
+	authHandler := setupAuthHandler(dbConn)
 
 	tests := map[string]struct {
 		authToken      string
@@ -184,7 +181,7 @@ func TestAuthHandler_Me(t *testing.T) {
 }
 
 func TestAuthHandler_Logout(t *testing.T) {
-	authHandler := setupAuthHandler(t, dbConn)
+	authHandler := setupAuthHandler(dbConn)
 
 	tests := map[string]struct {
 		expectCode     int
@@ -225,7 +222,7 @@ func TestAuthHandler_Logout(t *testing.T) {
 }
 
 func TestAuthHandler_Register(t *testing.T) {
-	authHandler := setupAuthHandler(t, dbConn)
+	authHandler := setupAuthHandler(dbConn)
 
 	tests := map[string]struct {
 		payload        string

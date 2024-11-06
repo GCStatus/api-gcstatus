@@ -7,6 +7,7 @@ import (
 	"gcstatus/di"
 	"gcstatus/internal/domain"
 	"gcstatus/internal/utils"
+	data_test "gcstatus/tests/data"
 	"net/http/httptest"
 	"path/filepath"
 	"runtime"
@@ -120,12 +121,13 @@ func SetupTestDB(t *testing.T) (*gorm.DB, *config.Config) {
 	}
 
 	models := di.GetModels()
-
 	for _, model := range models {
 		if err := dbConn.AutoMigrate(model); err != nil {
 			t.Fatalf("Failed to migrate table for model %T: %v", model, err)
 		}
 	}
+
+	data_test.Seed(t, dbConn)
 
 	return dbConn, env
 }
