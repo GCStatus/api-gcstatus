@@ -8,7 +8,6 @@ import (
 )
 
 func CreateDummyComment(t *testing.T, dbConn *gorm.DB, overrides *domain.Commentable) (*domain.Commentable, error) {
-
 	defaultComment := domain.Commentable{
 		Comment:         "Testing comment",
 		CommentableID:   1,

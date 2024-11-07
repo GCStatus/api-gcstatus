@@ -1,7 +1,6 @@
 package api
 
 import (
-	"gcstatus/internal/resources"
 	"gcstatus/internal/usecases"
 	"net/http"
 
@@ -17,16 +16,10 @@ func NewLevelHandler(levelService *usecases.LevelService) *LevelHandler {
 }
 
 func (h *LevelHandler) GetAll(c *gin.Context) {
-	levels, err := h.levelService.GetAll()
+	response, err := h.levelService.GetAll()
 	if err != nil {
-		RespondWithError(c, http.StatusInternalServerError, err.Error())
+		RespondWithError(c, err.Code, err.Error())
 		return
-	}
-
-	transformedLevels := resources.TransformLevels(levels)
-
-	response := resources.Response{
-		Data: transformedLevels,
 	}
 
 	c.JSON(http.StatusOK, response)

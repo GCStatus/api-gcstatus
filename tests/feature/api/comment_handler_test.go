@@ -100,7 +100,9 @@ func TestCommentHandler_Create(t *testing.T) {
 				assert.NoError(t, err, "Comment record should exist in the database")
 
 				var payloadData map[string]any
-				json.Unmarshal([]byte(tc.payload), &payloadData)
+				if err := json.Unmarshal([]byte(tc.payload), &payloadData); err != nil {
+					t.Fatalf("failed to unmarshal payload body: %+v", err)
+				}
 
 				assert.Equal(t, payloadData["comment"], createdComment.Comment)
 				assert.Equal(t, uint(payloadData["commentable_id"].(float64)), createdComment.CommentableID)
@@ -208,8 +210,7 @@ func TestCommentHandler_Delete(t *testing.T) {
 			assert.Equal(t, tc.expectCode, w.Code)
 
 			var responseBody map[string]any
-			err = json.Unmarshal(w.Body.Bytes(), &responseBody)
-			if err != nil {
+			if err = json.Unmarshal(w.Body.Bytes(), &responseBody); err != nil {
 				t.Fatalf("failed to parse JSON response: %+v", err)
 			}
 

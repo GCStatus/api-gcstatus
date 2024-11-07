@@ -321,7 +321,9 @@ func TestAuthHandler_Register(t *testing.T) {
 
 			if w.Code == http.StatusCreated {
 				var payloadData map[string]any
-				json.Unmarshal([]byte(tc.payload), &payloadData)
+				if err := json.Unmarshal([]byte(tc.payload), &payloadData); err != nil {
+					t.Fatalf("failed to unmarshal payload body: %+v", err)
+				}
 
 				email := payloadData["email"].(string)
 
