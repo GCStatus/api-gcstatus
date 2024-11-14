@@ -69,7 +69,7 @@ func InitDependencies() (
 		adminTagService,
 		adminGameService,
 		heartService,
-		commentService := Setup(dbConn)
+		commentService := Setup(dbConn, *cfg)
 
 	// Setup clients for non-test environment
 	if cfg.ENV != "testing" {

@@ -1,6 +1,7 @@
 package di
 
 import (
+	"gcstatus/config"
 	"gcstatus/internal/adapters/db"
 	db_admin "gcstatus/internal/adapters/db/admin"
 	"gcstatus/internal/usecases"
@@ -9,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func Setup(dbConn *gorm.DB) (
+func Setup(dbConn *gorm.DB, env config.Config) (
 	*usecases.UserService,
 	*usecases.AuthService,
 	*usecases.PasswordResetService,
@@ -54,7 +55,7 @@ func Setup(dbConn *gorm.DB) (
 
 	// Create service instances
 	userService := usecases.NewUserService(userRepo)
-	authService := usecases.NewAuthService(nil)
+	authService := usecases.NewAuthService(env, nil)
 	passwordResetService := usecases.NewPasswordResetService(passwordResetRepo)
 	levelService := usecases.NewLevelService(levelRepo)
 	profileService := usecases.NewProfileService(profileRepo)
@@ -73,6 +74,9 @@ func Setup(dbConn *gorm.DB) (
 	adminGameService := usecases_admin.NewAdminGameService(adminGameRepo)
 	heartService := usecases.NewHeartService(heartRepo)
 	commentService := usecases.NewCommentService(commentRepo)
+
+	// Set dependencies that require service instances to avoid circular references
+	authService.SetUserService(userService)
 
 	return userService,
 		authService,

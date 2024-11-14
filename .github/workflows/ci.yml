@@ -14,10 +14,25 @@ env:
   DOCKER_HUB_PAT: ${{ secrets.DOCKER_HUB_PAT }}
   DOCKER_CONTAINER: gcstatus-api
   DOCKER_PORT: ${{ secrets.DOCKER_PORT }}
+  DB_NAME: test_db
+  DB_HOST: 127.0.0.1
 
 jobs:
   tests:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+          MYSQL_DATABASE: ${{ env.DB_NAME }}
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 3306:3306
     strategy:
       fail-fast: true
       matrix:
@@ -45,6 +60,13 @@ jobs:
         run: |
           go mod download
           go mod vendor
+
+      - name: Wait for MySQL to be ready
+        run: |
+          until mysqladmin ping -h ${{ env.DB_HOST }} --silent; do
+            echo "Waiting for MySQL..."
+            sleep 1
+          done
 
       - name: Execute tests
         run: go test ./tests/... -coverprofile=coverage.txt

@@ -1,9 +1,9 @@
 package api
 
 import (
+	"gcstatus/internal/ports"
 	"gcstatus/internal/usecases"
 	"gcstatus/internal/utils"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -25,13 +25,10 @@ func NewHeartHandler(
 }
 
 func (h *HeartHandler) ToggleHeartable(c *gin.Context) {
-	var request struct {
-		HeartableID   uint   `json:"heartable_id" binding:"required"`
-		HeartableType string `json:"heartable_type" binding:"required"`
-	}
+	var request ports.HeartTogglePayload
 
 	if err := c.ShouldBindJSON(&request); err != nil {
-		RespondWithError(c, http.StatusBadRequest, "Invalid request data")
+		RespondWithError(c, http.StatusUnprocessableEntity, "Invalid request data")
 		return
 	}
 
@@ -41,9 +38,11 @@ func (h *HeartHandler) ToggleHeartable(c *gin.Context) {
 		return
 	}
 
-	if err := h.heartService.ToggleHeartable(request.HeartableID, request.HeartableType, user.ID); err != nil {
-		RespondWithError(c, http.StatusInternalServerError, "Failed to save heart.")
-		log.Printf("failed to save user heart: %+v", err)
+	response, httpErr := h.heartService.ToggleHeartable(request.HeartableID, request.HeartableType, user.ID)
+	if httpErr != nil {
+		RespondWithError(c, httpErr.Code, httpErr.Error())
 		return
 	}
+
+	c.JSON(http.StatusOK, response)
 }
