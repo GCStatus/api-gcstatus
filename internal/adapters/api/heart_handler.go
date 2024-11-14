@@ -39,7 +39,7 @@ func (h *HeartHandler) ToggleHeartable(c *gin.Context) {
 	}
 
 	response, httpErr := h.heartService.ToggleHeartable(request.HeartableID, request.HeartableType, user.ID)
-	if err != nil {
+	if httpErr != nil {
 		RespondWithError(c, httpErr.Code, httpErr.Error())
 		return
 	}

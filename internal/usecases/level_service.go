@@ -22,7 +22,13 @@ func (h *LevelService) GetAll() (resources.Response, *errors.HttpError) {
 		return resources.Response{}, errors.NewHttpError(http.StatusInternalServerError, "Failed to fetch platform levels.")
 	}
 
-	transformedLevels := resources.TransformLevels(levels)
+	var transformedLevels []resources.LevelResource
+
+	if len(levels) > 0 {
+		transformedLevels = resources.TransformLevels(levels)
+	} else {
+		transformedLevels = []resources.LevelResource{}
+	}
 
 	return resources.Response{
 		Data: transformedLevels,
